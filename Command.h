@@ -7,12 +7,12 @@
 class Command
 {
 public:
-    Command(CmdType type):type(type){}
+    Command(CMD_TYPE_UINT32_ENUM type):type(type){}
     
     void doCommand(CommandDoer &cd);
 
 private:
-    CmdType type;
+    CMD_TYPE_UINT32_ENUM type;
 
 };
 

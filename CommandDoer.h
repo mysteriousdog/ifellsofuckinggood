@@ -7,7 +7,7 @@
 class CommandDoer
 {
 public:
-    virtual void doCommand(CmdType& cmdType)=0;
+    virtual void doCommand(CMD_TYPE_UINT32_ENUM cmdType)=0;
 private:
 
 };

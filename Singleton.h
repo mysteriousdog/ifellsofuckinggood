@@ -12,12 +12,13 @@ public:
     virtual ~Singleton(){};
 protected:
     Singleton(){};
+    Singleton(const Singleton& s);
+    Singleton& operator = (Singleton& s);
 private:
-  Singleton(const Singleton& s);
-  Singleton& operator = (Singleton& s);
+  
 
 };
 
-#define GET_SINGLE(name) #name->getInstance();
+#define GET_SINGLE(name) #name::getInstance();
 
 #endif

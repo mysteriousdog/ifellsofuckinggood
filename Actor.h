@@ -4,14 +4,22 @@
 #include "Singleton.h"
 #include "CommandDoer.h"
 #include "MyEnum.h"
+#include "GameObj.h"
 
-class Actor : public CommandDoer, public Singleton<Actor>
+class Actor : public CommandDoer, public Singleton<Actor>, public GameObj
 {
 public:
-    virtual void doCommand(CmdType& cmdType);
+    void action();
+    virtual void doCommand(CMD_TYPE_UINT32_ENUM cmdType) override;
+    virtual void update() override;
+protected:
+    Actor(){}
 private:
     void moveUp();
-
+    void moveDown();
+    void moveLeft();
+    void moveRight();
+friend class Singleton;
 };
 
 #endif
