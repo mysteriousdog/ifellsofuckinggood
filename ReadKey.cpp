@@ -1,4 +1,5 @@
 #include "ReadKey.h"
+#include "Command.h"
 #include <stdio.h>
 #include <iostream>
 #include<unistd.h>
@@ -21,7 +22,8 @@ CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
     in = getchar();
     
     tcsetattr(0,TCSANOW,&stored_settings);
-    cmdQue.push(cmd[in]);
+    Command* comd = new Command(cmd[in]);
+    cmdQue.push(comd);
     return cmd[in];
 }
 
@@ -33,12 +35,12 @@ ReadKey::ReadKey()
     cmd[100] = CMD_MOVE_RIGHT;
 }
 
-CMD_TYPE_UINT32_ENUM ReadKey::getCmd()
+Command* ReadKey::getCmd()
 {
     if (cmdQue.empty()) {
-        return CMD_BUTTON;
+        return nullptr;
     }
-    CMD_TYPE_UINT32_ENUM cmd = cmdQue.front();
+    Command* cmd = cmdQue.front();
     cmdQue.pop();
     return cmd;
 }

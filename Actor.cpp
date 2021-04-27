@@ -1,6 +1,7 @@
 #include "Actor.h"
 #include "MyEnum.h"
 #include "ReadKey.h"
+#include "Command.h"
 #include <iostream>
 using namespace std;
 
@@ -26,8 +27,8 @@ void Actor::moveRight()
 
 void Actor::action()
 {
-    CMD_TYPE_UINT32_ENUM cmd = ReadKey::getInstance().getCmd();
-    doCommand(cmd);
+    Command* cmd = ReadKey::getInstance().getCmd();
+    cmd->doCommand(*this);
 }
 
 void Actor::doCommand(CMD_TYPE_UINT32_ENUM cmdType)

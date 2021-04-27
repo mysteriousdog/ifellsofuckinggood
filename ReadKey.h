@@ -11,13 +11,13 @@ class ReadKey : public Singleton<ReadKey>
 {
 public:
     CMD_TYPE_UINT32_ENUM scanKeyBoard();
-    CMD_TYPE_UINT32_ENUM getCmd();
+    Command* getCmd();
 protected:
     ReadKey();
 private:
     
     std::map<int, CMD_TYPE_UINT32_ENUM> cmd;
-    std::queue<CMD_TYPE_UINT32_ENUM> cmdQue;
+    std::queue<Command*> cmdQue;
 friend class Singleton;
 };
 
