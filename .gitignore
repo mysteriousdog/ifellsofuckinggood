@@ -1,3 +1,14 @@
 test
 .DS_Store
 .vscode/settings.json
+client/client
+client/client.cpp
+server/myepoll.h
+server/server.cpp
+server/sever
+Game.o
+test.o
+ReadKey.o
+Command.o
+Actor.o
+u.txt
