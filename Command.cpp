@@ -2,18 +2,16 @@
 #include "MyEnum.h"
 #include <iostream>
 #include <sstream>
-#include <string>
+#include <string.h>
 
 void Command::doCommand(CommandDoer &cd)
 {
     cd.doCommand(type);
 }
 
-std::stringstream* Command::getSeqData()
+tansObj* Command::getSeqData()
 {
-    std::stringstream* ss = new std::stringstream();
-    *ss<<"#type:";
-    *ss<<type;
-    *ss<<"#";
-    return ss;
+    tansObj* obj = new tansObj(MSG_CMD, sizeof(*this));
+    memcpy(obj->msg, (void*)this, obj->len);
+    return obj;
 }

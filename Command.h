@@ -11,12 +11,12 @@ public:
     Command(CMD_TYPE_UINT32_ENUM type_):type(type_){}
     
     void doCommand(CommandDoer &cd);
-    virtual std::stringstream* getSeqData() override;
-
+    virtual tansObj* getSeqData() override;
+    CMD_TYPE_UINT32_ENUM getType() {
+        return type;
+    }
 private:
     CMD_TYPE_UINT32_ENUM type;
-
-
 
 };
 

@@ -29,10 +29,14 @@ public:
         return data.front();
     }
 
-    void pop(T& value){
+    T pop(){
         lock_guard<mutex> lock(m);
-        value = data.front();
+        if (data.empty()) {
+            return nullptr;
+        }
+        T value = data.front();
         data.pop();
+        return value;
     }
     bool empty() {
         lock_guard<mutex> lock(m);

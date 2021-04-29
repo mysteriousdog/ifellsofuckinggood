@@ -10,6 +10,15 @@ typedef enum CmdType{
     CMD_MOVE_RIGHT,
     CMD_BUTTON
 } cmdType;
-typedef uint32_t CMD_TYPE_UINT32_ENUM;
+typedef unsigned int CMD_TYPE_UINT32_ENUM;
+
+
+typedef enum MsgType{
+    MSG_CMD = 0,
+    MSG_BUTTON
+} msgType;
+typedef unsigned int MSG_TYPE_UINT32_ENUM;
+
+
 
 #endif

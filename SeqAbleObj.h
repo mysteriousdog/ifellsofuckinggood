@@ -1,11 +1,23 @@
 #ifndef _SEQABLEOBJ_H_
 #define _SEQABLEOBJ_H_
-#include <sstream>
+#include <stdint.h>
+#include <stdlib.h>
+#include "MyEnum.h"
+typedef struct TransObj
+{
+    MSG_TYPE_UINT32_ENUM msgType;
+    unsigned int len;
+    void *msg;
+    TransObj():msgType(0),len(0){}
+    TransObj(MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_):msgType(msgType_),len(len_){
+        msg = malloc(len);
+    }
+}tansObj;
 
 class SeqAbleObj
 {
 public:
-    virtual std::stringstream* getSeqData()=0;
+    virtual tansObj* getSeqData()=0;
     virtual ~SeqAbleObj(){}
 };
 

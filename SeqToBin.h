@@ -9,7 +9,7 @@
 #include <sstream>
 #include <queue>
 using namespace std;
-
+class Client;
 // ostream& operator<<(ostream& os,const T& cmd )
 // {
 // 	//空格分开,方便stream的读入
@@ -21,13 +21,14 @@ class SeqToBin : public Singleton<SeqToBin>
 public:
     void save2Bin(SeqAbleObj& obj)
     {
-        stringstream* ss = obj.getSeqData();
-        string s = ss->str();
-        buff.push(s);
-        delete ss;
+        tansObj* tansObj = obj.getSeqData();
+        buff.push(tansObj);
+    }
+    ConcQueue<tansObj*>& getBuff() {
+        return buff;
     }
 private:
-    ConcQueue<string> buff;
+    ConcQueue<tansObj*> buff;
 friend class Singleton;
 friend class client;
 };
