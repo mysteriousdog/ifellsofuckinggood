@@ -7,10 +7,12 @@ typedef struct TransObj
 {
     MSG_TYPE_UINT32_ENUM msgType;
     unsigned int len;
+    int id;
     void *msg;
     TransObj():msgType(0),len(0){}
     TransObj(MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_):msgType(msgType_),len(len_){
         msg = malloc(len);
+        id = 1;
     }
 }tansObj;
 

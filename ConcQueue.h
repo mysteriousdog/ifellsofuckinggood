@@ -30,7 +30,8 @@ public:
     }
 
     T pop(){
-        lock_guard<mutex> lock(m);
+        unique_lock<mutex> lock(m);
+        data_cond.wait(lock, [this] {return !(this->data.empty());});
         if (data.empty()) {
             return nullptr;
         }

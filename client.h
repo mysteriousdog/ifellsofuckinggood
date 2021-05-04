@@ -23,7 +23,7 @@ class Client
 
 public:
     Client();
-    Client(string& ip, int port);
+    Client(char* ip, int port);
     bool run();
     bool init();
 
@@ -32,7 +32,7 @@ private:
     struct sockaddr_in serverAddr;
     string rcvBuff;
     string sendBuff;
-    string ip;
+    char* ip;
     int port;
 };
 
