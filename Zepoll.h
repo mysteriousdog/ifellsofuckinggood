@@ -141,12 +141,12 @@ public:
 				std::cout << "Error reading from socket" << std::endl;
 			}
 			else if (received > 0) {
-				buffer[received] = 0;
-				std::cout << "Reading: " << buffer << std::endl;
+				// buffer[received] = 0;
+				std::cout << "Reading: " << std::endl;
 				if (strcmp(buffer, "stop") == 0) {
 					std::cout << "stop----" << std::endl;
 				}
-                std::cout << "Writing: " << buffer << std::endl;
+                std::cout << "Writing: " << std::endl;
                 if (send(fd, buffer, received, 0) != received)
 				{
 					std::cout << "Error writing to socket" << std::endl;
