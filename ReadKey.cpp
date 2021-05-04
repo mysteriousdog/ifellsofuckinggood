@@ -1,5 +1,6 @@
 #include "ReadKey.h"
 #include "Command.h"
+#include "SeqToBin.h"
 #include <stdio.h>
 #include <iostream>
 #include<unistd.h>
@@ -23,6 +24,10 @@ CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
     
     tcsetattr(0,TCSANOW,&stored_settings);
     Command* comd = new Command(cmd[in]);
+    SeqToBin& sb = SeqToBin::getInstance();
+    tansObj* obj = new tansObj(MSG_CMD, sizeof(Command));
+    memcpy(obj->msg, (void*)comd, obj->len);
+    sb.getBuff().push(obj);
     cmdQue.push(comd);
     return cmd[in];
 }

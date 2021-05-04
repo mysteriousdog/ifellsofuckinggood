@@ -38,12 +38,11 @@ bool Client::run()
         std::cout << "Error: connect" << std::endl;
         return false;
     }
-    int a;
-    cin>>a;
     SeqToBin& seq = SeqToBin::getInstance();
     char buf[255];
     int sendLen;
     int objSize = sizeof(TransObj);
+    cout<<"client thread begin !!"<<endl;
     while (true) {
         cout<<"wait for event..."<<endl;
         TransObj* tansObj = seq.getBuff().pop();
@@ -60,11 +59,15 @@ bool Client::run()
         memset(buf, 0, sizeof(buf));
         int len = recv(client, buf, sizeof(buf), 0);
         TransObj* recvTansObj = (TransObj*)buf;
+        std::cout << recvTansObj->id << std::endl;
         std::cout << recvTansObj->msgType << std::endl;
         std::cout << recvTansObj->len << std::endl;
         Command* cmd = (Command*)recvTansObj->msg;
         std::cout << cmd->getType() << std::endl;
-        break;
+        if (cmd->getType() == CMD_MOVE_DOWN) {
+            cout<<"out"<<endl;
+            break;
+        }
     }
     // TransObj* tansObj = seq.getBuff().pop();
     // char buff[255];
@@ -93,8 +96,8 @@ bool Client::run()
 
 void Client::operator () ()
 {
-    ip = "121.5.41.213";
-    port = 8877;
+    // ip = "121.5.41.213";
+    // port = 8877;
     init();
     run();
 }

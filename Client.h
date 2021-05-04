@@ -27,13 +27,12 @@ public:
     bool run();
     bool init();
     void operator () ();
-
 private:
     int client;
     struct sockaddr_in serverAddr;
     string rcvBuff;
     string sendBuff;
-    char* ip;
+    char const* ip;
     int port;
 };
 
