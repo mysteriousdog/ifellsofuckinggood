@@ -13,3 +13,5 @@ Command.o
 Actor.o
 u.txt
 server/server
+Makefile
+Client.cpp

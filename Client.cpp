@@ -45,6 +45,7 @@ bool Client::run()
     int sendLen;
     int objSize = sizeof(TransObj);
     while (true) {
+        cout<<"wait for event..."<<endl;
         TransObj* tansObj = seq.getBuff().pop();
         if (tansObj == nullptr) {
             continue;
@@ -87,4 +88,13 @@ bool Client::run()
     // close(client);
     close(client);
     return true;
+}
+
+
+void Client::operator () ()
+{
+    ip = "121.5.41.213";
+    port = 8877;
+    init();
+    run();
 }
