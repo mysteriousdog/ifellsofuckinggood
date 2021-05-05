@@ -40,6 +40,7 @@ bool Client::run()
     }
     SeqToBin& seq = SeqToBin::getInstance();
     char buf[255];
+    char buf2[255];
     int sendLen;
     int objSize = sizeof(TransObj);
     cout<<"client thread begin !!"<<endl;
@@ -49,16 +50,19 @@ bool Client::run()
         if (tansObj == nullptr) {
             continue;
         }
-        sendLen = objSize + tansObj->len;
-        memcpy((void*)buf, tansObj, sendLen);
+        
+        memcpy((void*)buf, tansObj, objSize);
+        // memcpy((void*)((TransObj*)buf)->msg, tansObj->msg, tansObj->len);
+        sendLen = objSize;
         send(client, buf, sendLen, 0);
+        delete(tansObj);
         // if (strcmp(buf, "exit") == 0) {
         //     std::cout << "...disconnect" << std::endl;
         //     break;
         // }
-        memset(buf, 0, sizeof(buf));
-        int len = recv(client, buf, sizeof(buf), 0);
-        TransObj* recvTansObj = (TransObj*)buf;
+        memset(buf2, 0, sizeof(buf2));
+        int len = recv(client, buf2, sizeof(buf2), 0);
+        TransObj* recvTansObj = (TransObj*)buf2;
         std::cout << recvTansObj->id << std::endl;
         std::cout << recvTansObj->msgType << std::endl;
         std::cout << recvTansObj->len << std::endl;
