@@ -15,9 +15,13 @@
 #include <fcntl.h>
 #include <iostream>
 #include <unordered_map>
+#include "ConRedis.h"
+#include "HandleMsg.h"
+#include "Actor.h"
+#include <string.h>
 
 #define MAX_PENDING 1024
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 255
 
 class Handler {
 public:
@@ -142,11 +146,27 @@ public:
 			}
 			else if (received > 0) {
 				// buffer[received] = 0;
+
+				
+
 				std::cout << "Reading: " << std::endl;
 				if (strcmp(buffer, "stop") == 0) {
 					std::cout << "stop----" << std::endl;
 				}
                 std::cout << "Writing: " << std::endl;
+				// MsgHandler& msgHandler =  MsgHandler::getInstance();
+				// msgHandler.handle((TransObj*)buffer);
+				TransObj* obj = (TransObj*)buffer;
+				cout<<"obj->msgType "<<obj->msgType<<endl;
+				cout<<"obj->id "<<obj->id<<endl;
+				cout<<"obj->len "<<obj->len<<endl;
+				// Command* cmd = (Command*)obj->msg;
+				Command cmd(0);
+				memcpy((void*)&cmd, (void*)obj->msg, obj->len);
+				// CMD_TYPE_UINT32_ENUM a = cmd->getType();
+				cout<<"cmd->type "<<cmd.getType()<<endl;
+				// Actor& actor = Actor::getInstance();
+				// cmd.doCommand(actor);
                 if (send(fd, buffer, received, 0) != received)
 				{
 					std::cout << "Error writing to socket" << std::endl;

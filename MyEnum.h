@@ -1,7 +1,7 @@
 #ifndef _MYENUM_H_
 #define _MYENUM_H_
 
-#include <stdint.h>
+
 
 typedef enum CmdType{
     CMD_MOVE_UP,
@@ -18,7 +18,6 @@ typedef enum MsgType{
     MSG_BUTTON
 } msgType;
 typedef unsigned int MSG_TYPE_UINT32_ENUM;
-
 
 
 #endif

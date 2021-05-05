@@ -5,6 +5,7 @@
 #include <iostream>
 #include<unistd.h>
 #include<termios.h>
+#include <string.h>
 
 CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
 {

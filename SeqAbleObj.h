@@ -3,15 +3,18 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "MyEnum.h"
+
+
+
+const int MAX_TRANS_MSG_LEN = 32;
 typedef struct TransObj
 {
     MSG_TYPE_UINT32_ENUM msgType;
     unsigned int len;
     int id;
-    void *msg;
+    char msg[MAX_TRANS_MSG_LEN];
     TransObj():msgType(0),len(0){}
     TransObj(MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_):msgType(msgType_),len(len_){
-        msg = malloc(len);
         id = 1;
     }
 }tansObj;
