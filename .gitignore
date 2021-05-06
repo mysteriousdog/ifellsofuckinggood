@@ -14,6 +14,8 @@ Actor.o
 u.txt
 server/server
 Makefile
-Client.cpp
+Makefile
 Client.o
-Client.o
+HandleMsg.o
+Server.o
+
