@@ -25,6 +25,7 @@ public:
     Client();
     Client(char* ip, int port);
     bool run();
+    bool recvMsg();
     bool init();
     void operator () ();
 private:

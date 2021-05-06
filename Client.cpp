@@ -97,6 +97,21 @@ bool Client::run()
     return true;
 }
 
+bool Client::recvMsg()
+{
+    if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+        std::cout << "Error: connect" << std::endl;
+        return false;
+    }
+    char buf[255];
+    SeqToBin& seq = SeqToBin::getInstance();
+    while (recv(client, buf, sizeof(buf), 0) > 0) {
+        TransObj* recvTansObj = (TransObj*)buf;
+        seq.getRcvBuff().push(recvTansObj);
+    }
+    return true;
+}
+
 
 void Client::operator () ()
 {
