@@ -1,6 +1,9 @@
 #include "Game.h"
 #include "ReadKey.h"
 #include "MyEnum.h"
+#include "HandleMsg.h"
+#include "SeqToBin.h"
+#include "ConcQueue.h"
 #include <sys/timeb.h>
 #include <iostream>
 using namespace std;
@@ -40,5 +43,12 @@ void Game::update()
     ReadKey& read = ReadKey::getInstance();
     read.scanKeyBoard();
     actor.update();
+    SeqToBin& seq = SeqToBin::getInstance();
+    TransObj* rcvObj;
+    if (seq.getRcvBuff().tryAndPop(rcvObj)) {
+        MsgHandler& msgHandler =  MsgHandler::getInstance();
+	    msgHandler.handle(rcvObj);
+    }
+    
     // cout<<"----------"<<endl;
 }

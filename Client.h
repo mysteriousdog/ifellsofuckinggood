@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include "MyEnum.h"
 using namespace std;
 
 const unsigned int RECV_BUFF = 255;
@@ -25,8 +26,11 @@ public:
     Client();
     Client(char* ip, int port);
     bool run();
+    bool recvMsg();
+    bool sendMsgOnce(int id, MSG_TYPE_UINT32_ENUM type, string& str);
     bool init();
     void operator () ();
+    void operator () (int rcv);
 private:
     int client;
     struct sockaddr_in serverAddr;

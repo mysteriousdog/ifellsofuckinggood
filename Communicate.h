@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-// class Message
+// class CommunMsg
 // {
 // public:
 //     M

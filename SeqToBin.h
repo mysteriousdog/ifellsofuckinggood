@@ -27,8 +27,12 @@ public:
     ConcQueue<tansObj*>& getBuff() {
         return buff;
     }
+    ConcQueue<tansObj*>& getRcvBuff() {
+        return rcvBuff;
+    }
 private:
     ConcQueue<tansObj*> buff;
+    ConcQueue<tansObj*> rcvBuff;
 friend class Singleton;
 friend class client;
 };
