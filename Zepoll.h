@@ -167,7 +167,7 @@ public:
 				cout<<"cmd->type "<<cmd.getType()<<endl;
 				// Actor& actor = Actor::getInstance();
 				// cmd.doCommand(actor);
-                if (send(fd, buffer, received, 0) != received)
+                if (send(6, buffer, received, 0) != received)
 				{
 					std::cout << "Error writing to socket" << std::endl;
 				}
