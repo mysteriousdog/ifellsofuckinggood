@@ -18,7 +18,7 @@ typedef struct MsgHandle{
 } msgHandle;
 
 void handleMsgCmd(TransObj* obj);
-
+void handleUserSendMsg(TransObj* obj);
 
 
 

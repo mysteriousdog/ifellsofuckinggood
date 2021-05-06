@@ -14,8 +14,7 @@ Actor.o
 u.txt
 server/server
 Makefile
-Makefile
 Client.o
 HandleMsg.o
 Server.o
-
+*.o

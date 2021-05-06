@@ -39,6 +39,17 @@ public:
         data.pop();
         return value;
     }
+
+    bool tryAndPop(T& value){
+        unique_lock<mutex> lock(m);
+        if (data.empty()) {
+            return false;
+        }
+        value = data.front();
+        data.pop();
+        return true;
+    }
+
     bool empty() {
         lock_guard<mutex> lock(m);
         return data.empty();

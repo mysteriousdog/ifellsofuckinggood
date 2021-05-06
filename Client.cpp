@@ -60,18 +60,18 @@ bool Client::run()
         //     std::cout << "...disconnect" << std::endl;
         //     break;
         // }
-        memset(buf2, 0, sizeof(buf2));
-        int len = recv(client, buf2, sizeof(buf2), 0);
-        TransObj* recvTansObj = (TransObj*)buf2;
-        std::cout << recvTansObj->id << std::endl;
-        std::cout << recvTansObj->msgType << std::endl;
-        std::cout << recvTansObj->len << std::endl;
-        Command* cmd = (Command*)recvTansObj->msg;
-        std::cout << cmd->getType() << std::endl;
-        if (cmd->getType() == CMD_MOVE_DOWN) {
-            cout<<"out"<<endl;
-            break;
-        }
+        // memset(buf2, 0, sizeof(buf2));
+        // int len = recv(client, buf2, sizeof(buf2), 0);
+        // TransObj* recvTansObj = (TransObj*)buf2;
+        // std::cout << recvTansObj->id << std::endl;
+        // std::cout << recvTansObj->msgType << std::endl;
+        // std::cout << recvTansObj->len << std::endl;
+        // Command* cmd = (Command*)recvTansObj->msg;
+        // std::cout << cmd->getType() << std::endl;
+        // if (cmd->getType() == CMD_MOVE_DOWN) {
+        //     cout<<"out"<<endl;
+        //     break;
+        // }
     }
     // TransObj* tansObj = seq.getBuff().pop();
     // char buff[255];
@@ -99,16 +99,36 @@ bool Client::run()
 
 bool Client::recvMsg()
 {
+    cout<<"rcv msg!!!"<<endl;
     if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         std::cout << "Error: connect" << std::endl;
         return false;
     }
     char buf[255];
     SeqToBin& seq = SeqToBin::getInstance();
+    string s("1");
+    sendMsgOnce(1, MSG_USER_RECV, s);
     while (recv(client, buf, sizeof(buf), 0) > 0) {
+        cout<<"rcv"<<endl;
         TransObj* recvTansObj = (TransObj*)buf;
+        std::cout << recvTansObj->id << std::endl;
+        std::cout << recvTansObj->msgType << std::endl;
+        std::cout << recvTansObj->len << std::endl;
+        Command* cmd = (Command*)recvTansObj->msg;
+        std::cout << cmd->getType() << std::endl;
         seq.getRcvBuff().push(recvTansObj);
     }
+    return true;
+}
+
+bool Client::sendMsgOnce(int id, MSG_TYPE_UINT32_ENUM type, string& str)
+{
+    char buf[255];
+    TransObj sendTansObj(id, type, str.length());
+
+    strcpy(sendTansObj.msg, str.c_str());
+    memcpy((void*)buf, (void*)(&sendTansObj), sizeof(TransObj));
+    send(client, buf, sizeof(buf), 0);
     return true;
 }
 
@@ -117,6 +137,12 @@ void Client::operator () ()
 {
     // ip = "121.5.41.213";
     // port = 8877;
-    init();
+    // init();
     run();
+}
+
+void Client::operator () (int rcv)
+{
+    // init();
+    recvMsg();
 }

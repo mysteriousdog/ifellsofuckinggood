@@ -2,7 +2,8 @@
 
 msgHandle g_msgHandle[] = {
 
-    {MSG_CMD, handleMsgCmd}
+    {MSG_CMD, handleMsgCmd},
+    {MSG_USER_SEND, handleUserSendMsg}
 };
 
 void MsgHandler::handle(TransObj* obj)
@@ -19,6 +20,14 @@ void MsgHandler::handle(TransObj* obj)
     }
 }
 
+void handleUserSendMsg(TransObj* obj) {
+    cout<<"get in handleUserSendMsg "<<endl;
+    char *msg = obj->msg;
+    cout<<"msg id"<<obj->id<<endl;
+    cout<<"msg msgType"<<obj->msgType<<endl;
+    cout<<"msg len"<<obj->len<<endl;
+    cout<<"msg "<<msg<<endl;   
+}
 
 void handleMsgCmd(TransObj* obj) {
     cout<<"get in handleMsgCmd "<<endl;
