@@ -8,7 +8,7 @@
 #include <iostream>
 using namespace std;
 
-typedef void (*MSG_HANDLE_FUNC_PTR)(TransObj*);
+typedef void (*MSG_HANDLE_FUNC_PTR)(TransObj*, int);
 
 typedef struct MsgHandle{
 
@@ -17,8 +17,8 @@ typedef struct MsgHandle{
 
 } msgHandle;
 
-void handleMsgCmd(TransObj* obj);
-void handleUserSendMsg(TransObj* obj);
+void handleMsgCmd(TransObj* obj, int fd);
+void handleUserSendMsg(TransObj* obj, int fd);
 
 
 
@@ -26,7 +26,7 @@ class MsgHandler : public Singleton<MsgHandler>
 {
 public:
 
-    void handle(TransObj* obj);
+    void handle(TransObj* obj, int fd);
 
 private:
     MsgHandler(){};

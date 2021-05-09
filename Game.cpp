@@ -48,7 +48,7 @@ void Game::update()
     if (seq.getRcvBuff().tryAndPop(rcvObj)) {
         cout<<"-----------get recv pop beg-----------"<<endl;
         MsgHandler& msgHandler =  MsgHandler::getInstance();
-	    msgHandler.handle(rcvObj);
+	    msgHandler.handle(rcvObj, -1);
         cout<<"-----------get recv pop end-----------"<<endl;
     }
     
