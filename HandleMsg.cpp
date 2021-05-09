@@ -1,12 +1,18 @@
 #include "HandleMsg.h"
+#include "redis_pool.h"
+#include "ComManger.h"
+#include "SeqToBin.h"
+#include <sys/socket.h>
+#include <vector>
+using namespace std;
 
 msgHandle g_msgHandle[] = {
 
     {MSG_CMD, handleMsgCmd},
-    {MSG_USER_SEND, handleUserSendMsg}
+    {MSG_USER_RECV, handleUserSendMsg}
 };
 
-void MsgHandler::handle(TransObj* obj)
+void MsgHandler::handle(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
         return;
@@ -15,23 +21,65 @@ void MsgHandler::handle(TransObj* obj)
         cout<<"now the g_msgHandle msgType is "<<g_msgHandle[loop].msgTye <<endl;
         cout<<"now the obj msgType is "<<obj->msgType <<endl;
         if (g_msgHandle[loop].msgTye == obj->msgType) {
-            g_msgHandle[loop].handler(obj);
+            g_msgHandle[loop].handler(obj, fd);
         }
     }
 }
 
-void handleUserSendMsg(TransObj* obj) {
+void handleUserSendMsg(TransObj* obj, int fd) {
     cout<<"get in handleUserSendMsg "<<endl;
     char *msg = obj->msg;
+    int id = obj->id;
     cout<<"msg id"<<obj->id<<endl;
     cout<<"msg msgType"<<obj->msgType<<endl;
     cout<<"msg len"<<obj->len<<endl;
-    cout<<"msg "<<msg<<endl;   
+    cout<<"msg "<<msg<<endl;
+    vector<string> response;
+    if (KGRedisClient::getInstance().ExecHset(response, "userHash", to_string(id), to_string(fd))) {
+        cout<<"Set redis success response is: "<<endl;
+    } else {
+        cout<<"Set redis err response is: "<<endl;
+    }
+
+    // auto userMap = ComManger::getInstance().getAllUserMap();
+    // // SeqToBin& seq = SeqToBin::getInstance();
+    // for (auto iter = userMap.begin(); iter != userMap.end(); iter++) {
+    //     // if (send(iter->second, msg, obj->len, 0) != obj->len)
+    //     // {
+    //     //     std::cout << "Error writing to socket" << std::endl;
+    //     // }
+    //     std::cout << "end "<<iter->second<<msg<<std::endl;
+    // }
+    // string response;
+    // if (KGRedisClient::getInstance().ExecSetString(response, "userid", to_string(fd))) {
+    //     cout<<"Set redis success response is: "<<response<<endl;
+    // } else {
+    //     cout<<"Set redis err response is: "<<response<<endl;
+    // }
+    // if (KGRedisClient::getInstance().ExecGetString(response, "userid")) {
+    //     cout<<"Get redis success response is: "<<response<<endl;
+    // } else {
+    //     cout<<"Get redis err response is: "<<response<<endl;
+    // }
 }
 
-void handleMsgCmd(TransObj* obj) {
+void handleMsgCmd(TransObj* obj, int fd) {
     cout<<"get in handleMsgCmd "<<endl;
     Command *cmd = (Command*)obj->msg;
     cout<<"get in handleMsgCmd2 "<<endl;
     cout<<"handle msg cmd "<<(int)cmd->getType()<<endl;
+    if (fd == -1) {
+        // 此时是客户端
+        cout<<"此时是客户端"<<endl;
+        return;
+    }
+    auto userMap = ComManger::getInstance().getAllUserMap();
+    // SeqToBin& seq = SeqToBin::getInstance();
+    for (auto iter = userMap.begin(); iter != userMap.end(); iter++) {
+        if (send(iter->second, (void*)obj, obj->len, 0) != obj->len)
+        {
+            std::cout << "Error writing to socket" << std::endl;
+        }
+        std::cout << "end "<<iter->second<<" "<<cmd->getType()<<std::endl;
+    }
 }

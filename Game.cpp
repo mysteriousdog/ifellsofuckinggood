@@ -47,7 +47,7 @@ void Game::update()
     TransObj* rcvObj;
     if (seq.getRcvBuff().tryAndPop(rcvObj)) {
         MsgHandler& msgHandler =  MsgHandler::getInstance();
-	    msgHandler.handle(rcvObj);
+	    msgHandler.handle(rcvObj, -1);
     }
     
     // cout<<"----------"<<endl;
