@@ -24,15 +24,20 @@ int main()
 // Singleton<int> *s = new Singleton<int>();
     // auto s = Singleton<int>::getInstance();
     // Actor& a = Actor::getInstance();
-    Client c("121.5.41.213", 8877);
-    c.init();
-    thread t(c);
-    int x = 1;
-    thread t2(c, x);
-    t.detach();
-    t2.detach();
-    Game& game = Game::getInstance();
-    game.updateWordPerSec();
+    // Client c("121.5.41.213", 8877);
+    // c.init();
+    // thread t(c);
+    // int x = 1;
+    // thread t2(c, x);
+    // t.detach();
+    // t2.detach();
+    // Game& game = Game::getInstance();
+    // game.updateWordPerSec();
+#ifdef CLIENT_COMPARE
+
+    cout<<"yes"<<endl;
+
+#endif
     // SeqToBin& s2b = SeqToBin::getInstance();
     // Command* cmd = new Command(CMD_MOVE_RIGHT);
     // // tansObj* obj = new tansObj(MSG_CMD, sizeof(*cmd));
