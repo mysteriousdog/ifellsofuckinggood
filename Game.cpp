@@ -46,8 +46,10 @@ void Game::update()
     SeqToBin& seq = SeqToBin::getInstance();
     TransObj* rcvObj;
     if (seq.getRcvBuff().tryAndPop(rcvObj)) {
+        cout<<"-----------get recv pop beg-----------"<<endl;
         MsgHandler& msgHandler =  MsgHandler::getInstance();
 	    msgHandler.handle(rcvObj);
+        cout<<"-----------get recv pop end-----------"<<endl;
     }
     
     // cout<<"----------"<<endl;
