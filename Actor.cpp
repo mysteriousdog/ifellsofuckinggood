@@ -5,6 +5,11 @@
 #include <iostream>
 using namespace std;
 
+Actor::Actor()
+{
+
+}
+
 void Actor::moveUp()
 {
     cout<<"i am now moving up!!"<<endl;
@@ -28,7 +33,11 @@ void Actor::moveRight()
 void Actor::action()
 {
     Command* cmd = ReadKey::getInstance().getCmd();
+    if (cmd == nullptr) {
+        return;
+    }
     cmd->doCommand(*this);
+    delete(cmd);
 }
 
 void Actor::doCommand(CMD_TYPE_UINT32_ENUM cmdType)

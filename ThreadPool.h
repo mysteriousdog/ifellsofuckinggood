@@ -10,6 +10,7 @@
 #include <future>
 #include <functional>
 #include <stdexcept>
+#include <iostream>
 
 class ThreadPool {
 public:
@@ -19,6 +20,8 @@ public:
         -> std::future<typename std::result_of<F(Args...)>::type>;
     ~ThreadPool();
 private:
+    
+    ThreadPool() {ThreadPool(5);}
     // need to keep track of threads so we can join them
     std::vector< std::thread > workers;
     // the task queue
@@ -78,6 +81,7 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
             throw std::runtime_error("enqueue on stopped ThreadPool");
 
         tasks.emplace([task](){ (*task)(); });
+        std::cout<<"input in thread pool!!!!!!!"<<std::endl;
     }
     condition.notify_one();
     return res;

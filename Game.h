@@ -3,11 +3,14 @@
 
 #include "Singleton.h"
 #include "Actor.h"
+#include "InputSysManger.h"
 
 class Game : public Singleton<Game>
 {
 public:
-    
+    void operator () () {
+        updateWordPerSec();
+    }
     void updateWordPerSec();
     void update();
 protected:
@@ -16,6 +19,7 @@ private:
     
     bool isRunning;
     Actor &actor;
+    InputSysManger& inputSysManger;
 
 friend class Singleton;
 };

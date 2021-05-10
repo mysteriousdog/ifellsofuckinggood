@@ -43,7 +43,7 @@ public:
     bool tryAndPop(T& value){
         unique_lock<mutex> lock(m);
         if (data.empty()) {
-            return nullptr;
+            return false;
         }
         value = data.front();
         data.pop();

@@ -8,6 +8,12 @@ typedef enum CmdType{
     CMD_MOVE_DOWN,
     CMD_MOVE_LEFT,
     CMD_MOVE_RIGHT,
+    CMD_ATTACK,
+    CMD_JUMP,
+    CMD_ENTER,
+    CMD_BACKPACK,
+    CMD_MAP,
+    CMD_SYSTEM,
     CMD_BUTTON
 } cmdType;
 typedef unsigned int CMD_TYPE_UINT32_ENUM;

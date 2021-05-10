@@ -13,8 +13,9 @@ public:
     virtual void doCommand(CMD_TYPE_UINT32_ENUM cmdType) override;
     virtual void update() override;
 protected:
-    Actor(){}
+    
 private:
+    Actor();
     void moveUp();
     void moveDown();
     void moveLeft();

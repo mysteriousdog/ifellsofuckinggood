@@ -17,7 +17,8 @@ long long systemtime()
 
 Game::Game():
 isRunning(true),
-actor(Actor::getInstance())
+actor(Actor::getInstance()),
+inputSysManger(InputSysManger::getInstance())
 {
     
 }
@@ -41,7 +42,8 @@ void Game::updateWordPerSec()
 void Game::update()
 {
     ReadKey& read = ReadKey::getInstance();
-    read.scanKeyBoard();
+    (void)read.scanKeyBoard();
+    inputSysManger.handleSysInput();
     actor.update();
     SeqToBin& seq = SeqToBin::getInstance();
     TransObj* rcvObj;
