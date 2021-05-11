@@ -14,49 +14,37 @@
 #include <iostream>
 #include <stdlib.h>
 #include <thread>
+
+#include "TalkManger.h"
+#include "ThreadPool.h"
+#include <unistd.h>
 using namespace std;
+
+void fun() {
+    cout<<"111"<<endl;
+    TalkManger& talkManger = TalkManger::getInstance();
+    talkManger();
+}
+void fun2() {
+    cout<<"222"<<endl;
+}
+
+void fun3() {
+    cout<<"333"<<endl;
+}
 
 int main()
 {
-    // Actor& actor = Actor::getInstance();
-    // Command *cmd = new Command(CmdType::CMD_MOVE_UP);
-    // cmd->doCommand(actor);
-// Singleton<int> *s = new Singleton<int>();
-    // auto s = Singleton<int>::getInstance();
-    // Actor& a = Actor::getInstance();
-    Client c("121.5.41.213", 8877);
-    c.init();
-    thread t(c);
-    int x = 1;
-    thread t2(c, x);
-    t.detach();
-    t2.detach();
+    // ThreadPool& threadPool = ThreadPool::getInstance();
+    // ThreadPool* threadPool = new ThreadPool(3);
+    // // TalkManger& talkManger = TalkManger::getInstance();
+    // threadPool->enqueue(fun);
+    // threadPool->enqueue(fun2);
+    // threadPool->enqueue(fun3);
+    ThreadPool* threadPool = new ThreadPool(1);
+    TalkManger& talkManger = TalkManger::getInstance();
+    threadPool->enqueue(fun);
     Game& game = Game::getInstance();
-    game.updateWordPerSec();
-    // SeqToBin& s2b = SeqToBin::getInstance();
-    // Command* cmd = new Command(CMD_MOVE_RIGHT);
-    // // tansObj* obj = new tansObj(MSG_CMD, sizeof(*cmd));
-    // // memcpy(obj->msg, (void*)obj, obj->len);
-    // // cout<<cmd->getType()<<endl;
-    // // Command* cmd2 = (Command*)obj->msg;
-    // cout<<cmd->getType()<<endl;
-
-    // // Command a1(2);
-    // // // a1.num = 2;
-    // // cout<<a1.getType()<<endl;
-    // // void* msg = malloc(sizeof(Command));
-    // // memcpy(msg, &a1, sizeof(Command));
-    // // Command *a2 = (Command*)msg;
-    // // cout<<a2->getType()<<endl;
-    // s2b.save2Bin(*cmd);
-    // char* ip = "127.0.0.1";
-    // char* ip = "106.54.163.125";
-    // Client* client = new Client(ip, 8877);
-    // client->init();
-    // client->run();
-    // Actor *a = new Actor();
-    // while (1) {
-    //     cout<<int(read.scanKeyBoard())<<endl;
-    // }
+    game();
     return 0;
 }

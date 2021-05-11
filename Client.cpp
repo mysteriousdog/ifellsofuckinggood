@@ -29,15 +29,15 @@ bool Client::init()
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);
     serverAddr.sin_addr.s_addr = inet_addr(ip);
+    if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+        std::cout << "Error: connect" << std::endl;
+        return false;
+    }
     return true;
 }
 
 bool Client::run()
 {
-    if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-        std::cout << "Error: connect" << std::endl;
-        return false;
-    }
     SeqToBin& seq = SeqToBin::getInstance();
     char buf[255];
     char buf2[255];
@@ -100,14 +100,19 @@ bool Client::run()
 bool Client::recvMsg()
 {
     cout<<"rcv msg!!!"<<endl;
-    if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-        std::cout << "Error: connect" << std::endl;
-        return false;
-    }
+    // if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+    //     std::cout << "Error: connect" << std::endl;
+    //     return false;
+    // }
     char buf[255];
     SeqToBin& seq = SeqToBin::getInstance();
     string s("1");
-    sendMsgOnce(1, MSG_USER_RECV, s);
+    if (sendMsgOnce(1, MSG_USER_RECV, s)) {
+        cout<<"id band success"<<endl;
+    } else {
+        cout<<"id band err"<<endl;
+        return false;
+    }
     while (recv(client, buf, sizeof(buf), 0) > 0) {
         cout<<"rcv"<<endl;
         TransObj* recvTansObj = (TransObj*)buf;
@@ -128,8 +133,10 @@ bool Client::sendMsgOnce(int id, MSG_TYPE_UINT32_ENUM type, string& str)
 
     strcpy(sendTansObj.msg, str.c_str());
     memcpy((void*)buf, (void*)(&sendTansObj), sizeof(TransObj));
-    send(client, buf, sizeof(buf), 0);
-    return true;
+    if (send(client, buf, sizeof(buf), 0) > 0) {
+        return true;
+    }
+    return false;;
 }
 
 
