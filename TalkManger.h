@@ -10,6 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "CommandDoer.h"
+#include <string.h>
 using namespace std;
 class TalkManger : public CommandDoer, public Singleton<TalkManger>
 {
