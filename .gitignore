@@ -12,7 +12,6 @@ ReadKey.o
 Command.o
 Actor.o
 u.txt
-server/server
 Makefile
 Client.o
 HandleMsg.o
