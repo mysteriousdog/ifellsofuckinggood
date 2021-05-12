@@ -39,7 +39,6 @@ inline void ThreadPool::init(size_t threads)
 {
     for(size_t i = 0; i<threads; ++i)
     {
-        std::cout<<"1！！！！！！！！！！"<<std::endl;
         workers.emplace_back(
             [this]
             {
@@ -48,22 +47,16 @@ inline void ThreadPool::init(size_t threads)
                     std::function<void()> task;
                     {
                         std::unique_lock<std::mutex> lock(this->queue_mutex);
-                        std::cout<<"2！！！！！！！！！！"<<std::endl;
                         this->condition.wait(lock,
                             [this]{ return this->stop || !this->tasks.empty(); });
                         if(this->stop && this->tasks.empty())
                         {
-                            std::cout<<"3！！！！！！！！！！"<<std::endl;
                             return;
                         }
-                        std::cout<<"4！！！！！！！！！！"<<std::endl;
                         task = std::move(this->tasks.front());
                         this->tasks.pop();
-                        std::cout<<"5！！！！！！！！！！"<<std::endl;
                     }
-                    std::cout<<"6！！！！！！！！！！"<<std::endl;
                     task();
-                    std::cout<<"7！！！！！！！！！！"<<std::endl;
                 }
             }
         );
@@ -92,7 +85,6 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
             throw std::runtime_error("enqueue on stopped ThreadPool");
         }
         tasks.emplace([task](){ (*task)(); });
-        std::cout<<"input in thread pool!!!!!!!"<<std::endl;
     }
     condition.notify_one();
     return res;
@@ -103,7 +95,6 @@ inline ThreadPool::~ThreadPool()
 {
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
-        std::cout<<"ThreadPool::~ThreadPool!!!!!!!"<<std::endl;
         stop = true;
     }
     condition.notify_all();
