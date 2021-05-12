@@ -1,6 +1,7 @@
 #include "HandleMsg.h"
 #ifdef SERVER_COMPARE
 #include "redis_pool.h"
+#include "ThreadPool.h"
 #include <sys/socket.h>
 #include "ComManger.h"
 #endif
@@ -89,4 +90,11 @@ void handleMsgCmd(TransObj* obj, int fd) {
         std::cout << "end "<<iter->second<<" "<<cmd->getType()<<std::endl;
     }
 #endif
+}
+
+void handleUserRegMsg(TransObj* obj, int fd)
+{
+    ThreadPool::getInstance().enqueue([] {
+        cout<<"fun"<<endl;
+    });
 }

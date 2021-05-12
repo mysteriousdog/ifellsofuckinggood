@@ -11,7 +11,8 @@
 #include <cppconn/prepared_statement.h>  
 #include <cppconn/statement.h>  
 #include <pthread.h>  
-#include <list>  
+#include <list>
+#include <vector>  
  
 using namespace std;  
 using namespace sql; 
@@ -23,13 +24,16 @@ public:
     static MysqlPool& GetInstance();
  
     //init pool
-    void initPool(std::string url_, std::string user_, std::string password_, int maxSize_);
+    void initPool(std::string url_, std::string user_, std::string password_, int maxSize_, string&& databaseName);
  
     //get a conn from pool
     Connection* GetConnection();
  
     //put the conn back to pool
     void ReleaseConnection(Connection *conn);
+
+    // for user to do query thing like ExecQuery("select * from userinfo where id = %d", 1);
+    ResultSet* ExecQuery(const char* format, ...);  
  
     ~MysqlPool();
     MysqlPool(){}
@@ -47,17 +51,19 @@ private:
  
     //destory db pool
     void DestoryConnPool();
+
+      
  
 private:
     string user;
     string password;
     string url;
+    string databaseName;
     int maxSize;
     int curSize;
  
     Driver*             driver;     //sql driver (the sql will free it)
     list<Connection*>   connList;   //create conn list
- 
     //thread lock mutex
     static pthread_mutex_t lock;     
 };

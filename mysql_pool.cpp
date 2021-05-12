@@ -2,6 +2,7 @@
 #include <stdexcept>  
 #include <exception>  
 #include <stdio.h>  
+#include <stdarg.h>
 #include "mysql_pool.h"
  
 using namespace std;
@@ -17,13 +18,14 @@ MysqlPool& MysqlPool::GetInstance()
     return instance_;  
 }
  
-void MysqlPool::initPool(std::string url_, std::string user_, std::string password_, int maxSize_)
-{  
+void MysqlPool::initPool(std::string url_, std::string user_, std::string password_, int maxSize_, string&& databaseName)
+{
     this->user = user_;  
     this->password = password_;
     this->url = url_;
     this->maxSize = maxSize_;  
     this->curSize = 0; 
+    this->databaseName = databaseName;
  
     try{  
         this->driver=sql::mysql::get_driver_instance();
@@ -53,7 +55,7 @@ void MysqlPool::InitConnection(int initSize)
         
         if(conn)
         {  
-            connList.push_back(conn);  
+            connList.push_back(conn);
             ++(this->curSize);  
         }  
         else  
@@ -186,4 +188,34 @@ void MysqlPool::DestoryConnection(Connection* conn)
 MysqlPool::~MysqlPool()  
 {  
     this->DestoryConnPool();  
+}
+
+ResultSet* MysqlPool::ExecQuery(const char* format, ...)
+{
+    ResultSet* reply = nullptr;
+    Connection *conn = GetConnection();
+    if (conn == nullptr) {
+        cout<<"MysqlPool::ExecQuery err in get con "<<endl;
+        return reply;
+    }
+    conn->setSchema(databaseName);
+    char cmdBuf[100];
+    Statement *state = conn->createStatement();
+    va_list args;
+    va_start(args, format);
+    vsnprintf(cmdBuf, 100, format, args);
+    va_end(args);
+    cout<<"in fun MysqlPool::ExecQuery "<<cmdBuf<<endl;
+    try
+    {
+        reply = state->executeQuery(cmdBuf);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return nullptr;
+    }
+
+    cout<<"in fun MysqlPool::ExecQuery reply is end"<<endl;
+    return reply;
 }

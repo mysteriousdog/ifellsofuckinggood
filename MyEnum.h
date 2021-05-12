@@ -24,7 +24,9 @@ typedef enum MsgType{
     MSG_USER_SEND = 1,
     MSG_USER_RECV = 2,
     MSG_TALK = 3,
-    MSG_ACK = 3,
+    MSG_ACK = 4,
+    MSG_REG = 5,
+    MSG_LOGIN = 6,
     MSG_BUTTON
 } msgType;
 typedef unsigned int MSG_TYPE_UINT32_ENUM;
