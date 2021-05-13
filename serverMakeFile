@@ -26,13 +26,13 @@ Game.o:Game.cpp Game.h ReadKey.h MyEnum.h HandleMsg.h SeqToBin.h ConcQueue.h
 	$(CC) -c Game.cpp 
 ReadKey.o:ReadKey.cpp ReadKey.h Command.h SeqToBin.h TalkManger.h
 	$(CC) -c ReadKey.cpp
-Server.o:Server.cpp Zepoll.h mysql_pool.h redis_pool.h ThreadPool.h HandleMsg.h
+Server.o:Server.cpp Zepoll.h mysql_pool.h redis_pool.h ThreadPool.h HandleMsg.h Client.h SeqToBin.h
 	$(CC) -c Server.cpp
 Client.o:Client.cpp Client.h ConcQueue.h SeqToBin.h SeqAbleObj.h Command.h
 	$(CC) -c Client.cpp
 mysql_pool.o:mysql_pool.cpp mysql_pool.h
 	$(CC) -c mysql_pool.cpp
-HandleMsg.o:HandleMsg.cpp HandleMsg.h redis_pool.h ThreadPool.h ComManger.h SeqToBin.h SeqAbleObj.h mysql_pool.h
+HandleMsg.o:HandleMsg.cpp HandleMsg.h redis_pool.h ThreadPool.h ComManger.h SeqToBin.h SeqAbleObj.h mysql_pool.h Player.h
 	$(CC) -c HandleMsg.cpp
 redis_pool.o:redis_pool.cpp redis_pool.h ComManger.h
 	$(CC) -c redis_pool.cpp
