@@ -4,9 +4,13 @@
 #include "ThreadPool.h"
 #include <sys/socket.h>
 #include "ComManger.h"
+#include "mysql_pool.h"
+#include "SeqAbleObj.h"
+#include "Player.h"
 #endif
 #include "SeqToBin.h"
 #include <vector>
+#include <iostream>
 using namespace std;
 
 msgHandle g_msgHandle[] = {
@@ -94,7 +98,31 @@ void handleMsgCmd(TransObj* obj, int fd) {
 
 void handleUserRegMsg(TransObj* obj, int fd)
 {
-    ThreadPool::getInstance().enqueue([] {
-        cout<<"fun"<<endl;
+    if (obj->len < (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
+        return;        
+    }
+    ThreadPool::getInstance().enqueue([obj, fd] {
+        cout<<"do reg!"<<endl;
+    });
+}
+
+void handleUserLogMsg(TransObj* obj, int fd)
+{
+    ThreadPool::getInstance().enqueue([obj, fd] {
+        int id = obj->id;
+        cout<<"id "<<id<<endl;
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select fd from userinfo where userid = %d;", id);
+        if (msqlResSet == nullptr) {
+            cout<<"no find id,"<<id <<endl;
+            TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
+            SeqToBin::getInstance().getBuff().push(tansObj);
+            return 0;
+        }
+
+        cout<<"now do the send thing!"<<endl;
+        TransObj* tansObj = new TransObj(id, MSG_LOGIN_ACCEPT, 1, fd);
+        SeqToBin::getInstance().getBuff().push(tansObj);
+        return 1;
+
     });
 }

@@ -24,6 +24,9 @@ int main(int argc, char** argv) {
 #include <iostream>
 #include "mysql_pool.h"
 #include "ThreadPool.h"
+#include "HandleMsg.h"
+#include "Client.h"
+#include "SeqToBin.h"
 using namespace std;
 
 
@@ -34,15 +37,30 @@ using namespace std;
 //     cout<<endl;
 // }
 
-int serverInit(size_t threadPoolSize) {
+int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
+    cout<<"init   start"<<endl;
     int ret = 0;
     ThreadPool::getInstance().init(threadPoolSize);
-    MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", 2, "user");
+    MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", mysqlPoolSize, "user");
+    Client client;
+    auto res = ThreadPool::getInstance().enqueue(client);
+    cout<<"init server complete"<<endl;
     return ret;
 }
 
+void serverEnd() {
+    cout<<"end server  start"<<endl;
+    TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
+    sleep(3);
+    SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
+    cout<<"end server  complete"<<endl;
+}
+
 int main(int argc, char** argv) {
-    MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", 2, "user");
+    serverInit(2, 2);
+    TransObj* obj = new TransObj(1,MSG_LOGIN,3);
+    handleUserLogMsg(obj, -1);
+    serverEnd();
     // MysqlPool* mysqlPool = new MysqlPool(); ThreadPool::getInstanch()
     // mysqlPool->initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", 2);
     // ThreadPool threadPool(2);
@@ -63,9 +81,6 @@ int main(int argc, char** argv) {
     //     // }
     //     cout<<"thread"<<endl;
     // });
-    cout<<"server1"<<endl;
-    ThreadPool::getInstance().init(2);
-    cout<<"server2"<<endl;
 
     // auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select * from userinfo;");
     //     if (msqlResSet == nullptr) {

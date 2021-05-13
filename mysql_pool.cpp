@@ -219,3 +219,8 @@ ResultSet* MysqlPool::ExecQuery(const char* format, ...)
     cout<<"in fun MysqlPool::ExecQuery reply is end"<<endl;
     return reply;
 }
+
+bool MysqlPool::ExecInsert(const char* format, ...)
+{
+    
+}

@@ -7,18 +7,21 @@
 
 
 const int MAX_TRANS_MSG_LEN = 32;
+
 typedef struct TransObj
 {
     MSG_TYPE_UINT32_ENUM msgType;
     unsigned int len;
     int id;
+    int fd;
     char msg[MAX_TRANS_MSG_LEN];
     TransObj():msgType(0),len(0){}
     TransObj(MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_):msgType(msgType_),len(len_){
         id = 1;
     }
     TransObj(int id_, MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_):id(id_),msgType(msgType_),len(len_){}
-}tansObj;
+    TransObj(int id_, MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_, int fd_):id(id_),msgType(msgType_),len(len_), fd(fd_){}
+} tansObj;
 
 class SeqAbleObj
 {

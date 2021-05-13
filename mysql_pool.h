@@ -33,7 +33,10 @@ public:
     void ReleaseConnection(Connection *conn);
 
     // for user to do query thing like ExecQuery("select * from userinfo where id = %d", 1);
-    ResultSet* ExecQuery(const char* format, ...);  
+    ResultSet* ExecQuery(const char* format, ...); 
+
+    // for user to do insert thing like ExecInsert("select * from userinfo where id = %d", 1);
+    bool ExecInsert(const char* format, ...);  
  
     ~MysqlPool();
     MysqlPool(){}

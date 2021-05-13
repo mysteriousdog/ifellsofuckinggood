@@ -27,6 +27,8 @@ typedef enum MsgType{
     MSG_ACK = 4,
     MSG_REG = 5,
     MSG_LOGIN = 6,
+    MSG_LOGIN_ACCEPT = 7,
+    MSG_LOGIN_REFUSE = 8,
     MSG_BUTTON
 } msgType;
 typedef unsigned int MSG_TYPE_UINT32_ENUM;
