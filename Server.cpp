@@ -27,6 +27,7 @@ int main(int argc, char** argv) {
 #include "HandleMsg.h"
 #include "Client.h"
 #include "SeqToBin.h"
+#include <stdio.h>
 using namespace std;
 
 
@@ -53,12 +54,15 @@ void serverEnd() {
     TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
     sleep(3);
     SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
-    cout<<"end server  complete"<<endl;
+    cout<<"end server complete"<<endl;
 }
 
 int main(int argc, char** argv) {
     serverInit(2, 2);
-    TransObj* obj = new TransObj(1,MSG_LOGIN,3);
+    char passwd[] = "8219497Pwd!";
+    TransObj* obj = new TransObj(1,MSG_LOGIN, sizeof(passwd));
+    sprintf(obj->msg, passwd);
+    cout<<"now the input password is "<<obj->msg<<endl;
     handleUserLogMsg(obj, -1);
     serverEnd();
     // MysqlPool* mysqlPool = new MysqlPool(); ThreadPool::getInstanch()

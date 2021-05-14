@@ -8,6 +8,7 @@
 #include "SeqAbleObj.h"
 #include "Player.h"
 #endif
+#include <string.h>
 #include "SeqToBin.h"
 #include <vector>
 #include <iostream>
@@ -103,6 +104,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
     }
     ThreadPool::getInstance().enqueue([obj, fd] {
         cout<<"do reg!"<<endl;
+
     });
 }
 
@@ -111,14 +113,27 @@ void handleUserLogMsg(TransObj* obj, int fd)
     ThreadPool::getInstance().enqueue([obj, fd] {
         int id = obj->id;
         cout<<"id "<<id<<endl;
-        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select fd from userinfo where userid = %d;", id);
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where userid = %d;", id);
         if (msqlResSet == nullptr) {
             cout<<"no find id,"<<id <<endl;
             TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
             SeqToBin::getInstance().getBuff().push(tansObj);
             return 0;
         }
-
+        if (msqlResSet->next()) {
+            cout<<"now getting the password!"<<endl;
+            string relPasswd = msqlResSet->getString("password");
+            cout<<"getted the password!"<<endl;
+            char tansPasswd[PASSWORD_MAX_LEN];
+            memcpy(tansPasswd, obj->msg, obj->len);
+            tansPasswd[obj->len] = '\0';
+            if (strcmp(tansPasswd, relPasswd.c_str()) != 0) {
+                cout<<"password not equal!"<<endl;
+                cout<<"realPassword is "<<relPasswd<<endl;
+                cout<<"ransPassword is "<<tansPasswd<<endl;
+                return 0;
+            }
+        }
         cout<<"now do the send thing!"<<endl;
         TransObj* tansObj = new TransObj(id, MSG_LOGIN_ACCEPT, 1, fd);
         SeqToBin::getInstance().getBuff().push(tansObj);

@@ -222,5 +222,5 @@ ResultSet* MysqlPool::ExecQuery(const char* format, ...)
 
 bool MysqlPool::ExecInsert(const char* format, ...)
 {
-    
+    return true;
 }
