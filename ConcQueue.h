@@ -37,6 +37,9 @@ public:
         }
         T value = data.front();
         data.pop();
+        if (data.empty()) {
+            empty_cond.notify_one();
+        }
         return value;
     }
 
@@ -54,10 +57,20 @@ public:
         lock_guard<mutex> lock(m);
         return data.empty();
     }
+
+    void waitPushTillEmpty(T& value) {
+        unique_lock<mutex> lock(m);
+        empty_cond.wait(lock, [this] {return this->data.empty();});
+        // data_cond.wait(lock, [this] {return !(this->data.empty());});
+        data.push(value);
+        data_cond.notify_one();
+    }
+
 private:
     queue<T> data;
     mutable mutex m;
     condition_variable data_cond;
+    condition_variable empty_cond;
 };
 
 #endif

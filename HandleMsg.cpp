@@ -1,11 +1,17 @@
 #include "HandleMsg.h"
 #ifdef SERVER_COMPARE
 #include "redis_pool.h"
+#include "ThreadPool.h"
 #include <sys/socket.h>
 #include "ComManger.h"
+#include "mysql_pool.h"
+#include "SeqAbleObj.h"
+#include "Player.h"
 #endif
+#include <string.h>
 #include "SeqToBin.h"
 #include <vector>
+#include <iostream>
 using namespace std;
 
 msgHandle g_msgHandle[] = {
@@ -89,4 +95,67 @@ void handleMsgCmd(TransObj* obj, int fd) {
         std::cout << "end "<<iter->second<<" "<<cmd->getType()<<std::endl;
     }
 #endif
+}
+
+void handleUserRegMsg(TransObj* obj, int fd)
+{
+    if (obj->len < (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
+        return;        
+    }
+    ThreadPool::getInstance().enqueue([&obj, fd] {
+        cout<<"do reg!"<<endl;
+        char name[NAME_MAX_LEN];
+        char passwd[PASSWORD_MAX_LEN];
+        memcpy(name, obj->msg, NAME_MAX_LEN);
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where username = %s;", name);
+        if (msqlResSet->next()) {
+            delete(msqlResSet);
+            cout<<"name reg exists already"<<endl;
+            return 0;
+        }
+        memcpy(passwd, (obj->msg + NAME_MAX_LEN), PASSWORD_MAX_LEN);
+        bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(%s, %d, %s);", name, fd, passwd);
+        return res ? 1: 0;
+    });
+}
+
+void handleUserLogMsg(TransObj* obj, int fd)
+{
+    ThreadPool::getInstance().enqueue([obj, fd] {
+        int id = obj->id;
+        cout<<"id "<<id<<endl;
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where userid = %d;", id);
+        if (msqlResSet == nullptr) {
+            cout<<"no find id,"<<id <<endl;
+            TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
+            SeqToBin::getInstance().getBuff().push(tansObj);
+            delete(msqlResSet);
+            return 0;
+        }
+        if (obj->len > PASSWORD_MAX_LEN) {
+            cout<<"password len too long!"<<endl;
+            delete(msqlResSet);
+            return 0;
+        }
+        if (msqlResSet->next()) {
+            cout<<"now getting the password!"<<endl;
+            string relPasswd = msqlResSet->getString("password");
+            cout<<"getted the password!"<<endl;
+            char tansPasswd[PASSWORD_MAX_LEN];
+            memcpy(tansPasswd, (obj->msg + NAME_MAX_LEN), obj->len);
+            if (strcmp(tansPasswd, relPasswd.c_str()) != 0) {
+                cout<<"password not equal!"<<endl;
+                cout<<"realPassword is "<<relPasswd<<endl;
+                cout<<"ransPassword is "<<tansPasswd<<endl;
+                delete(msqlResSet);
+                return 0;
+            }
+        }
+        cout<<"now do the send thing!"<<endl;
+        TransObj* tansObj = new TransObj(id, MSG_LOGIN_ACCEPT, 1, fd);
+        SeqToBin::getInstance().getBuff().push(tansObj);
+        delete(msqlResSet);
+        return 1;
+
+    });
 }

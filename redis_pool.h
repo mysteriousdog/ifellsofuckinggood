@@ -67,7 +67,7 @@ public:
     }
 private:
     KGRedisClient(std::string ip, int port, std::string password, int timeout = 2000);
-    KGRedisClient():m_setverIp("106.54.163.125"), m_serverPort(6379), m_password("353656535132Zlh!"), m_timeout(2000), conType(REDIS_CON_CLUSTER_TYPE){cout<<"client init"<<endl;};
+    KGRedisClient():m_setverIp("121.5.41.213"), m_serverPort(6379), m_password("353656535132Zlh!"), m_timeout(2000), conType(REDIS_CON_CLUSTER_TYPE){cout<<"client init"<<endl;};
     int m_timeout;
     int m_serverPort;
     REDIS_CON_INT32_ENUM_TYPE conType;
