@@ -217,10 +217,34 @@ ResultSet* MysqlPool::ExecQuery(const char* format, ...)
     }
 
     cout<<"in fun MysqlPool::ExecQuery reply is end"<<endl;
+    state->close();
+    delete(state);
     return reply;
 }
 
 bool MysqlPool::ExecInsert(const char* format, ...)
 {
-    return true;
+    ResultSet* reply = nullptr;
+    Connection *conn = GetConnection();
+    if (conn == nullptr) {
+        cout<<"MysqlPool::ExecInsert err in get con "<<endl;
+        return reply;
+    }
+    conn->setSchema(databaseName);
+    char cmdBuf[100];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(cmdBuf, 100, format, args);
+    va_end(args);
+    bool res = false;
+    try
+    {
+        auto prep_stmt = conn->prepareStatement(cmdBuf);
+        res = prep_stmt->execute();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    return res;
 }

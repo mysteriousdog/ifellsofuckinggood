@@ -27,6 +27,7 @@ int main(int argc, char** argv) {
 #include "HandleMsg.h"
 #include "Client.h"
 #include "SeqToBin.h"
+#include "Player.h"
 #include <stdio.h>
 using namespace std;
 
@@ -59,9 +60,9 @@ void serverEnd() {
 
 int main(int argc, char** argv) {
     serverInit(2, 2);
-    char passwd[] = "8219497Pwd!";
+    char passwd[] = "8219497Zwd!";
     TransObj* obj = new TransObj(1,MSG_LOGIN, sizeof(passwd));
-    sprintf(obj->msg, passwd);
+    sprintf((obj->msg) + NAME_MAX_LEN, passwd);
     cout<<"now the input password is "<<obj->msg<<endl;
     handleUserLogMsg(obj, -1);
     serverEnd();
