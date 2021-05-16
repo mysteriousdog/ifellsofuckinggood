@@ -15,9 +15,10 @@
 using namespace std;
 
 msgHandle g_msgHandle[] = {
-
     {MSG_CMD, handleMsgCmd},
-    {MSG_USER_RECV, handleUserSendMsg}
+    {MSG_TALK, handleUserSendMsg},
+    {MSG_REG, handleUserRegMsg},
+    {MSG_LOGIN, handleUserLogMsg}
 };
 
 void MsgHandler::handle(TransObj* obj, int fd)
@@ -35,41 +36,30 @@ void MsgHandler::handle(TransObj* obj, int fd)
 }
 
 void handleUserSendMsg(TransObj* obj, int fd) {
+
     cout<<"get in handleUserSendMsg "<<endl;
     char *msg = obj->msg;
     int id = obj->id;
     cout<<"msg id"<<obj->id<<endl;
+    cout<<"msg recvId id"<<obj->recverId<<endl;
     cout<<"msg msgType"<<obj->msgType<<endl;
     cout<<"msg len"<<obj->len<<endl;
     cout<<"msg "<<msg<<endl;
 #ifdef SERVER_COMPARE
-    vector<string> response;
-    if (KGRedisClient::getInstance().ExecHset(response, "userHash", to_string(id), to_string(fd))) {
-        cout<<"Set redis success response is: "<<endl;
-    } else {
-        cout<<"Set redis err response is: "<<endl;
-    }
+
+    ThreadPool::getInstance().enqueue([obj] () mutable {
+        ComManger::getInstance().removeSessionTalker(obj->id);
+        if (ComManger::getInstance().isTalkerOnline(obj->recverId)) {
+            SeqToBin::getInstance().getBuff().push(obj);
+        }
+    });
 #endif
-    // auto userMap = ComManger::getInstance().getAllUserMap();
-    // // SeqToBin& seq = SeqToBin::getInstance();
-    // for (auto iter = userMap.begin(); iter != userMap.end(); iter++) {
-    //     // if (send(iter->second, msg, obj->len, 0) != obj->len)
-    //     // {
-    //     //     std::cout << "Error writing to socket" << std::endl;
-    //     // }
-    //     std::cout << "end "<<iter->second<<msg<<std::endl;
-    // }
-    // string response;
-    // if (KGRedisClient::getInstance().ExecSetString(response, "userid", to_string(fd))) {
-    //     cout<<"Set redis success response is: "<<response<<endl;
-    // } else {
-    //     cout<<"Set redis err response is: "<<response<<endl;
-    // }
-    // if (KGRedisClient::getInstance().ExecGetString(response, "userid")) {
-    //     cout<<"Get redis success response is: "<<response<<endl;
-    // } else {
-    //     cout<<"Get redis err response is: "<<response<<endl;
-    // }
+
+#ifdef CLIENT_COMPARE
+
+    cout<<"client  handleUserSendMsg get!"<<msg<<endl;
+
+#endif
 }
 
 void handleMsgCmd(TransObj* obj, int fd) {
@@ -99,10 +89,12 @@ void handleMsgCmd(TransObj* obj, int fd) {
 
 void handleUserRegMsg(TransObj* obj, int fd)
 {
+    cout << hex << (void *)obj << endl;
     if (obj->len > (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
         return;        
     }
-    ThreadPool::getInstance().enqueue([obj, fd] {
+    ThreadPool::getInstance().enqueue([obj, fd] () mutable {
+        cout << hex << (void *)obj << endl;
         cout<<"do reg!"<<endl;
         cout<<obj->msg<<endl;
         char name[NAME_MAX_LEN] {0};
@@ -114,8 +106,9 @@ void handleUserRegMsg(TransObj* obj, int fd)
         if (msqlResSet->next()) {
             delete(msqlResSet);
             cout<<"name reg exists already"<<endl;
-            TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
-            SeqToBin::getInstance().getBuff().push(tansObj);
+            // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
+            obj->setMsgType(MSG_REG_REFUSE);
+            SeqToBin::getInstance().getBuff().push(obj);
             return 0;
         }
         memcpy(passwd, (obj->msg + NAME_MAX_LEN), PASSWORD_MAX_LEN);
@@ -123,35 +116,43 @@ void handleUserRegMsg(TransObj* obj, int fd)
         bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", name, fd, passwd);
         if (res) {
             auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select max(userid) from userinfo;");
-            TransObj* tansObj = new TransObj(-1, MSG_REG_ACCEPT, 1, fd);
+            // TransObj* tansObj = new TransObj(-1, MSG_REG_ACCEPT, 1, fd);
+            obj->setMsgType(MSG_REG_ACCEPT);
             if (!msqlResSet->next()) {
-                tansObj->setMsgType(MSG_REG_REFUSE);
+                // tansObj->setMsgType(MSG_REG_REFUSE);
+                obj->setMsgType(MSG_REG_REFUSE);
             } else {
                 int id  = msqlResSet->getInt("userid");
-                tansObj->setId(id);
+                // tansObj->setId(id);
+                obj->setId(id);
                 cout<<"handleUserRegMsg insert succed id: "<<id<<endl;
             }
-            SeqToBin::getInstance().getBuff().push(tansObj);
+            SeqToBin::getInstance().getBuff().push(obj);
             
             return 1;
         }
         cout<<"handleUserRegMsg insert failed "<<endl;
-        TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
-        SeqToBin::getInstance().getBuff().push(tansObj);
+        // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
+        obj->setMsgType(MSG_REG_REFUSE);
+        SeqToBin::getInstance().getBuff().push(obj);
         return res ? 1: 0;
     });
 }
 
 void handleUserLogMsg(TransObj* obj, int fd)
 {
-    ThreadPool::getInstance().enqueue([obj, fd] {
+    cout << hex << (void *)obj << endl;
+    ThreadPool::getInstance().enqueue([obj, fd] () mutable {
+        cout << hex << (void *)obj << endl;
         int id = obj->id;
         cout<<"id "<<id<<endl;
-        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where userid = %d;", id);
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password, username from userinfo where userid = %d;", id);
         if (msqlResSet == nullptr) {
             cout<<"no find id,"<<id <<endl;
-            TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
-            SeqToBin::getInstance().getBuff().push(tansObj);
+            // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
+            // SeqToBin::getInstance().getBuff().push(tansObj);
+            obj->setMsgType(MSG_LOGIN_REFUSE);
+            SeqToBin::getInstance().getBuff().push(obj);
             delete(msqlResSet);
             return 0;
         }
@@ -163,6 +164,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
         if (msqlResSet->next()) {
             cout<<"now getting the password!"<<endl;
             string relPasswd = msqlResSet->getString("password");
+            string userName = msqlResSet->getString("username");
             cout<<"getted the password!"<<endl;
             char tansPasswd[PASSWORD_MAX_LEN];
             memcpy(tansPasswd, (obj->msg + NAME_MAX_LEN), obj->len);
@@ -170,16 +172,50 @@ void handleUserLogMsg(TransObj* obj, int fd)
                 cout<<"password not equal!"<<endl;
                 cout<<"realPassword is "<<relPasswd<<endl;
                 cout<<"ransPassword is "<<tansPasswd<<endl;
-                TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
-                SeqToBin::getInstance().getBuff().push(tansObj);
+                // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
+                // SeqToBin::getInstance().getBuff().push(tansObj);
+                obj->setMsgType(MSG_LOGIN_REFUSE);
+                SeqToBin::getInstance().getBuff().push(obj);
                 delete(msqlResSet);
                 return 0;
             }
+            ComManger::getInstance().addSessionTalker(obj->id, move(userName), fd);
         }
         cout<<"now do the send thing!"<<endl;
-        TransObj* tansObj = new TransObj(id, MSG_LOGIN_ACCEPT, 1, fd);
-        SeqToBin::getInstance().getBuff().push(tansObj);
+        // TransObj* tansObj = new TransObj(id, MSG_LOGIN_ACCEPT, 1, fd);
+        // SeqToBin::getInstance().getBuff().push(tansObj);
+        obj->setMsgType(MSG_LOGIN_ACCEPT);
+        SeqToBin::getInstance().getBuff().push(obj);
         delete(msqlResSet);
+        
         return 1;
     });
 }
+
+void handleUserLogOutMsg(TransObj* obj, int fd)
+{
+    ThreadPool::getInstance().enqueue([obj] {
+        ComManger::getInstance().removeSessionTalker(obj->id);
+    });
+}
+
+void handleAskForFriendMsg(TransObj* obj, int fd) {
+#ifdef SERVER_COMPARE
+
+    ThreadPool::getInstance().enqueue([obj] () mutable {
+        if (ComManger::getInstance().isTalkerOnline(obj->recverId)) {
+            SeqToBin::getInstance().getBuff().push(obj);
+            return 1;
+        }
+        return 0;
+    });
+
+#endif
+
+#ifdef CLIENT_COMPARE
+
+    cout<<"client handleUserLogOutMsg"<<endl;
+
+#endif
+}
+

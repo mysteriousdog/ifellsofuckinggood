@@ -21,16 +21,16 @@ typedef unsigned int CMD_TYPE_UINT32_ENUM;
 
 typedef enum MsgType{
     MSG_CMD = 0,
-    MSG_USER_SEND = 1,
-    MSG_USER_RECV = 2,
-    MSG_TALK = 3,
-    MSG_ACK = 4,
-    MSG_REG = 5,
-    MSG_REG_ACCEPT = 6,
-    MSG_REG_REFUSE = 7,
-    MSG_LOGIN = 8,
-    MSG_LOGIN_ACCEPT = 9,
-    MSG_LOGIN_REFUSE = 10,
+    MSG_TALK,
+    MSG_ACK,
+    MSG_REG,
+    MSG_REG_ACCEPT,
+    MSG_REG_REFUSE,
+    MSG_LOGIN,
+    MSG_LOGIN_ACCEPT,
+    MSG_LOGIN_REFUSE,
+    MSG_LOGOUT,
+    MSG_ASK_FOR_FRIEND,
     MSG_BUTTON
 } msgType;
 typedef unsigned int MSG_TYPE_UINT32_ENUM;

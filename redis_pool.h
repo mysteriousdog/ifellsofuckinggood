@@ -36,6 +36,8 @@ public:
  //   bool ExecuteCmd_spop(const char *cmd, size_t len, std::string &response);
     bool ExecuteCmd_spop(std::vector<std::string>& response, const char* format, ...);
 
+    bool ExecDel(std::vector<std::string>& response, string&& key);
+
     bool ExecSetString(std::vector<std::string>& response, string&& strName, string&& str);
 
     bool ExecGetString(std::vector<std::string>& response, string&& strName);
@@ -50,7 +52,15 @@ public:
 
     bool ExecGetLstAll(std::vector<std::string>& response, string&& lstName);
 
+    bool ExecSadd(std::vector<std::string>& response, string&& setName, string&& val);
+
+    bool ExecScontain(std::vector<std::string>& response, string&& setName, string&& val);
+
+    bool ExecSremove(std::vector<std::string>& response, string&& setName, string&& val);
+
     bool ExecHset(std::vector<std::string>& response, string&& hashName, string&& key, string&& value);
+
+    bool ExecHMset(std::vector<std::string>& response, string&& hashName, vector<pair<string, string>>& keyVals);
 
     bool ExecHget(std::vector<std::string>& response, string&& hashName, string&& key);
 

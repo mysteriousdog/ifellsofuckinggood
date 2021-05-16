@@ -52,6 +52,9 @@ public:
     void setUserMapFlag(int _isUserHashChanged) {
         data->isUserHashChanged = _isUserHashChanged;
     }
+    bool addSessionTalker(int id, string&& name, int fd);
+    bool isTalkerOnline(int id);
+    bool removeSessionTalker(int id);
 private:
     ComManger(){};
     redisDataManger* data;

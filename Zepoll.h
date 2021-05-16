@@ -156,7 +156,9 @@ public:
 				}
                 std::cout << "Writing: " << std::endl;
 				MsgHandler& msgHandler =  MsgHandler::getInstance();
-				msgHandler.handle((TransObj*)buffer, fd);
+				TransObj* obj = new TransObj();
+				memcpy(obj, buffer, sizeof(TransObj));
+				msgHandler.handle(obj, fd);
 				// TransObj* obj = (TransObj*)buffer;
 				// cout<<"obj->msgType "<<obj->msgType<<endl;
 				// cout<<"obj->id "<<obj->id<<endl;
@@ -168,10 +170,10 @@ public:
 				// cout<<"cmd->type "<<cmd.getType()<<endl;
 				// Actor& actor = Actor::getInstance();
 				// cmd.doCommand(actor);
-                if (send(fd, buffer, received, 0) != received)
-				{
-					std::cout << "Error writing to socket" << std::endl;
-				}
+                // if (send(fd, buffer, received, 0) != received)
+				// {
+				// 	std::cout << "Error writing to socket" << std::endl;
+				// }
 			}
 
 			// if (received > 0) {

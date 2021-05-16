@@ -13,6 +13,7 @@ typedef struct TransObj
     MSG_TYPE_UINT32_ENUM msgType;
     unsigned int len;
     int id;
+    int recverId;
     int fd;
     char msg[MAX_TRANS_MSG_LEN];
     TransObj():msgType(0),len(0){}
@@ -21,11 +22,25 @@ typedef struct TransObj
     }
     TransObj(int id_, MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_):id(id_),msgType(msgType_),len(len_){}
     TransObj(int id_, MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_, int fd_):id(id_),msgType(msgType_),len(len_), fd(fd_){}
+    TransObj(int id_, int recverId_ ,MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_, int fd_):
+    msgType(msgType_),
+    len(len_),
+    id(id_),
+    recverId(recverId_),
+    fd(fd_)
+    {}
+
     void setMsgType(MSG_TYPE_UINT32_ENUM msgType_) {
         msgType = msgType_;
     }
+    MSG_TYPE_UINT32_ENUM getMsgType() {
+        return msgType;
+    }
     void setId(int id_) {
         id = id_;
+    }
+    void setFd(int fd_) {
+        fd = fd_;
     }
 } tansObj;
 
