@@ -58,7 +58,27 @@ void serverEnd() {
     cout<<"end server complete"<<endl;
 }
 
-bool test() {
+bool serverRegTest() {
+    char name[] = "zlh";
+    char passwd[] = "8219497Pwd!";
+    TransObj* obj = new TransObj(1,MSG_REG, sizeof(passwd) + sizeof(name));
+    sprintf((obj->msg), name);
+    sprintf((obj->msg) + NAME_MAX_LEN, passwd);
+    try
+    {
+        handleUserRegMsg(obj, -1);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        cout<<"err in serverRegTest"<<endl;
+        return false;
+    }
+    return true;
+    
+}
+
+bool serverLoginTest() {
     char passwd[] = "8219497Zwd!";
     TransObj* obj = new TransObj(1,MSG_LOGIN, sizeof(passwd));
     sprintf((obj->msg) + NAME_MAX_LEN, passwd);
@@ -70,21 +90,27 @@ bool test() {
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        cout<<"err in serverLoginTest"<<endl;
         return false;
     }
     
     return true;
 }
 
+bool serverTest() {
+    bool ret;
+    ret = serverRegTest();
+    if (ret) {
+        return ret;
+    }
+    ret = serverLoginTest();
+    if (ret) {
+        return ret;
+    }
+}
+
 int main(int argc, char** argv) {
     serverInit(2, 2);
-    char name[] = "zlh2";
-    char passwd[] = "8219497Pwd!";
-    TransObj* obj = new TransObj(1,MSG_REG, sizeof(passwd) + sizeof(name));
-    sprintf((obj->msg), name);
-    sprintf((obj->msg) + NAME_MAX_LEN, passwd);
-    cout<<"!!!!!!!!"<<obj->msg<<endl;
-    handleUserRegMsg(obj, -1);
     serverEnd();
     // MysqlPool* mysqlPool = new MysqlPool(); ThreadPool::getInstanch()
     // mysqlPool->initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", 2);

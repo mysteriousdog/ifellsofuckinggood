@@ -181,6 +181,5 @@ void handleUserLogMsg(TransObj* obj, int fd)
         SeqToBin::getInstance().getBuff().push(tansObj);
         delete(msqlResSet);
         return 1;
-
     });
 }
