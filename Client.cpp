@@ -59,12 +59,13 @@ bool Client::run()
         // memcpy((void*)((TransObj*)buf)->msg, tansObj->msg, tansObj->len);
         sendLen = objSize;
 #ifdef SERVER_COMPARE
-        cout<<"send from server ..."<<endl;
+        cout<<"send from server msgType is ..."<<tansObj->getMsgType()<<endl;
+        cout << hex << (void *)tansObj << endl;
         // int fd = tansObj->fd;
         // send(fd, buf, sendLen, 0);
 #endif
 #ifdef CLIENT_COMPARE
-        cout<<"send from client ..."<<endl;
+        cout<<"send from client ..."<<tansObj->msg<<endl;
         send(client, buf, sendLen, 0);
 #endif
         delete(tansObj);
@@ -83,13 +84,13 @@ bool Client::recvMsg()
     // }
     char buf[255];
     SeqToBin& seq = SeqToBin::getInstance();
-    string s("1");
-    if (sendMsgOnce(1, MSG_USER_RECV, s)) {
-        cout<<"id band success"<<endl;
-    } else {
-        cout<<"id band err"<<endl;
-        return false;
-    }
+    // string s("1");
+    // if (sendMsgOnce(1, MSG_USER_RECV, s)) {
+    //     cout<<"id band success"<<endl;
+    // } else {
+    //     cout<<"id band err"<<endl;
+    //     return false;
+    // }
     while (recv(client, buf, sizeof(buf), 0) > 0) {
         cout<<"rcv"<<endl;
         TransObj* recvTansObj = (TransObj*)buf;

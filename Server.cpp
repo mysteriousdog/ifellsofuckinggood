@@ -58,13 +58,79 @@ void serverEnd() {
     cout<<"end server complete"<<endl;
 }
 
-int main(int argc, char** argv) {
-    serverInit(2, 2);
-    char passwd[] = "8219497Zwd!";
+bool serverRegTest() {
+    char name[] = "zlh";
+    char passwd[] = "8219497Pwd!";
+    TransObj* obj = new TransObj(1,MSG_REG, sizeof(passwd) + sizeof(name));
+    sprintf((obj->msg), name);
+    sprintf((obj->msg) + NAME_MAX_LEN, passwd);
+    try
+    {
+        cout << hex << (void *)obj << endl;
+        handleUserRegMsg(obj, -1);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        cout<<"err in serverRegTest"<<endl;
+        return false;
+    }
+    return true;
+    
+}
+
+bool serverLoginTest() {
+    char passwd[] = "8219497Pwd!";
     TransObj* obj = new TransObj(1,MSG_LOGIN, sizeof(passwd));
     sprintf((obj->msg) + NAME_MAX_LEN, passwd);
     cout<<"now the input password is "<<obj->msg<<endl;
-    handleUserLogMsg(obj, -1);
+    try
+    {
+        cout << hex << (void *)obj << endl;
+        handleUserLogMsg(obj, -1);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        cout<<"err in serverLoginTest"<<endl;
+        return false;
+    }
+    
+    return true;
+}
+
+bool serverLogoutTest() {
+    TransObj* obj = new TransObj(1,MSG_LOGOUT, 1);
+    try
+    {
+        cout << hex << (void *)obj << endl;
+        handleUserLogOutMsg(obj, -1);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        cout<<"err in serverLogoutTest"<<endl;
+        return false;
+    }
+    
+    return true;
+}
+
+bool serverTest() {
+    bool ret;
+    ret = serverRegTest();
+    if (ret) {
+        return ret;
+    }
+    ret = serverLoginTest();
+    if (ret) {
+        return ret;
+    }
+}
+
+int main(int argc, char** argv) {
+    serverInit(2, 2);
+    serverLogoutTest();
     serverEnd();
     // MysqlPool* mysqlPool = new MysqlPool(); ThreadPool::getInstanch()
     // mysqlPool->initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", 2);

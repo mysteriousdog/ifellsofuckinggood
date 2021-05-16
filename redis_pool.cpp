@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdarg.h>
+#include <sstream>
 using namespace std;
 KGRedisClient::KGRedisClient(std::string ip, int port, std::string password, int timeout)
 {
@@ -112,6 +113,11 @@ bool KGRedisClient::ExecuteCmd_spop(std::vector<std::string>& response, const ch
         return false;
     }
 #endif
+}
+
+bool KGRedisClient::ExecDel(std::vector<std::string>& response, string&& key)
+{
+    return ExecuteCmd_spop(response, "DEL %s", key.c_str());
 }
 
 redisReply* KGRedisClient::ExecuteCmd(const char* format, ...)
@@ -296,6 +302,22 @@ bool KGRedisClient::ExecHset(std::vector<std::string>& response, string&& hashNa
     return false;
 }
 
+bool KGRedisClient::ExecHMset(std::vector<std::string>& response, string&& hashName, vector<pair<string, string>>& keyVals)
+{
+    stringstream ss;
+    ss<<"HMSET";
+    ss<<" ";
+    ss<<hashName;
+    for (auto it = keyVals.begin(); it != keyVals.end(); it++) {
+        ss<<" ";
+        ss<<(*it).first;
+        ss<<" ";
+        ss<<(*it).second;
+    }
+    cout<<"KGRedisClient::ExecHMset "<<ss.str().c_str()<<endl;
+    return ExecuteCmd_spop(response, ss.str().c_str());
+}
+
 bool KGRedisClient::ExecHget(std::vector<std::string>& response, string&& hashName, string&& key)
 {
     return ExecuteCmd_spop(response, "hget %s %s", hashName.c_str(), key.c_str());
@@ -304,4 +326,19 @@ bool KGRedisClient::ExecHget(std::vector<std::string>& response, string&& hashNa
 bool KGRedisClient::ExecHgetAll(std::vector<std::string>& response, string&& hashName)
 {
     return ExecuteCmd_spop(response, "hgetAll %s", hashName.c_str());
+}
+
+bool KGRedisClient::ExecSadd(std::vector<std::string>& response, string&& setName, string&& val)
+{
+    return ExecuteCmd_spop(response, "SADD %s %s", setName.c_str(), val.c_str());
+}
+
+bool KGRedisClient::ExecScontain(std::vector<std::string>& response, string&& setName, string&& val)
+{
+    return ExecuteCmd_spop(response, "SISMEMBER %s %s", setName.c_str(), val.c_str());
+}
+
+bool KGRedisClient::ExecSremove(std::vector<std::string>& response, string&& setName, string&& val)
+{
+    return ExecuteCmd_spop(response, "SREM %s %s", setName.c_str(), val.c_str());
 }
