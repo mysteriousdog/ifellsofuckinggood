@@ -58,13 +58,33 @@ void serverEnd() {
     cout<<"end server complete"<<endl;
 }
 
-int main(int argc, char** argv) {
-    serverInit(2, 2);
+bool test() {
     char passwd[] = "8219497Zwd!";
     TransObj* obj = new TransObj(1,MSG_LOGIN, sizeof(passwd));
     sprintf((obj->msg) + NAME_MAX_LEN, passwd);
     cout<<"now the input password is "<<obj->msg<<endl;
-    handleUserLogMsg(obj, -1);
+    try
+    {
+        handleUserLogMsg(obj, -1);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return false;
+    }
+    
+    return true;
+}
+
+int main(int argc, char** argv) {
+    serverInit(2, 2);
+    char name[] = "zlh2";
+    char passwd[] = "8219497Pwd!";
+    TransObj* obj = new TransObj(1,MSG_REG, sizeof(passwd) + sizeof(name));
+    sprintf((obj->msg), name);
+    sprintf((obj->msg) + NAME_MAX_LEN, passwd);
+    cout<<"!!!!!!!!"<<obj->msg<<endl;
+    handleUserRegMsg(obj, -1);
     serverEnd();
     // MysqlPool* mysqlPool = new MysqlPool(); ThreadPool::getInstanch()
     // mysqlPool->initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", 2);

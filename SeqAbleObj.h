@@ -21,6 +21,12 @@ typedef struct TransObj
     }
     TransObj(int id_, MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_):id(id_),msgType(msgType_),len(len_){}
     TransObj(int id_, MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_, int fd_):id(id_),msgType(msgType_),len(len_), fd(fd_){}
+    void setMsgType(MSG_TYPE_UINT32_ENUM msgType_) {
+        msgType = msgType_;
+    }
+    void setId(int id_) {
+        id = id_;
+    }
 } tansObj;
 
 class SeqAbleObj

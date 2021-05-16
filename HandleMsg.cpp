@@ -99,22 +99,45 @@ void handleMsgCmd(TransObj* obj, int fd) {
 
 void handleUserRegMsg(TransObj* obj, int fd)
 {
-    if (obj->len < (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
+    if (obj->len > (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
         return;        
     }
-    ThreadPool::getInstance().enqueue([&obj, fd] {
+    ThreadPool::getInstance().enqueue([obj, fd] {
         cout<<"do reg!"<<endl;
-        char name[NAME_MAX_LEN];
-        char passwd[PASSWORD_MAX_LEN];
-        memcpy(name, obj->msg, NAME_MAX_LEN);
-        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where username = %s;", name);
+        cout<<obj->msg<<endl;
+        char name[NAME_MAX_LEN] {0};
+        char passwd[PASSWORD_MAX_LEN] {0};
+        // memcpy(name, obj->msg, 4);
+        strncpy(name, obj->msg, NAME_MAX_LEN);
+        cout<<"handleUserRegMsg get name is "<<name<<endl;
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where username = \'%s\';", name);
         if (msqlResSet->next()) {
             delete(msqlResSet);
             cout<<"name reg exists already"<<endl;
+            TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
+            SeqToBin::getInstance().getBuff().push(tansObj);
             return 0;
         }
         memcpy(passwd, (obj->msg + NAME_MAX_LEN), PASSWORD_MAX_LEN);
-        bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(%s, %d, %s);", name, fd, passwd);
+        cout<<"handleUserRegMsg get passwd is "<<passwd<<endl;
+        bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", name, fd, passwd);
+        if (res) {
+            auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select max(userid) from userinfo;");
+            TransObj* tansObj = new TransObj(-1, MSG_REG_ACCEPT, 1, fd);
+            if (!msqlResSet->next()) {
+                tansObj->setMsgType(MSG_REG_REFUSE);
+            } else {
+                int id  = msqlResSet->getInt("userid");
+                tansObj->setId(id);
+                cout<<"handleUserRegMsg insert succed id: "<<id<<endl;
+            }
+            SeqToBin::getInstance().getBuff().push(tansObj);
+            
+            return 1;
+        }
+        cout<<"handleUserRegMsg insert failed "<<endl;
+        TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
+        SeqToBin::getInstance().getBuff().push(tansObj);
         return res ? 1: 0;
     });
 }
@@ -147,6 +170,8 @@ void handleUserLogMsg(TransObj* obj, int fd)
                 cout<<"password not equal!"<<endl;
                 cout<<"realPassword is "<<relPasswd<<endl;
                 cout<<"ransPassword is "<<tansPasswd<<endl;
+                TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
+                SeqToBin::getInstance().getBuff().push(tansObj);
                 delete(msqlResSet);
                 return 0;
             }
