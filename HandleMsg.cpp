@@ -89,6 +89,7 @@ void handleMsgCmd(TransObj* obj, int fd) {
 
 void handleUserRegMsg(TransObj* obj, int fd)
 {
+#ifdef SERVER_COMPARE
     cout << hex << (void *)obj << endl;
     if (obj->len > (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
         return;        
@@ -137,10 +138,19 @@ void handleUserRegMsg(TransObj* obj, int fd)
         SeqToBin::getInstance().getBuff().push(obj);
         return res ? 1: 0;
     });
+#endif
+
+#ifdef CLIENT_COMPARE
+
+    cout<<"client handleUserRegMsg"<<endl;
+
+#endif
+
 }
 
 void handleUserLogMsg(TransObj* obj, int fd)
 {
+#ifdef SERVER_COMPARE
     cout << hex << (void *)obj << endl;
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
         cout << hex << (void *)obj << endl;
@@ -190,13 +200,26 @@ void handleUserLogMsg(TransObj* obj, int fd)
         
         return 1;
     });
+#endif
+
+#ifdef CLIENT_COMPARE
+
+    cout<<"client handleUserLogMsg"<<endl;
+
+#endif
 }
 
 void handleUserLogOutMsg(TransObj* obj, int fd)
 {
+#ifdef SERVER_COMPARE
     ThreadPool::getInstance().enqueue([obj] {
         ComManger::getInstance().removeSessionTalker(obj->id);
     });
+#endif
+
+#ifdef CLIENT_COMPARE
+    cout<<"client handleUserLogOutMsg"<<endl;
+#endif
 }
 
 void handleAskForFriendMsg(TransObj* obj, int fd) {
