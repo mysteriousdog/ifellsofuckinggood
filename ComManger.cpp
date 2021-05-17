@@ -54,3 +54,24 @@ bool ComManger::removeSessionTalker(int id)
     cout<<"ComManger::removeSessionTalker1 err: "<<endl;
     return false;
 }
+
+int ComManger::getTalkerFd(int id)
+{
+    vector<string> response;
+    if (KGRedisClient::getInstance().ExecHget(response, to_string(id), "fd")) {
+        int fd;
+        try
+        {
+            fd = atoi(response[0].c_str());
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            cout<<"getTalkerFd exception"<<endl;
+            return -1;
+        }
+        return fd;
+    }
+    cout<<"getTalkerFd ExecHget"<<endl;
+    return -1;
+}

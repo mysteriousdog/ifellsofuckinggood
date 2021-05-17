@@ -18,7 +18,8 @@ msgHandle g_msgHandle[] = {
     {MSG_CMD, handleMsgCmd},
     {MSG_TALK, handleUserSendMsg},
     {MSG_REG, handleUserRegMsg},
-    {MSG_LOGIN, handleUserLogMsg}
+    {MSG_LOGIN, handleUserLogMsg},
+    {MSG_ASK_FOR_FRIEND, handleAskForFriendMsg}
 };
 
 void MsgHandler::handle(TransObj* obj, int fd)
@@ -48,7 +49,6 @@ void handleUserSendMsg(TransObj* obj, int fd) {
 #ifdef SERVER_COMPARE
 
     ThreadPool::getInstance().enqueue([obj] () mutable {
-        ComManger::getInstance().removeSessionTalker(obj->id);
         if (ComManger::getInstance().isTalkerOnline(obj->recverId)) {
             SeqToBin::getInstance().getBuff().push(obj);
         }
@@ -204,9 +204,13 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
 
     ThreadPool::getInstance().enqueue([obj] () mutable {
         if (ComManger::getInstance().isTalkerOnline(obj->recverId)) {
+            cout<<"servr handleAskForFriendMsg friend online!"<<endl;
+            int fd = ComManger::getInstance().getTalkerFd(obj->recverId);
+            obj->fd = fd;
             SeqToBin::getInstance().getBuff().push(obj);
             return 1;
         }
+        cout<<"servr handleAskForFriendMsg friend offline!"<<endl;
         return 0;
     });
 
