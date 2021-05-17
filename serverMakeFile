@@ -11,7 +11,7 @@ LINK= -lrediscluster -lmysqlcppconn -lpthread
 
 CC=g++ -g ${CPP_FLAGS} ${PLAT_MACRO}
 
-objs = Actor.o Command.o Game.o ReadKey.o Server.o Client.o HandleMsg.o redis_pool.o mysql_pool.o SeqAbleObj.o
+objs = Actor.o Command.o Game.o ReadKey.o Server.o Client.o HandleMsg.o redis_pool.o mysql_pool.o SeqAbleObj.o Player.o ComManger.o
 
 
 server: $(objs)
@@ -26,7 +26,7 @@ Game.o:Game.cpp Game.h ReadKey.h MyEnum.h HandleMsg.h SeqToBin.h ConcQueue.h
 	$(CC) -c Game.cpp 
 ReadKey.o:ReadKey.cpp ReadKey.h Command.h SeqToBin.h TalkManger.h
 	$(CC) -c ReadKey.cpp
-Server.o:Server.cpp Zepoll.h mysql_pool.h redis_pool.h ThreadPool.h HandleMsg.h Client.h SeqToBin.h
+Server.o:Server.cpp Zepoll.h mysql_pool.h redis_pool.h ThreadPool.h HandleMsg.h Client.h SeqToBin.h Player.h
 	$(CC) -c Server.cpp
 Client.o:Client.cpp Client.h ConcQueue.h SeqToBin.h SeqAbleObj.h Command.h
 	$(CC) -c Client.cpp
@@ -36,6 +36,10 @@ HandleMsg.o:HandleMsg.cpp HandleMsg.h redis_pool.h ThreadPool.h ComManger.h SeqT
 	$(CC) -c HandleMsg.cpp
 redis_pool.o:redis_pool.cpp redis_pool.h ComManger.h
 	$(CC) -c redis_pool.cpp
+Player.o:Player.cpp Player.h
+	$(CC) -c Player.cpp
+ComManger.o:ComManger.cpp ComManger.h
+	$(CC) -c ComManger.cpp
 
 
 # .PHONY

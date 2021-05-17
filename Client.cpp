@@ -59,7 +59,7 @@ bool Client::run()
         // memcpy((void*)((TransObj*)buf)->msg, tansObj->msg, tansObj->len);
         sendLen = objSize;
 #ifdef SERVER_COMPARE
-        cout<<"send from server msgType is ..."<<tansObj->getMsgType()<<endl;
+        cout<<"send from server msgType is ... "<<(int)tansObj->getMsgType()<<endl;
         cout << hex << (void *)tansObj << endl;
         // int fd = tansObj->fd;
         // send(fd, buf, sendLen, 0);

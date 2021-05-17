@@ -42,6 +42,9 @@ typedef struct TransObj
     void setFd(int fd_) {
         fd = fd_;
     }
+    void setrecverId(int recverId_) {
+        recverId = recverId_;
+    }
 } tansObj;
 
 class SeqAbleObj

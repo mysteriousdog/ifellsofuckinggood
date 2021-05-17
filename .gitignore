@@ -6,9 +6,10 @@ client/client.cpp
 server/myepoll.h
 server/server.cpp
 server/sever
-server
 Makefile
 *.o
 appendonly_6380.aof
 nodes.conf
 appendonly.aof
+*.rdb
+server

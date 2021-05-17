@@ -25,7 +25,6 @@ KGRedisClient::~KGRedisClient()
     }
 }
 
-
 bool KGRedisClient::ExecuteCmd_spop(std::vector<std::string>& response, const char* format, ...)
 {
     va_list args;
@@ -335,7 +334,20 @@ bool KGRedisClient::ExecSadd(std::vector<std::string>& response, string&& setNam
 
 bool KGRedisClient::ExecScontain(std::vector<std::string>& response, string&& setName, string&& val)
 {
-    return ExecuteCmd_spop(response, "SISMEMBER %s %s", setName.c_str(), val.c_str());
+    if (ExecuteCmd_spop(response, "SISMEMBER %s %s", setName.c_str(), val.c_str())) {
+        try
+        {
+            if (response[0] == "1") {
+                return true;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            return false;
+        }
+    }
+    return false;
 }
 
 bool KGRedisClient::ExecSremove(std::vector<std::string>& response, string&& setName, string&& val)
