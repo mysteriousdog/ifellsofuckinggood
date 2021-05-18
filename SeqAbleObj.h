@@ -6,7 +6,7 @@
 
 
 
-const int MAX_TRANS_MSG_LEN = 32;
+const int MAX_TRANS_MSG_LEN = 64;
 
 typedef struct TransObj
 {

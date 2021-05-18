@@ -225,7 +225,17 @@ void handleUserLogOutMsg(TransObj* obj, int fd)
 void handleAskForFriendMsg(TransObj* obj, int fd) {
 #ifdef SERVER_COMPARE
 
-    ThreadPool::getInstance().enqueue([obj] () mutable {
+    ThreadPool::getInstance().enqueue([obj, fd] () mutable {
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select userid from userinfo where username = %s;", obj->msg);
+        if (msqlResSet->next()) {
+            obj->recverId = msqlResSet.getInt("userid");
+        } else {
+            cout<<"asked friend not found!"<<endl;
+            obj->setMsgType(MSG_ASK_FOR_FRIEND_NOT_FOUND);
+            obj->setFd(fd);
+            SeqToBin::getInstance().getBuff().push(obj);
+            return 0;
+        }
         if (ComManger::getInstance().isTalkerOnline(obj->recverId)) {
             cout<<"servr handleAskForFriendMsg friend online!"<<endl;
             int fd = ComManger::getInstance().getTalkerFd(obj->recverId);

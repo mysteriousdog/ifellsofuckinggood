@@ -134,6 +134,22 @@ bool serverAskForFriendTest() {
     return true;
 }
 
+bool serverAskForFriendNotFoundTest() {
+    TransObj* obj = new TransObj(1,MSG_ASK_FOR_FRIEND, 1);
+    snprintf(obj->msg, NAME_MAX_LEN, "xxx");
+    try
+    {
+        handleAskForFriendMsg(obj, -1);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        cout<<"err in serverLogoutTest"<<endl;
+        return false;
+    }
+    return true;
+}
+
 bool serverTest() {
     bool ret = true;
     ret = serverRegTest();
