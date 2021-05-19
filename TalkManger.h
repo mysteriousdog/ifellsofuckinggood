@@ -11,7 +11,12 @@
 #include <condition_variable>
 #include "CommandDoer.h"
 #include <string.h>
+#include <list>
+#include <map>
 using namespace std;
+
+int const MAX_FRIENDS_NUM = 3000;
+
 class TalkManger : public CommandDoer, public Singleton<TalkManger>
 {
 public:
@@ -27,29 +32,13 @@ public:
         while (true) {
             cout<<"wait for talk..."<<endl;
             unique_lock<mutex> lock(data_mutex);
-            data_cond.wait(lock, [this] {return this->talking;});
-            talking = true;
-            struct termios new_settings;
-            struct termios stored_settings;
-            tcgetattr(0,&stored_settings);
-            new_settings = stored_settings;
-            new_settings.c_lflag &= (ICANON);
-            new_settings.c_lflag &= ECHO;// 关闭回显
-            tcsetattr(0,TCSANOW,&new_settings);
-            tcsetattr(0,TCSANOW,&stored_settings);
-            string str;
-            cout<<"Now say someyhing..."<<endl;
-            cin>>str;
-            getchar();
-            cout<<"You say "<<str<<endl;
-            if (str.length() >= MAX_TRANS_MSG_LEN) {
-                cout<<"talk too much.. your message shoud inside 31 char"<<endl;
-                continue;
+            data_cond.wait(lock, [this] {return this->talking || this->getSysMsg;});
+            if (this->getSysMsg) {
+                handleSysMsg();
+            } else if (this->talking) {
+                handleTalk();
             }
-            TransObj* talkObj = new TransObj(1, MSG_TALK, 0);
-            memcpy(talkObj->msg, str.c_str(), str.length());
-            SeqToBin::getInstance().getBuff().push(talkObj);
-            talking = false;
+            
         }
     }
     void turnToTalk() {
@@ -65,11 +54,48 @@ public:
         return talking;
     }
 
+    string& getTalkerName() {
+        return talkerName;
+    }
+    void setTalkerName(string&& name) {
+        talkerName = name;
+    }
+
+    map<string, bool>& getAllFriends() {
+        return friends;
+    } 
+
+    bool addFriend(string&& name) {
+        if (friends.size() >= MAX_FRIENDS_NUM) {
+            return false;
+        }
+        friends[name] = true;
+        isFriendsChanged = true;
+        return true;
+    }
+    bool delFriend(string&& name) {
+        if (friends.count(name) > 0) {
+            friends[name] = false;
+            isFriendsChanged = true;
+            return true;
+        }
+        return false;
+    }
+
+    void handleSysMsg();
+    void handleTalk();
+
 private:
-    TalkManger() : talking(false){};
+    TalkManger() : talking(false), isFriendsChanged(false), getSysMsg(false){
+        // load friends
+    };
     bool talking;
+    bool getSysMsg;
+    bool isFriendsChanged;
     mutex data_mutex;
     condition_variable data_cond;
+    string talkerName;
+    map<string, bool> friends;
 friend class Singleton;
 };
 

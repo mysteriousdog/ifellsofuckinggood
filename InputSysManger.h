@@ -28,6 +28,12 @@ public:
             break;
         }
     }
+    void handleSysRecvMsg() {
+        TransObj* rcvObj;
+        if (SeqToBin::getInstance().getRcvBuff().tryAndPop(rcvObj)) {
+            MsgHandler::getInstance().handle(rcvObj, -1);
+        }
+    }
 
 private:
     InputSysManger() : talkManger(TalkManger::getInstance()){};

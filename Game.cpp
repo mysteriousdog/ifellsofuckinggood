@@ -41,8 +41,7 @@ void Game::updateWordPerSec()
 
 void Game::update()
 {
-    ReadKey& read = ReadKey::getInstance();
-    (void)read.scanKeyBoard();
+    (void)ReadKey::getInstance().scanKeyBoard();
     inputSysManger.handleSysInput();
     actor.update();
     SeqToBin& seq = SeqToBin::getInstance();

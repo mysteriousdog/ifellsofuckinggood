@@ -68,11 +68,18 @@ void UtilTestUnit() {
     obj = util.getMsgFromInput("zhulihua wqdwq 123456");
     assert(obj != nullptr);
     assert(obj->msgType == MSG_TALK);
+    assert(strncmp(obj->msg, "zhulihua wqdwq 123456", MAX_TRANS_MSG_LEN) == 0);
     delete(obj);
 
-    obj = util.getMsgFromInput("add@zhulihua|123456");
+    obj = util.getMsgFromInput("add@lily");
     assert(obj != nullptr);
     assert(obj->msgType == MSG_ASK_FOR_FRIEND);
+    assert(strncmp(obj->msg, "lily", NAME_MAX_LEN) == 0);
+    delete(obj);
+
+    obj = util.getMsgFromInput("chose@lily");
+    assert(obj != nullptr);
+    assert(strncmp(TalkManger::getInstance().getTalkerName().c_str(), "lily", NAME_MAX_LEN) == 0);
     delete(obj);
 }
 

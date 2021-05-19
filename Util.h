@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "SeqAbleObj.h"
+#include "Singleton.h"
 using namespace std;
 
 #define INPUTSTR_SPLIT_FLAG "@"
@@ -17,7 +18,7 @@ typedef struct CommunicationCmd {
 } CommunicationCmdTable;
 
 
-class Util
+class Util : public Singleton<Util>
 {
 public:
     Util(){}
@@ -26,7 +27,15 @@ public:
     TransObj* getMsgFromInput(string&& input);
 private:
     
-
+friend class Singleton;
 };
 
+
+TransObj* handleInputOfLogin(string&& input);
+TransObj* handleInputOfLogout(string&& input);
+TransObj* handleInputOfRegin(string&& input);
+TransObj* handleInputOfAskForFriend(string&& input);
+TransObj* handleInputOfChoseTalker(string&& input);
+TransObj* handleInputOfShowFriends(string&& input);
+bool splitInputStr2NameAndPwd(vector<string>& res, string&& input);
 #endif // _UTIL_H_
