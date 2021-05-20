@@ -4,12 +4,22 @@
 #include <sstream>
 using namespace std;
 
-void ii(SystemMsgObj* sysObj){}
 
 static sysMsgHandle sysMsgHandleTable[] = {
-    {SYS_SHOW_FRIENDS_MSG, ii},
     {SYS_SHOW_FRIENDS_MSG, bind(&SysManger::handleSysMsgOfShowFriends, &SysManger::getInstance(), placeholders::_1)},
 };
+
+void SysManger::handleSysMsg() {
+        SystemMsgObj* sysObj;
+        if (SeqToBin::getInstance().tryGetSysMsg(sysObj)) {
+            for (int loop = 0; loop < (sizeof(sysMsgHandleTable) / sizeof(sysMsgHandle)); loop++) {
+                if (sysMsgHandleTable[loop].sysMsgType == sysObj->msgType) {
+                    sysMsgHandleTable[loop].handler(sysObj);
+                }
+            }
+        }
+    }
+
 
 void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
 {
@@ -29,6 +39,7 @@ void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
             (*ss)<<"\n";
         }
     }
+    delete(sysObj);
     cout<<"SysManger::handleSysMsgOfShowFriends "<<ss->str().c_str()<<endl;
     ioManger.putOutputMsg(ss);
 }

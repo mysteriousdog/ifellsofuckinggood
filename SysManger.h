@@ -56,12 +56,7 @@ public:
         }
     }
 
-    void handleSysMsg() {
-        SystemMsgObj* sysObj;
-        if (SeqToBin::getInstance().tryGetSysMsg(sysObj)) {
-
-        }
-    }
+    void handleSysMsg();
 
     void handleSysMsgOfShowFriends(SystemMsgObj* sysObj);
 
