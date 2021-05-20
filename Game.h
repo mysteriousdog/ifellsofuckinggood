@@ -3,7 +3,7 @@
 
 #include "Singleton.h"
 #include "Actor.h"
-#include "InputSysManger.h"
+#include "SysManger.h"
 
 class Game : public Singleton<Game>
 {
@@ -19,7 +19,7 @@ private:
     
     bool isRunning;
     Actor &actor;
-    InputSysManger& inputSysManger;
+    SysManger& inputSysManger;
 
 friend class Singleton;
 };

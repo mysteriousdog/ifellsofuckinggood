@@ -24,7 +24,7 @@ Actor.o:Actor.cpp Actor.h MyEnum.h ReadKey.h Command.h
 	$(CC) -c Actor.cpp
 Game.o:Game.cpp Game.h ReadKey.h MyEnum.h HandleMsg.h SeqToBin.h ConcQueue.h
 	$(CC) -c Game.cpp 
-ReadKey.o:ReadKey.cpp ReadKey.h Command.h SeqToBin.h TalkManger.h
+ReadKey.o:ReadKey.cpp ReadKey.h Command.h SeqToBin.h IOManger.h
 	$(CC) -c ReadKey.cpp
 Server.o:Server.cpp Zepoll.h mysql_pool.h redis_pool.h ThreadPool.h HandleMsg.h Client.h SeqToBin.h Player.h
 	$(CC) -c Server.cpp

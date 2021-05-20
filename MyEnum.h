@@ -37,4 +37,10 @@ typedef enum MsgType{
 typedef unsigned int MSG_TYPE_UINT32_ENUM;
 
 
+typedef enum SysMsgType{
+    SYS_SHOW_FRIENDS_MSG = 0,
+    SYS_MSG_BUTTON
+} sysMsgType;
+typedef unsigned int SYS_MSG_TYPE_UINT32_ENUM;
+
 #endif

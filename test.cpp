@@ -16,15 +16,15 @@
 #include <stdlib.h>
 #include <thread>
 #include "Player.h"
-#include "TalkManger.h"
+#include "IOManger.h"
 #include "ThreadPool.h"
 #include <unistd.h>
 using namespace std;
 
 void fun() {
     cout<<"111"<<endl;
-    TalkManger& talkManger = TalkManger::getInstance();
-    talkManger();
+    // IOManger& IOManger = IOManger::getInstance();
+    // IOManger();
 }
 
 void UtilTestUnit() {
@@ -79,17 +79,29 @@ void UtilTestUnit() {
 
     obj = util.getMsgFromInput("chose@lily");
     assert(obj != nullptr);
-    assert(strncmp(TalkManger::getInstance().getTalkerName().c_str(), "lily", NAME_MAX_LEN) == 0);
+    assert(strncmp(Player::getInstance().getTalkerName().c_str(), "lily", NAME_MAX_LEN) == 0);
     delete(obj);
 }
 
+class A {
+public:
+    void f(int b) {
+        cout<<"fuck!"<<b<<endl;
+    }
+};
+
 int main()
 {
-    UtilTestUnit();
+    // UtilTestUnit();
     // ThreadPool::getInstance().init(2);
-    // // TalkManger& talkManger = TalkManger::getInstance();
+    // // IOManger& IOManger = IOManger::getInstance();
     // ThreadPool::getInstance().enqueue(fun);
     // Game& game = Game::getInstance();
     // game();
+    A a;
+    ThreadPool::getInstance().init(2);
+    ThreadPool::getInstance().enqueue(&A::f, a, 1);
+    // ThreadPool::getInstance().enqueue(fun);
+    sleep(1);
     return 0;
 }

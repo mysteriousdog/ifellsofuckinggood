@@ -58,6 +58,12 @@ public:
         return data.empty();
     }
 
+    bool waitTillNotEmpty(){
+        unique_lock<mutex> lock(m);
+        data_cond.wait(lock, [this] {return !(this->data.empty());});
+        return true;
+    }
+
     void waitPushTillEmpty(T& value) {
         unique_lock<mutex> lock(m);
         empty_cond.wait(lock, [this] {return this->data.empty();});

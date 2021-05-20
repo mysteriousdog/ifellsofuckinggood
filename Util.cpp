@@ -4,7 +4,8 @@
 #include<boost/format.hpp>
 #include <iostream>
 #include "Player.h"
-#include "TalkManger.h"
+#include "IOManger.h"
+#include "ReadKey.h"
 
 static CommunicationCmd communicationCmdTable[] = {
     {"li", handleInputOfLogin},
@@ -86,14 +87,15 @@ TransObj* handleInputOfChoseTalker(string&& input) {
         return nullptr;
     }
     // 首先要判断这个人存不存在 然后判断是不是好友 最后判断是不是在线
-    TalkManger::getInstance().setTalkerName(move(input));
+    Player::getInstance().setTalkerName(move(input));
     TransObj* obj = new TransObj(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
     snprintf(obj->msg, NAME_MAX_LEN, input.c_str());
     return obj;
 }
 
 TransObj* handleInputOfShowFriends(string&& input) {
-    auto friends = TalkManger::getInstance().getAllFriends();
+    auto friends = Player::getInstance().getAllFriends();
+    
     // show 所有的friends
     return nullptr;
 }

@@ -30,9 +30,16 @@ public:
     ConcQueue<tansObj*>& getRcvBuff() {
         return rcvBuff;
     }
+    bool tryGetSysMsg(SystemMsgObj* sysObj) {
+        return sysBuff.tryAndPop(sysObj);
+    }
+    void putSysMsg(SystemMsgObj* sysObj) {
+        sysBuff.push(sysObj);
+    }
 private:
     ConcQueue<tansObj*> buff;
     ConcQueue<tansObj*> rcvBuff;
+    ConcQueue<SystemMsgObj*> sysBuff;
 friend class Singleton;
 friend class client;
 };

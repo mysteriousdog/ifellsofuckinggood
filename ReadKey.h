@@ -13,6 +13,9 @@ public:
     CMD_TYPE_UINT32_ENUM scanKeyBoard();
     Command* getCmd();
     Command* getSysCmd();
+    void putSysCmd() {
+        
+    }
 protected:
     ReadKey();
 private:

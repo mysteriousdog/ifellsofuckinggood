@@ -6,7 +6,7 @@
 #include<unistd.h>
 #include<termios.h>
 #include <string.h>
-#include "TalkManger.h"
+#include "IOManger.h"
 using namespace std;
 
 bool ReadKey::isSystemCmd(CMD_TYPE_UINT32_ENUM type)
@@ -27,7 +27,7 @@ bool ReadKey::isActorCmd(CMD_TYPE_UINT32_ENUM type)
 
 bool ReadKey::isTimeToReadKey()
 {
-    return !TalkManger::getInstance().isTalking();
+    return !IOManger::getInstance().isTalking();
 }
 
 CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()

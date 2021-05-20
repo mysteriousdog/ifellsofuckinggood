@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "MyEnum.h"
-
+#include <iostream>
 
 
 const int MAX_TRANS_MSG_LEN = 64;
@@ -48,7 +48,14 @@ typedef struct TransObj
     void setLen(int len_) {
         len = len_;
     }
+    virtual ~TransObj(){}
 } tansObj;
+
+typedef struct SystemMsgObj{
+
+    void* sysMsg;
+    SystemMsgObj(){};
+}systemMsgObj;
 
 class SeqAbleObj
 {

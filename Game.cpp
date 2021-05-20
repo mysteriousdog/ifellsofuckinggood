@@ -18,7 +18,7 @@ long long systemtime()
 Game::Game():
 isRunning(true),
 actor(Actor::getInstance()),
-inputSysManger(InputSysManger::getInstance())
+inputSysManger(SysManger::getInstance())
 {
     
 }
@@ -41,17 +41,8 @@ void Game::updateWordPerSec()
 
 void Game::update()
 {
-    (void)ReadKey::getInstance().scanKeyBoard();
     inputSysManger.handleSysInput();
+    (void)ReadKey::getInstance().scanKeyBoard();
     actor.update();
-    SeqToBin& seq = SeqToBin::getInstance();
-    TransObj* rcvObj;
-    if (seq.getRcvBuff().tryAndPop(rcvObj)) {
-        cout<<"-----------get recv pop beg-----------"<<endl;
-        MsgHandler& msgHandler =  MsgHandler::getInstance();
-	    msgHandler.handle(rcvObj, -1);
-        cout<<"-----------get recv pop end-----------"<<endl;
-    }
-    
-    // cout<<"----------"<<endl;
+
 }

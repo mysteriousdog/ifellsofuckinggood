@@ -1,8 +1,8 @@
-#include "TalkManger.h"
+#include "IOManger.h"
 #include "Player.h"
 #include "Util.h"
 
-void TalkManger::handleTalk()
+void IOManger::handleTalk()
 {
     talking = true;
     struct termios new_settings;
@@ -32,7 +32,13 @@ void TalkManger::handleTalk()
     talking = false;
 }
 
-void TalkManger::handleSysMsg()
+void IOManger::handleOutputMsg()
 {
-    
+    stringstream* msg;
+    if (outputMsg.tryAndPop(msg)) {
+        cout<<"###########################################################################################"<<endl;
+        cout<<msg->str().c_str()<<endl;
+        delete(msg);
+        cout<<"###########################################################################################"<<endl;
+    }
 }
