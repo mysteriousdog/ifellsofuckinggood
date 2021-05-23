@@ -30,10 +30,10 @@ static CommunicationCmd communicationCmdTable[] = {
     {"chose", handleInputOfChoseTalker},
     {"Chose", handleInputOfChoseTalker},
     {"CHOSE", handleInputOfChoseTalker},
+    {"sf", handleInputOfShowFriends},
     {"showfriends", handleInputOfShowFriends},
     {"showFriends", handleInputOfShowFriends},
     {"ShowFriends", handleInputOfShowFriends},
-    {"sf", handleInputOfShowFriends},
     {"sr", handleInputOfShowRequests},
     {"showrequests", handleInputOfShowRequests},
     {"showRequests", handleInputOfShowRequests},
@@ -130,7 +130,20 @@ TransObj* handleInputOfAccRequest(string&& input)
 {
     int index = atoi(input.c_str());
     if (SysManger::getInstance().containsReqIdx(index)) {
-        TransObj* obj = new TransObj(-1, -1, MSG_ASK_FOR_FRIEND_ACCEPT, MAX_TRANS_MSG_LEN, -1);
+        TransObj* reqObj = nullptr;
+        if (!SysManger::getInstance().getOneRequest(index, reqObj)) {
+            stringstream *ss = new stringstream();
+            (*ss)<<"Your command of accept the request send err"<<" \n";
+            IOManger::getInstance().putOutputMsg(ss);
+            return nullptr;
+        }
+        int recvId = reqObj->id;
+        string name = reqObj->msg;
+        TransObj* obj = new TransObj(Player::getInstance().getPlayerId(), recvId, MSG_ASK_FOR_FRIEND_ACCEPT, MAX_TRANS_MSG_LEN, -1);
+        stringstream *ss = new stringstream();
+        (*ss)<<"Your command of accept the request have been send"<<" \n";
+        IOManger::getInstance().putOutputMsg(ss);
+        Player::getInstance().addFriend(move(name), recvId);
         return obj;
     }
     stringstream *ss = new stringstream();

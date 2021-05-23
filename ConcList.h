@@ -115,6 +115,16 @@ public:
         unique_lock<mutex> lock(m);
         return size;
     }
+    bool getOneRequest(int index, T& obj) {
+        unique_lock<mutex> lock(m);
+        if (index >= 0 && index < size) {
+            auto it = data.begin();
+            advance(it, index);
+            obj = *it;
+            return true;
+        }
+        return false;
+    }
 private:
     int size;
     list<T> data;

@@ -26,14 +26,14 @@ void SysManger::handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj) {
     if (sysObj == nullptr) {
         return;
     }
-    list<requestObj*> reqs;
+    list<TransObj*> reqs;
     getAllRequests(reqs);
     // show requests
     stringstream *ss = new stringstream();
     (*ss)<<"All requests list down here: \n";
     int i = 0;
     for (auto it = reqs.begin(); it != reqs.end(); it++) {
-        (*ss)<<i<<": "<<(*it)->getReqMsg()<<" \n";
+        (*ss)<<i<<": "<<(*it)->msg<<" \n";
     }
     IOManger::getInstance().putOutputMsg(ss);
     delete(sysObj);

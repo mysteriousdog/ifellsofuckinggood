@@ -44,5 +44,4 @@ void Game::update()
     inputSysManger.handleSysInput();
     (void)ReadKey::getInstance().scanKeyBoard();
     actor.update();
-
 }

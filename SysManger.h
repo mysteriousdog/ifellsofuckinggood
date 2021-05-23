@@ -63,23 +63,23 @@ public:
     void handleSysMsgOfShowFriends(SystemMsgObj* sysObj);
     void handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj);
 
-    void pushBackReq(requestObj* req) {
+    void pushBackReq(TransObj* req) {
         reqBuff.push_back(req);
     }
-    void pushFrontReq(requestObj* req) {
+    void pushFrontReq(TransObj* req) {
         reqBuff.push_front(req);
     }
 
-    requestObj* popBackReq() {
+    TransObj* popBackReq() {
         reqBuff.pop_back();
     }
-    requestObj* popFrontReq() {
+    TransObj* popFrontReq() {
         reqBuff.pop_front();
     }
     bool eraseOneReq(int index) {
        return reqBuff.erase(index);
     }
-    void getAllRequests(list<requestObj*> reqs) {
+    void getAllRequests(list<TransObj*> reqs) {
         reqBuff.getAllData(reqs);
     }
     bool containsReqIdx(int index) {
@@ -88,12 +88,15 @@ public:
         }
         return false;
     }
+    bool getOneRequest(int index, TransObj* req) {
+        return reqBuff.getOneRequest(index, req);
+    }
 
 private:
     SysManger() : ioManger(IOManger::getInstance()), player(Player::getInstance()){};
     IOManger& ioManger;
     Player& player;
-    ConcList<requestObj*> reqBuff;
+    ConcList<TransObj*> reqBuff;
     
 friend class Singleton;
 };

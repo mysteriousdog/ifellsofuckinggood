@@ -8,11 +8,8 @@
 
 const int MAX_TRANS_MSG_LEN = 64;
 
-typedef struct RequestObj{
-    virtual const char* getReqMsg(){return nullptr;}
-} requestObj;
 
-typedef struct TransObj : public RequestObj
+typedef struct TransObj
 {
     MSG_TYPE_UINT32_ENUM msgType;
     unsigned int len;
@@ -33,10 +30,6 @@ typedef struct TransObj : public RequestObj
     recverId(recverId_),
     fd(fd_)
     {}
-
-    virtual const char* getReqMsg(){
-        return msg;
-    }
 
     void setMsgType(MSG_TYPE_UINT32_ENUM msgType_) {
         msgType = msgType_;
@@ -67,13 +60,11 @@ typedef struct TransObj : public RequestObj
     virtual ~TransObj(){}
 } tansObj;
 
-typedef struct SystemMsgObj  : public RequestObj
+typedef struct SystemMsgObj
 {
     SYS_MSG_TYPE_UINT32_ENUM msgType;
 
     SystemMsgObj(SYS_MSG_TYPE_UINT32_ENUM msgType_): msgType(msgType_){}
-
-    virtual const char* getReqMsg(){return nullptr;}
 
 }systemMsgObj;
 

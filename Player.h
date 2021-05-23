@@ -12,6 +12,7 @@ int const MAX_FRIENDS_NUM = 3000;
 
 typedef struct PlayerData {
 
+    int id;
     string name;
     string password;
 
@@ -27,9 +28,10 @@ typedef struct FriendData {
 class Player : public Singleton<Player> {
 
 public:
-    void init(string& name_, string& password_) {
+    void init(string& name_, string& password_, int id_) {
         data.name = name_;
         data.password = password_;
+        data.id = id_;
     }
 
     string getPlayerName() {
@@ -40,6 +42,9 @@ public:
         return data.password;
     }
 
+    int getPlayerId() {
+        return data.id;
+    }
 
     string& getTalkerName() {
         return talkerName;

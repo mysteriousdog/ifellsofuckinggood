@@ -21,10 +21,24 @@
 #include <unistd.h>
 using namespace std;
 
-void fun() {
-    cout<<"111"<<endl;
-    // IOManger& IOManger = IOManger::getInstance();
-    // IOManger();
+bool clientInit(size_t threadPoolSize) {
+    cout<<"init client  start"<<endl;
+    int ret = 0;
+    ThreadPool::getInstance().init(threadPoolSize);
+    Client client;
+    ThreadPool::getInstance().enqueue(&Client::run, &client);
+    ThreadPool::getInstance().enqueue(&Client::recvMsg, &client);
+    cout<<"init client complete"<<endl;
+    return ret;
+}
+
+void clientEnd() {
+    cout<<"end client  start"<<endl;
+    TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
+    sleep(3);
+    SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
+    sleep(1);
+    cout<<"end client complete"<<endl;
 }
 
 void UtilTestUnit() {
@@ -83,25 +97,12 @@ void UtilTestUnit() {
     delete(obj);
 }
 
-class A {
-public:
-    void f(int b) {
-        cout<<"fuck!"<<b<<endl;
-    }
-};
 
 int main()
 {
-    // UtilTestUnit();
-    // ThreadPool::getInstance().init(2);
-    // // IOManger& IOManger = IOManger::getInstance();
-    // ThreadPool::getInstance().enqueue(fun);
-    // Game& game = Game::getInstance();
-    // game();
-    A a;
-    ThreadPool::getInstance().init(2);
-    ThreadPool::getInstance().enqueue(&A::f, a, 1);
-    // ThreadPool::getInstance().enqueue(fun);
-    sleep(1);
+    clientInit(4);
+    Game& game =  Game::getInstance();
+    game();
+    clientEnd();
     return 0;
 }

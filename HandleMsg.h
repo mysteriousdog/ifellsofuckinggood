@@ -27,6 +27,7 @@ void handleAskForFriendMsg(TransObj* obj, int fd);
 void handleAskForFriendNotFoundMsg(TransObj* obj, int fd);
 void handleAskForFriendAcceptMsg(TransObj* obj, int fd);
 
+
 class MsgHandler : public Singleton<MsgHandler>
 {
 public:

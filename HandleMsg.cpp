@@ -29,7 +29,8 @@ msgHandle g_msgHandle[] = {
     {MSG_REG, handleUserRegMsg},
     {MSG_LOGIN, handleUserLogMsg},
     {MSG_ASK_FOR_FRIEND, handleAskForFriendMsg},
-    {MSG_ASK_FOR_FRIEND_NOT_FOUND, handleAskForFriendNotFoundMsg}
+    {MSG_ASK_FOR_FRIEND_NOT_FOUND, handleAskForFriendNotFoundMsg},
+    {MSG_ASK_FOR_FRIEND_ACCEPT, handleAskForFriendAcceptMsg}
 };
 
 void MsgHandler::handle(TransObj* obj, int fd)
@@ -270,6 +271,7 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
             cout<<"servr handleAskForFriendMsg friend online!"<<endl;
             int fd = ComManger::getInstance().getTalkerFd(obj->recverId);
             obj->fd = fd;
+
             SeqToBin::getInstance().getBuff().push(obj);
             return 1;
         }
@@ -302,7 +304,10 @@ void handleAskForFriendNotFoundMsg(TransObj* obj, int fd)
     }
 
 #ifdef CLIENT_COMPARE
-    int senderId = obj->id;
+    stringstream *ss = new stringstream();
+    (*ss)<<"the friend you asked " <<obj->msg<< " do not exists!\n";
+    IOManger::getInstance().putOutputMsg(ss);
+    delete(obj);
     
 #endif
 }
