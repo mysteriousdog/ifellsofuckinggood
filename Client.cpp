@@ -65,6 +65,7 @@ bool Client::run()
 #endif
 #ifdef CLIENT_COMPARE
         cout<<"send from client ..."<<tansObj->getMsgType()<<endl;
+        cout<<"send from client msg ..."<<tansObj->getMsg()<<endl;
         send(client, buf, sendLen, 0);
 #endif
         delete(tansObj);

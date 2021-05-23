@@ -56,6 +56,9 @@ typedef struct TransObj
     char* getName() {
         return msg;
     }
+    char* getMsg() {
+        return msg;
+    }
 
     virtual ~TransObj(){}
 } tansObj;

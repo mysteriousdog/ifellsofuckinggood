@@ -22,11 +22,14 @@ void handleMsgCmd(TransObj* obj, int fd);
 void handleUserSendMsg(TransObj* obj, int fd);
 void handleUserRegMsg(TransObj* obj, int fd);
 void handleUserLogMsg(TransObj* obj, int fd);
+void handleUserLogRefusedMsg(TransObj* obj, int fd);
+void handleUserLogAcceptedMsg(TransObj* obj, int fd);
 void handleUserLogOutMsg(TransObj* obj, int fd);
 void handleAskForFriendMsg(TransObj* obj, int fd);
 void handleAskForFriendNotFoundMsg(TransObj* obj, int fd);
 void handleAskForFriendAcceptMsg(TransObj* obj, int fd);
-
+void handleUserRegRefusedMsg(TransObj* obj, int fd);
+void handleUserRegAcceptedMsg(TransObj* obj, int fd);
 
 class MsgHandler : public Singleton<MsgHandler>
 {

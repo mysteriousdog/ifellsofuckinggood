@@ -41,6 +41,7 @@ void Game::updateWordPerSec()
 
 void Game::update()
 {
+    cout<<"-------------"<<endl;
     inputSysManger.handleSysInput();
     (void)ReadKey::getInstance().scanKeyBoard();
     actor.update();

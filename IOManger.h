@@ -28,11 +28,11 @@ public:
         
     }
 
-    void operator () () {
+    void run() {
         while (true) {
             cout<<"wait for talk..."<<endl;
             unique_lock<mutex> lock(data_mutex);
-            data_cond.wait(lock, [this] {return this->talking || this->outputMsg.waitTillNotEmpty();});
+            data_cond.wait(lock, [this] {return this->talking || !(this->outputMsg.empty());});
             if (!this->talking) {
                 handleOutputMsg();
             } else {
@@ -40,6 +40,10 @@ public:
             }
             
         }
+    }
+
+    void operator () () {
+        run();
     }
 
     bool isTalking() {

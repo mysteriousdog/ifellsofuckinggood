@@ -81,6 +81,7 @@ TransObj* handleInputOfRegin(string&& input) {
     TransObj* obj = new TransObj(-1, -1, MSG_REG, MAX_TRANS_MSG_LEN, -1);
     snprintf(obj->msg, NAME_MAX_LEN, res[0].c_str());
     snprintf(obj->msg + NAME_MAX_LEN, PASSWORD_MAX_LEN, res[1].c_str());
+    Player::getInstance().init(res[0], res[1], -1);
     return obj;
 }
 

@@ -27,7 +27,11 @@ msgHandle g_msgHandle[] = {
     {MSG_CMD, handleMsgCmd},
     {MSG_TALK, handleUserSendMsg},
     {MSG_REG, handleUserRegMsg},
+    {MSG_REG_REFUSE, handleUserRegRefusedMsg},
+    {MSG_REG_ACCEPT, handleUserRegAcceptedMsg},
     {MSG_LOGIN, handleUserLogMsg},
+    {MSG_LOGIN_REFUSE, handleUserLogRefusedMsg},
+    {MSG_LOGIN_ACCEPT, handleUserLogAcceptedMsg},
     {MSG_ASK_FOR_FRIEND, handleAskForFriendMsg},
     {MSG_ASK_FOR_FRIEND_NOT_FOUND, handleAskForFriendNotFoundMsg},
     {MSG_ASK_FOR_FRIEND_ACCEPT, handleAskForFriendAcceptMsg}
@@ -130,7 +134,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
             cout<<"name reg exists already"<<endl;
             // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
             obj->setMsgType(MSG_REG_REFUSE);
-            obj->setMsg("regin err!");
+            obj->setMsg("regin err! name reg exists already!");
             SeqToBin::getInstance().getBuff().push(obj);
             return 0;
         }
@@ -144,6 +148,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
             if (!msqlResSet->next()) {
                 // tansObj->setMsgType(MSG_REG_REFUSE);
                 obj->setMsgType(MSG_REG_REFUSE);
+                obj->setMsg("regin err! \n");
             } else {
                 int id  = msqlResSet->getInt("userid");
                 // tansObj->setId(id);
@@ -157,6 +162,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
         cout<<"handleUserRegMsg insert failed "<<endl;
         // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
         obj->setMsgType(MSG_REG_REFUSE);
+        obj->setMsg("regin err! \n");
         SeqToBin::getInstance().getBuff().push(obj);
         return res ? 1: 0;
     });
@@ -170,6 +176,40 @@ void handleUserRegMsg(TransObj* obj, int fd)
 
 }
 
+void handleUserRegRefusedMsg(TransObj* obj, int fd)
+{
+    if (obj == nullptr) {
+        cout<<"client handleUserRegRefusedMsg err nullptr!"<<endl;
+        return;
+    }
+#ifdef CLIENT_COMPARE 
+
+    stringstream *ss = new stringstream();
+    (*ss)<<obj->getMsg();
+    IOManger::getInstance().putOutputMsg();
+
+#endif
+}
+
+void handleUserRegAcceptedMsg(TransObj* obj, int fd)
+{
+    if (obj == nullptr) {
+        cout<<"client handleUserRegAcceptedMsg err nullptr!"<<endl;
+        return;
+    }
+
+#ifdef CLIENT_COMPARE 
+
+    // Player::getInstance().setLoginStatus(false);
+    stringstream *ss = new stringstream();
+    (*ss)<<"Regin success!\n";
+    IOManger::getInstance().putOutputMsg();
+
+#endif
+ 
+}
+
+
 void handleUserLogMsg(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
@@ -179,7 +219,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
 #ifdef SERVER_COMPARE
     cout << hex << (void *)obj << endl;
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
-        cout << hex << (void *)obj << endl;
+
         int id = obj->id;
         cout<<"id "<<id<<endl;
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password, username from userinfo where userid = %d;", id);
@@ -188,12 +228,16 @@ void handleUserLogMsg(TransObj* obj, int fd)
             // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
             // SeqToBin::getInstance().getBuff().push(tansObj);
             obj->setMsgType(MSG_LOGIN_REFUSE);
+            obj->setMsg("Login err! not found id\n");
             SeqToBin::getInstance().getBuff().push(obj);
             delete(msqlResSet);
             return 0;
         }
         if (obj->len > PASSWORD_MAX_LEN) {
-            cout<<"password len too long!"<<endl;
+            cout<<"msg len too long!"<<endl;
+            obj->setMsgType(MSG_LOGIN_REFUSE);
+            obj->setMsg("Login err! \n");
+            SeqToBin::getInstance().getBuff().push(obj);
             delete(msqlResSet);
             return 0;
         }
@@ -211,6 +255,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
                 // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
                 // SeqToBin::getInstance().getBuff().push(tansObj);
                 obj->setMsgType(MSG_LOGIN_REFUSE);
+                obj->setMsg("Login err!\n");
                 SeqToBin::getInstance().getBuff().push(obj);
                 delete(msqlResSet);
                 return 0;
@@ -233,6 +278,40 @@ void handleUserLogMsg(TransObj* obj, int fd)
     cout<<" client handleUserLogMsg"<<endl;
 #endif
 }
+
+void handleUserLogRefusedMsg(TransObj* obj, int fd)
+{
+    if (obj == nullptr) {
+        cout<<"get in handleUserLogRefusedMsg err nullptr"<<endl;
+        return;
+    }
+
+#ifdef CLIENT_COMPARE
+    stringstream *ss = new stringstream();
+    (*ss)<<bj->msg;
+    IOManger::getInstance().putOutputMsg(ss);
+    delete(obj);
+
+#endif
+}
+
+void handleUserLogAcceptedMsg(TransObj* obj, int fd)
+{
+    if (obj == nullptr) {
+        cout<<"get in handleUserLogAcceptedMsg err nullptr"<<endl;
+        return;
+    }
+
+#ifdef CLIENT_COMPARE
+    stringstream *ss = new stringstream();
+    (*ss)<<"you have login in success!\n";
+    Player::getInstance().setLoginStatus(true);
+    Player::getInstance().setPlayerId(obj->id);
+    IOManger::getInstance().putOutputMsg(ss);
+    delete(obj);
+#endif
+}
+
 
 void handleUserLogOutMsg(TransObj* obj, int fd)
 {

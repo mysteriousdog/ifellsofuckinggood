@@ -42,6 +42,10 @@ public:
         return data.password;
     }
 
+    void setPlayerId(int id_) {
+        data.id = id_;
+    }
+
     int getPlayerId() {
         return data.id;
     }
@@ -85,8 +89,16 @@ public:
         return false;
     }
 
+    void setLoginStatus(bool isLogined) {
+        logined = isLogined;
+    }
+    bool isLogined() {
+        return logined;
+    }
+
 private:
-    Player(): isFriendsChanged(false){};
+    bool logined;
+    Player(): isFriendsChanged(false), logined(false){};
     playerData data;
     bool isFriendsChanged;
     string talkerName;

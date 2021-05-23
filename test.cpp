@@ -28,6 +28,9 @@ bool clientInit(size_t threadPoolSize) {
     Client client;
     ThreadPool::getInstance().enqueue(&Client::run, &client);
     ThreadPool::getInstance().enqueue(&Client::recvMsg, &client);
+    IOManger& iomanger = IOManger::getInstance();
+    ThreadPool::getInstance().enqueue(&IOManger::run, &(IOManger::getInstance()));
+    sleep(1);
     cout<<"init client complete"<<endl;
     return ret;
 }

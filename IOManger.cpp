@@ -1,6 +1,7 @@
 #include "IOManger.h"
 #include "Player.h"
 #include "Util.h"
+#include <sstream>
 
 void IOManger::handleTalk()
 {
@@ -20,6 +21,15 @@ void IOManger::handleTalk()
     cout<<"You say "<<str<<endl;
     if (str.length() >= MAX_TRANS_MSG_LEN) {
         cout<<"talk too much.. your message shoud inside "<< MAX_TRANS_MSG_LEN <<" words."<<endl;
+        return;
+    }
+    if (!Player::getInstance().isLogined()) {
+        stringstream *ss = new stringstream();
+        (*ss)<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
+        (*ss)<<"Try Regin ==> Regin@yourname|yourpassword\n";
+        (*ss)<<"Try Login ==> Login@yourname|yourpassword\n";
+        (*ss)<<"(-_-)\n";
+        putOutputMsg(ss);
         return;
     }
     // TransObj* talkObj = new TransObj(1, MSG_TALK, 0);
