@@ -6,6 +6,9 @@
 #include "Player.h"
 #include "IOManger.h"
 #include "ReadKey.h"
+#include <list>
+#include <stdlib.h>
+#include "SysManger.h"
 
 static CommunicationCmd communicationCmdTable[] = {
     {"li", handleInputOfLogin},
@@ -31,6 +34,16 @@ static CommunicationCmd communicationCmdTable[] = {
     {"showFriends", handleInputOfShowFriends},
     {"ShowFriends", handleInputOfShowFriends},
     {"sf", handleInputOfShowFriends},
+    {"sr", handleInputOfShowRequests},
+    {"showrequests", handleInputOfShowRequests},
+    {"showRequests", handleInputOfShowRequests},
+    {"ShowRequests", handleInputOfShowRequests},
+    {"SHOWREQUESTS", handleInputOfShowRequests},
+    {"ar", handleInputOfAccRequest},
+    {"acceptrequest", handleInputOfAccRequest},
+    {"acceptRequest", handleInputOfAccRequest},
+    {"Acceptrequest", handleInputOfAccRequest},
+    {"ACCEPTREQUEST", handleInputOfAccRequest},
 };
 
 bool splitInputStr2NameAndPwd(vector<string>& res, string&& input) {
@@ -94,9 +107,35 @@ TransObj* handleInputOfChoseTalker(string&& input) {
 }
 
 TransObj* handleInputOfShowFriends(string&& input) {
-    auto friends = Player::getInstance().getAllFriends();
-    
+    SystemMsgObj* sysObj = new SystemMsgObj(SYS_SHOW_FRIENDS_MSG);
+    SeqToBin::getInstance().putSysMsg(sysObj);
     // show 所有的friends
+    return nullptr;
+}
+
+TransObj* handleInputOfShowRequests(string&& input)
+{
+    // SystemMsgObj* sysObj = new SystemMsgObj(SYS_SHOW_FRIENDS_MSG);
+    // SeqToBin::getInstance().putSysMsg(sysObj);
+    // show 所有的friends
+    // list<RequestObj*> allReqs;
+    // SysManger::getInstance().getAllRequests(allReqs);
+    SystemMsgObj* sysObj = new SystemMsgObj(SYS_SHOW_ASK_FOR_FRIEND_REQ);
+    SeqToBin::getInstance().putSysMsg(sysObj);
+    
+    return nullptr;
+}
+
+TransObj* handleInputOfAccRequest(string&& input)
+{
+    int index = atoi(input.c_str());
+    if (SysManger::getInstance().containsReqIdx(index)) {
+        TransObj* obj = new TransObj(-1, -1, MSG_ASK_FOR_FRIEND_ACCEPT, MAX_TRANS_MSG_LEN, -1);
+        return obj;
+    }
+    stringstream *ss = new stringstream();
+    (*ss)<<"Your input number of accepted request id not exists ==> "<<input<<" \n";
+    IOManger::getInstance().putOutputMsg(ss);
     return nullptr;
 }
 

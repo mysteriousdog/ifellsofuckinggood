@@ -17,6 +17,13 @@ typedef struct PlayerData {
 
 }playerData;
 
+typedef struct FriendData {
+
+    int id;
+    FriendData(int id_): id(id_){}
+
+}friendData;
+
 class Player : public Singleton<Player> {
 
 public:
@@ -25,28 +32,48 @@ public:
         data.password = password_;
     }
 
+    string getPlayerName() {
+        return data.name;
+    }
+
+    string getPlayerPwd() {
+        return data.password;
+    }
+
+
     string& getTalkerName() {
         return talkerName;
     }
     void setTalkerName(string&& name) {
         talkerName = name;
     }
+    int getTalkerId() {
+        return friends[talkerName]->id;
+    }
 
-    map<string, bool>& getAllFriends() {
+    map<string, friendData*>& getAllFriends() {
         return friends;
     } 
 
-    bool addFriend(string&& name) {
+    bool addFriend(string&& name, int id) {
         if (friends.size() >= MAX_FRIENDS_NUM) {
             return false;
         }
-        friends[name] = true;
+        if (friends.count(name) > 0) {
+            friends[name]->id = id;
+            isFriendsChanged = true;
+            return true;
+        }
+        friends[name] = new friendData(id);
         isFriendsChanged = true;
         return true;
     }
     bool delFriend(string&& name) {
         if (friends.count(name) > 0) {
-            friends[name] = false;
+            if (friends[name] != nullptr) {
+                delete(friends[name]);
+            }
+            friends[name] = nullptr;
             isFriendsChanged = true;
             return true;
         }
@@ -58,7 +85,7 @@ private:
     playerData data;
     bool isFriendsChanged;
     string talkerName;
-    map<string, bool> friends;
+    map<string, friendData*> friends;
     mutex data_mutex;
     condition_variable data_cond;
 friend class Singleton;

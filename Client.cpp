@@ -55,7 +55,7 @@ bool Client::run()
             break;
         }
         
-        memcpy((void*)buf, tansObj, objSize);
+        memcpy((void*)buf, (void*)tansObj, objSize);
         // memcpy((void*)((TransObj*)buf)->msg, tansObj->msg, tansObj->len);
         sendLen = objSize;
 #ifdef SERVER_COMPARE
@@ -92,7 +92,9 @@ bool Client::recvMsg()
     // }
     while (recv(client, buf, sizeof(buf), 0) > 0) {
         cout<<"rcv"<<endl;
-        TransObj* recvTansObj = (TransObj*)buf;
+        // TransObj* recvTansObj = (TransObj*)buf;
+        TransObj* recvTansObj = new TransObj();
+        memcpy((void*)recvTansObj, (void*)buf, sizeof(TransObj));
         std::cout << recvTansObj->id << std::endl;
         std::cout << recvTansObj->msgType << std::endl;
         std::cout << recvTansObj->len << std::endl;

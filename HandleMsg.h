@@ -8,7 +8,8 @@
 #include <iostream>
 using namespace std;
 
-typedef void (*MSG_HANDLE_FUNC_PTR)(TransObj*, int);
+// typedef void (*MSG_HANDLE_FUNC_PTR)(TransObj*, int);
+typedef function<void(TransObj*, int)> MSG_HANDLE_FUNC_PTR;
 
 typedef struct MsgHandle{
 
@@ -23,7 +24,8 @@ void handleUserRegMsg(TransObj* obj, int fd);
 void handleUserLogMsg(TransObj* obj, int fd);
 void handleUserLogOutMsg(TransObj* obj, int fd);
 void handleAskForFriendMsg(TransObj* obj, int fd);
-
+void handleAskForFriendNotFoundMsg(TransObj* obj, int fd);
+void handleAskForFriendAcceptMsg(TransObj* obj, int fd);
 
 class MsgHandler : public Singleton<MsgHandler>
 {

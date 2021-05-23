@@ -9,7 +9,9 @@
 #include "ThreadPool.h"
 #include "SeqToBin.h"
 #include "Player.h"
+#include "ConcList.h"
 #include <iostream>
+#include <list>
 using namespace std;
 
 
@@ -59,11 +61,39 @@ public:
     void handleSysMsg();
 
     void handleSysMsgOfShowFriends(SystemMsgObj* sysObj);
+    void handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj);
+
+    void pushBackReq(requestObj* req) {
+        reqBuff.push_back(req);
+    }
+    void pushFrontReq(requestObj* req) {
+        reqBuff.push_front(req);
+    }
+
+    requestObj* popBackReq() {
+        reqBuff.pop_back();
+    }
+    requestObj* popFrontReq() {
+        reqBuff.pop_front();
+    }
+    bool eraseOneReq(int index) {
+       return reqBuff.erase(index);
+    }
+    void getAllRequests(list<requestObj*> reqs) {
+        reqBuff.getAllData(reqs);
+    }
+    bool containsReqIdx(int index) {
+        if (index >= 0 && index < reqBuff.getSize()) {
+            return true;
+        }
+        return false;
+    }
 
 private:
     SysManger() : ioManger(IOManger::getInstance()), player(Player::getInstance()){};
     IOManger& ioManger;
     Player& player;
+    ConcList<requestObj*> reqBuff;
     
 friend class Singleton;
 };

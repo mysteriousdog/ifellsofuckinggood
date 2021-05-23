@@ -75,3 +75,23 @@ int ComManger::getTalkerFd(int id)
     cout<<"getTalkerFd ExecHget"<<endl;
     return -1;
 }
+
+bool getTalkerName(int id, string& res)
+{
+    vector<string> response;
+    if (KGRedisClient::getInstance().ExecHget(response, to_string(id), "name")) {
+        try
+        {
+            res = response[0];
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            cout<<"getTalkerName exception"<<endl;
+            return false;
+        }
+        return true;
+    }
+    cout<<"getTalkerName ExecHget"<<endl;
+    return false;
+}

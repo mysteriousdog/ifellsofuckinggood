@@ -8,6 +8,15 @@
 #include "SeqAbleObj.h"
 #include "Player.h"
 #endif
+
+#ifdef CLIENT_COMPARE
+#include "Util.h"
+#include "SysManger.h"
+#include "IOManger.h"
+#include <sstream>
+#include "Player.h"
+#include <sstream>
+#endif
 #include <string.h>
 #include "SeqToBin.h"
 #include <vector>
@@ -19,7 +28,8 @@ msgHandle g_msgHandle[] = {
     {MSG_TALK, handleUserSendMsg},
     {MSG_REG, handleUserRegMsg},
     {MSG_LOGIN, handleUserLogMsg},
-    {MSG_ASK_FOR_FRIEND, handleAskForFriendMsg}
+    {MSG_ASK_FOR_FRIEND, handleAskForFriendMsg},
+    {MSG_ASK_FOR_FRIEND_NOT_FOUND, handleAskForFriendNotFoundMsg}
 };
 
 void MsgHandler::handle(TransObj* obj, int fd)
@@ -38,14 +48,11 @@ void MsgHandler::handle(TransObj* obj, int fd)
 
 void handleUserSendMsg(TransObj* obj, int fd) {
 
+    if (obj == nullptr) {
+        cout<<"get in handleUserSendMsg err nullptr"<<endl;
+        return;
+    }
     cout<<"get in handleUserSendMsg "<<endl;
-    char *msg = obj->msg;
-    int id = obj->id;
-    cout<<"msg id"<<obj->id<<endl;
-    cout<<"msg recvId id"<<obj->recverId<<endl;
-    cout<<"msg msgType"<<obj->msgType<<endl;
-    cout<<"msg len"<<obj->len<<endl;
-    cout<<"msg "<<msg<<endl;
 #ifdef SERVER_COMPARE
 
     ThreadPool::getInstance().enqueue([obj] () mutable {
@@ -57,7 +64,14 @@ void handleUserSendMsg(TransObj* obj, int fd) {
 
 #ifdef CLIENT_COMPARE
 
-    cout<<"client  handleUserSendMsg get!"<<msg<<endl;
+    cout<<"client  handleUserSendMsg get!"<<endl;
+    stringstream* ss = new stringstream();
+    (*ss)<<"You just got message from ";
+    (*ss)<<obj->id<<" :\n";
+    (*ss)<<obj->msg<<" \n";
+    cout<<"client  handleUserSendMsg get "<<ss->str().c_str()<<endl;
+    IOManger::getInstance().putOutputMsg(ss);
+    delete(obj);
 
 #endif
 }
@@ -70,7 +84,8 @@ void handleMsgCmd(TransObj* obj, int fd) {
 #ifdef CLIENT_COMPARE
     if (fd == -1) {
         // 此时是客户端
-        cout<<"此时是客户端"<<endl;
+        cout<<"此时是客户端 handleMsgCmd"<<endl;
+        
         return;
     }
 #endif
@@ -89,6 +104,11 @@ void handleMsgCmd(TransObj* obj, int fd) {
 
 void handleUserRegMsg(TransObj* obj, int fd)
 {
+    if (obj == nullptr) {
+        cout<<"client handleUserRegMsg err nullptr!"<<endl;
+        return;
+    }
+
 #ifdef SERVER_COMPARE
     cout << hex << (void *)obj << endl;
     if (obj->len > (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
@@ -109,6 +129,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
             cout<<"name reg exists already"<<endl;
             // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
             obj->setMsgType(MSG_REG_REFUSE);
+            obj->setMsg("regin err!");
             SeqToBin::getInstance().getBuff().push(obj);
             return 0;
         }
@@ -141,8 +162,8 @@ void handleUserRegMsg(TransObj* obj, int fd)
 #endif
 
 #ifdef CLIENT_COMPARE
-
-    cout<<"client handleUserRegMsg"<<endl;
+    
+    cout<<"CLIENT_COMPARE handleUserRegMsg"<<endl;
 
 #endif
 
@@ -150,6 +171,10 @@ void handleUserRegMsg(TransObj* obj, int fd)
 
 void handleUserLogMsg(TransObj* obj, int fd)
 {
+    if (obj == nullptr) {
+        cout<<"get in handleUserLogMsg err nullptr"<<endl;
+        return;
+    }
 #ifdef SERVER_COMPARE
     cout << hex << (void *)obj << endl;
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
@@ -204,8 +229,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
 
 #ifdef CLIENT_COMPARE
 
-    cout<<"client handleUserLogMsg"<<endl;
-
+    cout<<" client handleUserLogMsg"<<endl;
 #endif
 }
 
@@ -223,6 +247,12 @@ void handleUserLogOutMsg(TransObj* obj, int fd)
 }
 
 void handleAskForFriendMsg(TransObj* obj, int fd) {
+
+    if (obj == nullptr) {
+        cout<<"get in handleAskForFriendMsg err nullptr"<<endl;
+        return;
+    }
+
 #ifdef SERVER_COMPARE
 
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
@@ -251,8 +281,76 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
 
 #ifdef CLIENT_COMPARE
 
-    cout<<"client handleUserLogOutMsg"<<endl;
-
+    cout<<"client handleAskForFriendMsg"<<endl;
+    if (obj == nullptr) {
+        return;
+    }
+    char* name = obj->msg;
+    stringstream* ss = new stringstream();
+    (*ss)<<"You have a request from ";
+    (*ss)<<name;
+    IOManger::getInstance().putOutputMsg(ss);
+    SysManger::getInstance().pushBackReq(obj);
 #endif
 }
 
+void handleAskForFriendNotFoundMsg(TransObj* obj, int fd)
+{
+    if (obj == nullptr) {
+        cout<<"get in handleAskForFriendNotFoundMsg err nullptr"<<endl;
+        return;
+    }
+
+#ifdef CLIENT_COMPARE
+    int senderId = obj->id;
+    
+#endif
+}
+
+
+void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
+{
+
+    if (obj == nullptr) {
+        cout<<"get in handleAskForFriendAcceptMsg err nullptr"<<endl;
+        return;
+    }
+#ifdef SERVER_COMPARE
+
+    ThreadPool::getInstance().enqueue([obj] () mutable {
+        if (ComManger::getInstance().isTalkerOnline(obj->recverId)) {
+            int fd = ComManger::getInstance().getTalkerFd(obj->recverId);
+            obj->setFd(fd);
+            string name;
+            if (ComManger::getInstance().getTalkerName(name)) {
+                if (name.length() >= NAME_MAX_LEN) {
+                    cout<<"server handleAskForFriendAcceptMsg get name length err "<<name.length()<<endl;
+                    return -1;
+                }
+                obj->setMsg(name.c_str());
+            }
+            SeqToBin::getInstance().getBuff().push(obj);
+            return 1;
+        }
+        cout<<"server handleAskForFriendAcceptMsg get recverId err "<<endl;
+        return -1;
+    });
+
+#endif
+
+#ifdef CLIENT_COMPARE
+
+    string name = obj->getName();
+    if (name.length() >= NAME_MAX_LEN) {
+        cout<<"client handleAskForFriendAcceptMsg get name length err "<<name.length()<<endl;
+        return;
+    }
+    if (Player::getInstance().addFriend(move(name), obj->id)) {
+        stringstream *ss = new stringstream();
+        (*ss)<<"Your ask friend request had been accepted from "<<name<<"\n";
+        IOManger::getInstance().putOutputMsg(ss);
+    } else {
+        cout<<"client handleAskForFriendAcceptMsg add  friend err "<<name<<endl;
+    }
+#endif
+}

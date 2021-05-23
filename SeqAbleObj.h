@@ -4,11 +4,15 @@
 #include <stdlib.h>
 #include "MyEnum.h"
 #include <iostream>
-
+#include <string.h>
 
 const int MAX_TRANS_MSG_LEN = 64;
 
-typedef struct TransObj
+typedef struct RequestObj{
+    virtual const char* getReqMsg(){return nullptr;}
+} requestObj;
+
+typedef struct TransObj : public RequestObj
 {
     MSG_TYPE_UINT32_ENUM msgType;
     unsigned int len;
@@ -30,6 +34,10 @@ typedef struct TransObj
     fd(fd_)
     {}
 
+    virtual const char* getReqMsg(){
+        return msg;
+    }
+
     void setMsgType(MSG_TYPE_UINT32_ENUM msgType_) {
         msgType = msgType_;
     }
@@ -48,14 +56,25 @@ typedef struct TransObj
     void setLen(int len_) {
         len = len_;
     }
+
+    void setMsg(char* msg_) {
+        strncpy(msg, msg_, strlen(msg_));
+    }
+    char* getName() {
+        return msg;
+    }
+
     virtual ~TransObj(){}
 } tansObj;
 
-typedef struct SystemMsgObj{
-
+typedef struct SystemMsgObj  : public RequestObj
+{
     SYS_MSG_TYPE_UINT32_ENUM msgType;
-    void* sysMsg;
+
     SystemMsgObj(SYS_MSG_TYPE_UINT32_ENUM msgType_): msgType(msgType_){}
+
+    virtual const char* getReqMsg(){return nullptr;}
+
 }systemMsgObj;
 
 class SeqAbleObj

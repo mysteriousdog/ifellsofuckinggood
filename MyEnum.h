@@ -32,6 +32,8 @@ typedef enum MsgType{
     MSG_LOGOUT,
     MSG_ASK_FOR_FRIEND,
     MSG_ASK_FOR_FRIEND_NOT_FOUND,
+    MSG_ASK_FOR_FRIEND_ACCEPT,
+    MSG_ASK_FOR_FRIEND_REFUSE,
     MSG_BUTTON
 } msgType;
 typedef unsigned int MSG_TYPE_UINT32_ENUM;
@@ -39,6 +41,7 @@ typedef unsigned int MSG_TYPE_UINT32_ENUM;
 
 typedef enum SysMsgType{
     SYS_SHOW_FRIENDS_MSG = 0,
+    SYS_SHOW_ASK_FOR_FRIEND_REQ,
     SYS_MSG_BUTTON
 } sysMsgType;
 typedef unsigned int SYS_MSG_TYPE_UINT32_ENUM;

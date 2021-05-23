@@ -56,6 +56,7 @@ public:
     bool isTalkerOnline(int id);
     bool removeSessionTalker(int id);
     int getTalkerFd(int id);
+    bool getTalkerName(int id, string& res);
 private:
     ComManger(){};
     redisDataManger* data;
