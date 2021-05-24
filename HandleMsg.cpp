@@ -186,7 +186,7 @@ void handleUserRegRefusedMsg(TransObj* obj, int fd)
 
     stringstream *ss = new stringstream();
     (*ss)<<obj->getMsg();
-    IOManger::getInstance().putOutputMsg();
+    IOManger::getInstance().putOutputMsg(ss);
 
 #endif
 }
@@ -203,7 +203,7 @@ void handleUserRegAcceptedMsg(TransObj* obj, int fd)
     // Player::getInstance().setLoginStatus(false);
     stringstream *ss = new stringstream();
     (*ss)<<"Regin success!\n";
-    IOManger::getInstance().putOutputMsg();
+    IOManger::getInstance().putOutputMsg(ss);
 
 #endif
  
@@ -288,7 +288,7 @@ void handleUserLogRefusedMsg(TransObj* obj, int fd)
 
 #ifdef CLIENT_COMPARE
     stringstream *ss = new stringstream();
-    (*ss)<<bj->msg;
+    (*ss)<<obj->msg;
     IOManger::getInstance().putOutputMsg(ss);
     delete(obj);
 
