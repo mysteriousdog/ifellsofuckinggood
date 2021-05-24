@@ -23,13 +23,12 @@ void IOManger::handleTalk()
         cout<<"talk too much.. your message shoud inside "<< MAX_TRANS_MSG_LEN <<" words."<<endl;
         return;
     }
+
     if (!Player::getInstance().isLogined()) {
-        stringstream *ss = new stringstream();
-        (*ss)<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
-        (*ss)<<"Try Regin ==> Regin@yourname|yourpassword\n";
-        (*ss)<<"Try Login ==> Login@yourname|yourpassword\n";
-        (*ss)<<"(-_-)\n";
-        putOutputMsg(ss);
+        cout<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
+        cout<<"Try Regin ==> Regin@yourname|yourpassword\n";
+        cout<<"Try Login ==> Login@yourname|yourpassword\n";
+        cout<<"(-_-)\n";
         return;
     }
     // TransObj* talkObj = new TransObj(1, MSG_TALK, 0);
@@ -45,6 +44,7 @@ void IOManger::handleTalk()
 void IOManger::handleOutputMsg()
 {
     stringstream* msg;
+    cout<<"IOManger::handleOutputMsg"<<endl;
     if (outputMsg.tryAndPop(msg)) {
         cout<<"###########################################################################################"<<endl;
         cout<<msg->str().c_str()<<endl;

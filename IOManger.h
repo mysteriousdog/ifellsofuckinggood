@@ -34,8 +34,10 @@ public:
             unique_lock<mutex> lock(data_mutex);
             data_cond.wait(lock, [this] {return this->talking || !(this->outputMsg.empty());});
             if (!this->talking) {
+                cout<<"get in handleOutputMsg"<<endl;
                 handleOutputMsg();
             } else {
+                cout<<"get in handleTalk"<<endl;
                 handleTalk();
             }
             
@@ -61,10 +63,12 @@ public:
     }
 
     void putOutputMsg(stringstream* msg) {
+        unique_lock<mutex> lock(data_mutex);
         std::cout<<"now turn to show msg !!"<<std::endl;
         // TransObj* obj = new TransObj(1, MSG_TALK, 0);
         // talkingQueue.push(obj);
         outputMsg.push(msg);
+        data_cond.notify_one();
     }
 
     void handleOutputMsg();

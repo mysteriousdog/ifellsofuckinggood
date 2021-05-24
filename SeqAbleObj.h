@@ -70,6 +70,9 @@ typedef struct SystemMsgObj
 {
     SYS_MSG_TYPE_UINT32_ENUM msgType;
 
+    // template <class T>
+    // std::shared_ptr<T> sysMsgPtr;
+
     SystemMsgObj(SYS_MSG_TYPE_UINT32_ENUM msgType_): msgType(msgType_){}
 
 }systemMsgObj;
