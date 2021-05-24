@@ -76,7 +76,7 @@ int ComManger::getTalkerFd(int id)
     return -1;
 }
 
-bool getTalkerName(int id, string& res)
+bool ComManger::getTalkerName(int id, string& res)
 {
     vector<string> response;
     if (KGRedisClient::getInstance().ExecHget(response, to_string(id), "name")) {

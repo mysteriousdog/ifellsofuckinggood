@@ -6,10 +6,11 @@
 #include "Command.h"
 #include "Singleton.h"
 #include <iostream>
+#include <functional>
 using namespace std;
 
 // typedef void (*MSG_HANDLE_FUNC_PTR)(TransObj*, int);
-typedef function<void(TransObj*, int)> MSG_HANDLE_FUNC_PTR;
+typedef std::function<void(TransObj*, int)> MSG_HANDLE_FUNC_PTR;
 
 typedef struct MsgHandle{
 

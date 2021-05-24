@@ -50,8 +50,11 @@ typedef struct TransObj
         len = len_;
     }
 
-    void setMsg(char* msg_) {
+    void setMsg(const char* msg_) {
         strncpy(msg, msg_, strlen(msg_));
+    }
+    void clearMsg() {
+        memset(msg, 0, MAX_TRANS_MSG_LEN);
     }
     char* getName() {
         return msg;

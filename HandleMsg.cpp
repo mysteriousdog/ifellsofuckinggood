@@ -336,9 +336,9 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
 #ifdef SERVER_COMPARE
 
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
-        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select userid from userinfo where username = %s;", obj->msg);
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select userid from userinfo where username = \'%s\';", obj->msg);
         if (msqlResSet->next()) {
-            obj->recverId = msqlResSet.getInt("userid");
+            obj->recverId = msqlResSet->getInt("userid");
         } else {
             cout<<"asked friend not found!"<<endl;
             obj->setMsgType(MSG_ASK_FOR_FRIEND_NOT_FOUND);
@@ -406,7 +406,7 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
             int fd = ComManger::getInstance().getTalkerFd(obj->recverId);
             obj->setFd(fd);
             string name;
-            if (ComManger::getInstance().getTalkerName(name)) {
+            if (ComManger::getInstance().getTalkerName(obj->id, name)) {
                 if (name.length() >= NAME_MAX_LEN) {
                     cout<<"server handleAskForFriendAcceptMsg get name length err "<<name.length()<<endl;
                     return -1;
