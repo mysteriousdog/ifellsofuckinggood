@@ -119,6 +119,8 @@ bool serverLogoutTest() {
 bool serverAskForFriendTest() {
     TransObj* obj = new TransObj(1,MSG_ASK_FOR_FRIEND, 1);
     obj->setrecverId(2);
+    obj->clearMsg();
+    obj->setMsg("lily");
     try
     {
         cout << hex << (void *)obj << endl;

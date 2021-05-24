@@ -3,6 +3,8 @@
 
 #include "Singleton.h"
 #include <iostream>
+#include <mutex>
+#include <condition_variable>
 #include <map>
 using namespace std;
 
