@@ -25,10 +25,15 @@ void IOManger::handleTalk()
     }
 
     if (!Player::getInstance().isLogined()) {
-        cout<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
-        cout<<"Try Regin ==> Regin@yourname|yourpassword\n";
-        cout<<"Try Login ==> Login@yourname|yourpassword\n";
-        cout<<"(-_-)\n";
+        auto ss = make_shared<stringstream>();
+        (*ss)<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
+        (*ss)<<"Try Regin ==> Regin@yourname|yourpassword\n";
+        (*ss)<<"Try Login ==> Login@yourname|yourpassword\n";
+        (*ss)<<"(-_-)\n";
+        SystemMsgObj* sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        SeqToBin::getInstance().putSysMsg(sysObj);
+        talking = false;
+        prePareToOutput = true;
         return;
     }
     // TransObj* talkObj = new TransObj(1, MSG_TALK, 0);
@@ -43,12 +48,12 @@ void IOManger::handleTalk()
 
 void IOManger::handleOutputMsg()
 {
-    stringstream* msg;
+    std::shared_ptr<std::stringstream> msg;
     cout<<"IOManger::handleOutputMsg"<<endl;
-    if (outputMsg.tryAndPop(msg)) {
+    if ((msg = outputMsg.tryAndPop()) != nullptr) {
         cout<<"###########################################################################################"<<endl;
         cout<<msg->str().c_str()<<endl;
         cout<<"###########################################################################################"<<endl;
-        delete(msg);
     }
+    prePareToOutput = false;
 }

@@ -133,23 +133,26 @@ TransObj* handleInputOfAccRequest(string&& input)
     if (SysManger::getInstance().containsReqIdx(index)) {
         TransObj* reqObj = nullptr;
         if (!SysManger::getInstance().getOneRequest(index, reqObj)) {
-            stringstream *ss = new stringstream();
+            shared_ptr<stringstream> ss = make_shared<stringstream>();
             (*ss)<<"Your command of accept the request send err"<<" \n";
-            IOManger::getInstance().putOutputMsg(ss);
+            SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+            SeqToBin::getInstance().putSysMsg(sysObj);
             return nullptr;
         }
         int recvId = reqObj->id;
         string name = reqObj->msg;
         TransObj* obj = new TransObj(Player::getInstance().getPlayerId(), recvId, MSG_ASK_FOR_FRIEND_ACCEPT, MAX_TRANS_MSG_LEN, -1);
-        stringstream *ss = new stringstream();
+        shared_ptr<stringstream> ss = make_shared<stringstream>();
         (*ss)<<"Your command of accept the request have been send"<<" \n";
-        IOManger::getInstance().putOutputMsg(ss);
+        SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        SeqToBin::getInstance().putSysMsg(sysObj);
         Player::getInstance().addFriend(move(name), recvId);
         return obj;
     }
-    stringstream *ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"Your input number of accepted request id not exists ==> "<<input<<" \n";
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        SeqToBin::getInstance().putSysMsg(sysObj);
     return nullptr;
 }
 

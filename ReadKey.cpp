@@ -27,7 +27,7 @@ bool ReadKey::isActorCmd(CMD_TYPE_UINT32_ENUM type)
 
 bool ReadKey::isTimeToReadKey()
 {
-    return !IOManger::getInstance().isTalking();
+    return !IOManger::getInstance().isTalking() && !IOManger::getInstance().isOutputing();
 }
 
 CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()

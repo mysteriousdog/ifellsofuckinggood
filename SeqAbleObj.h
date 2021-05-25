@@ -69,11 +69,18 @@ typedef struct TransObj
 typedef struct SystemMsgObj
 {
     SYS_MSG_TYPE_UINT32_ENUM msgType;
+    std::shared_ptr<std::stringstream> sysMsgPtr;
 
-    // template <class T>
-    // std::shared_ptr<T> sysMsgPtr;
+    SystemMsgObj(SYS_MSG_TYPE_UINT32_ENUM msgType_): msgType(msgType_), sysMsgPtr(nullptr){}
+    SystemMsgObj(SYS_MSG_TYPE_UINT32_ENUM msgType_, std::shared_ptr<std::stringstream> sysMsgPtr_): msgType(msgType_),
+    sysMsgPtr(sysMsgPtr_){}
 
-    SystemMsgObj(SYS_MSG_TYPE_UINT32_ENUM msgType_): msgType(msgType_){}
+    std::shared_ptr<std::stringstream> getSysMsgPtr() {
+        return sysMsgPtr;
+    }
+    void setSysMsgPtr(std::shared_ptr<std::stringstream> sysMsgPtr_) {
+        sysMsgPtr = sysMsgPtr_;
+    }
 
 }systemMsgObj;
 

@@ -30,8 +30,8 @@ public:
     ConcQueue<tansObj*>& getRcvBuff() {
         return rcvBuff;
     }
-    bool tryGetSysMsg(SystemMsgObj* sysObj) {
-        return sysBuff.tryAndPop(sysObj);
+    SystemMsgObj* tryGetSysMsg() {
+        return sysBuff.tryAndPop();
     }
     void putSysMsg(SystemMsgObj* sysObj) {
         sysBuff.push(sysObj);

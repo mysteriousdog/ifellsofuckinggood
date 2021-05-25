@@ -40,7 +40,8 @@ typedef unsigned int MSG_TYPE_UINT32_ENUM;
 
 
 typedef enum SysMsgType{
-    SYS_SHOW_FRIENDS_MSG = 0,
+    SYS_OUTPUT_MSG = 0,
+    SYS_SHOW_FRIENDS_MSG,
     SYS_SHOW_ASK_FOR_FRIEND_REQ,
     SYS_MSG_BUTTON
 } sysMsgType;

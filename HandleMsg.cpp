@@ -70,12 +70,13 @@ void handleUserSendMsg(TransObj* obj, int fd) {
 #ifdef CLIENT_COMPARE
 
     cout<<"client  handleUserSendMsg get!"<<endl;
-    stringstream* ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"You just got message from ";
     (*ss)<<obj->id<<" :\n";
     (*ss)<<obj->msg<<" \n";
     cout<<"client  handleUserSendMsg get "<<ss->str().c_str()<<endl;
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
     delete(obj);
 
 #endif
@@ -184,9 +185,10 @@ void handleUserRegRefusedMsg(TransObj* obj, int fd)
     }
 #ifdef CLIENT_COMPARE 
 
-    stringstream *ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<obj->getMsg();
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
 
 #endif
 }
@@ -201,9 +203,10 @@ void handleUserRegAcceptedMsg(TransObj* obj, int fd)
 #ifdef CLIENT_COMPARE 
 
     // Player::getInstance().setLoginStatus(false);
-    stringstream *ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"Regin success!\n";
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
 
 #endif
  
@@ -287,9 +290,10 @@ void handleUserLogRefusedMsg(TransObj* obj, int fd)
     }
 
 #ifdef CLIENT_COMPARE
-    stringstream *ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<obj->msg;
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
     delete(obj);
 
 #endif
@@ -303,11 +307,12 @@ void handleUserLogAcceptedMsg(TransObj* obj, int fd)
     }
 
 #ifdef CLIENT_COMPARE
-    stringstream *ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"you have login in success!\n";
     Player::getInstance().setLoginStatus(true);
     Player::getInstance().setPlayerId(obj->id);
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
     delete(obj);
 #endif
 }
@@ -367,10 +372,11 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
         return;
     }
     char* name = obj->msg;
-    stringstream* ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"You have a request from ";
     (*ss)<<name;
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
     SysManger::getInstance().pushBackReq(obj);
 #endif
 }
@@ -383,9 +389,10 @@ void handleAskForFriendNotFoundMsg(TransObj* obj, int fd)
     }
 
 #ifdef CLIENT_COMPARE
-    stringstream *ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"the friend you asked " <<obj->msg<< " do not exists!\n";
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
     delete(obj);
     
 #endif
@@ -430,9 +437,10 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
         return;
     }
     if (Player::getInstance().addFriend(move(name), obj->id)) {
-        stringstream *ss = new stringstream();
+        shared_ptr<stringstream> ss = make_shared<stringstream>();
         (*ss)<<"Your ask friend request had been accepted from "<<name<<"\n";
-        IOManger::getInstance().putOutputMsg(ss);
+        SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        SeqToBin::getInstance().putSysMsg(sysObj);
     } else {
         cout<<"client handleAskForFriendAcceptMsg add  friend err "<<name<<endl;
     }
