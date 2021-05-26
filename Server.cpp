@@ -42,10 +42,17 @@ using namespace std;
 int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
     cout<<"init   start"<<endl;
     int ret = 0;
+    if (!ComManger::getInstance().init()) {
+        cout<<"ComManger init err"<<endl;
+        return 0;
+    }
     ThreadPool::getInstance().init(threadPoolSize);
     MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", mysqlPoolSize, "user");
     Client client;
     auto res = ThreadPool::getInstance().enqueue(client);
+
+    ServerHandler serverhandler(8877);
+	IOLoop::Instance()->start();
     cout<<"init server complete"<<endl;
     return ret;
 }
@@ -166,45 +173,8 @@ bool serverTest() {
 }
 
 int main(int argc, char** argv) {
-    serverInit(2, 2);
-    serverAskForFriendTest();
+    serverInit(4, 4);
     serverEnd();
-    // MysqlPool* mysqlPool = new MysqlPool(); ThreadPool::getInstanch()
-    // mysqlPool->initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", 2);
-    // ThreadPool threadPool(2);
-    // ThreadPool::getInstance().enqueue([] {
-    //     // auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select * from userinfo;");
-    //     // if (msqlResSet == nullptr) {
-    //     //     return;
-    //     // }
-    //     // int i = 0;
-    //     // cout<<"msqlResSet->next()"<<endl;
-    //     // cout<<msqlResSet->next()<<endl;
-    //     // while (msqlResSet->next()) {
-    //     //     cout<<i<<endl;
-    //     //     cout<<"userid "<<msqlResSet->getInt("userid");
-    //     //     cout<<"username "<<msqlResSet->getString("username");
-    //     //     cout<<"fd "<<msqlResSet->getInt("fd");
-    //     //     cout<<"pwd "<<msqlResSet->getString("password");
-    //     // }
-    //     cout<<"thread"<<endl;
-    // });
-
-    // auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select * from userinfo;");
-    //     if (msqlResSet == nullptr) {
-    //         cout<<"msqlResSet->next()11"<<endl;
-    //         return 0;
-    //     }
-    //     int i = 0;
-    //     cout<<"msqlResSet->next()"<<endl;
-    //     cout<<msqlResSet->next()<<endl;
-    //     while (msqlResSet->next()) {
-    //         cout<<i<<endl;
-    //         cout<<"userid "<<msqlResSet->getInt("userid");
-    //         cout<<"username "<<msqlResSet->getString("username");
-    //         cout<<"fd "<<msqlResSet->getInt("fd");
-    //         cout<<"pwd "<<msqlResSet->getString("password");
-    //     }
 	return 0;
 }
 #endif
