@@ -27,12 +27,19 @@ bool clientInit(size_t threadPoolSize) {
     int ret = 0;
     ThreadPool::getInstance().init(threadPoolSize);
     cout<<"init ThreadPool  succ"<<endl;
-    Client client("121.5.41.213", 8877);
-    cout<<"create client  succ"<<endl;
-    client.init();
-    cout<<"init client  succ"<<endl;
-    ThreadPool::getInstance().enqueue(&Client::run, &client);
-    ThreadPool::getInstance().enqueue(&Client::recvMsg, &client);
+
+    Client rcvClient("121.5.41.213", 8877);
+    cout<<"create rcvClient  succ"<<endl;
+    rcvClient.init();
+    cout<<"init rcvClient  succ"<<endl;
+
+    Client sendClient("121.5.41.213", 8877);
+    cout<<"create sendClient  succ"<<endl;
+    sendClient.init();
+    cout<<"init sendClient  succ"<<endl;
+
+    ThreadPool::getInstance().enqueue(&Client::run, &sendClient);
+    ThreadPool::getInstance().enqueue(&Client::recvMsg, &rcvClient);
     cout<<"init client thread succ"<<endl;
     ThreadPool::getInstance().enqueue(&IOManger::run, &(IOManger::getInstance()));
     cout<<"init IOManger thread succ"<<endl;
