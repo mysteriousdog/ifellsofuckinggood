@@ -19,24 +19,25 @@ Command.o:Command.cpp Command.h MyEnum.h
 	$(CC) -c Command.cpp
 Actor.o:Actor.cpp Actor.h MyEnum.h ReadKey.h Command.h
 	$(CC) -c Actor.cpp
-Game.o:Game.cpp Game.h ReadKey.h MyEnum.h HandleMsg.h SeqToBin.h ConcQueue.h
+Game.o:Game.cpp Game.h ReadKey.h MyEnum.h HandleMsg.h SeqToBin.h ConcQueue.h SysManger.h
 	$(CC) -c Game.cpp
 ReadKey.o:ReadKey.cpp ReadKey.h Command.h SeqToBin.h IOManger.h
 	$(CC)  -c ReadKey.cpp
 test.o:test.cpp Singleton.h CommandDoer.h MyEnum.h Command.h Actor.h ReadKey.h Game.h SeqToBin.h Client.h \
-	SeqAbleObj.h IOManger.h ThreadPool.h Util.h Player.h
+	SeqAbleObj.h IOManger.h ThreadPool.h Util.h Player.h SysManger.h
 	$(CC)  -c test.cpp
 Client.o:Client.cpp Client.h ConcQueue.h SeqToBin.h SeqAbleObj.h Command.h
 	$(CC)  -c Client.cpp
-HandleMsg.o:HandleMsg.cpp HandleMsg.h redis_pool.h ThreadPool.h ComManger.h SeqToBin.h SeqAbleObj.h mysql_pool.h Player.h
+HandleMsg.o:HandleMsg.cpp HandleMsg.h redis_pool.h ThreadPool.h ComManger.h SeqToBin.h SeqAbleObj.h mysql_pool.h \
+	Player.h Util.h IOManger.h SysManger.h
 	$(CC)  -c HandleMsg.cpp
 IOManger.o:IOManger.cpp IOManger.h Singleton.h ConcQueue.h SeqAbleObj.h SeqToBin.h CommandDoer.h Player.h Util.h
 	$(CC)  -c IOManger.cpp
-Util.o:Util.cpp Util.h Player.h IOManger.h ReadKey.h
+Util.o:Util.cpp Util.h Player.h IOManger.h ReadKey.h SysManger.h
 	$(CC)  -c Util.cpp
 Player.o:Player.cpp Player.h
 	$(CC)  -c Player.cpp
-SysManger.o:SysManger.cpp SysManger.h
+SysManger.o:SysManger.cpp SysManger.h ConcQueue.h
 	$(CC)  -c SysManger.cpp
 clean:
 	rm ${objs}

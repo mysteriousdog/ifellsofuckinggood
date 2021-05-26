@@ -10,6 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "CommandDoer.h"
+#include "Player.h"
 #include <string.h>
 #include <list>
 #include <map>
@@ -48,14 +49,11 @@ public:
         run();
     }
 
+    bool tryLoginFirst();
+
     bool isTalking() {
         unique_lock<mutex> lock(data_mutex);
         return talking;
-    }
-
-    bool isOutputing() {
-        unique_lock<mutex> lock(data_mutex);
-        return prePareToOutput;
     }
 
     void turnToTalk() {
@@ -79,12 +77,13 @@ public:
     void handleOutputMsg();
     void handleTalk();
 
+    
+
 private:
-    IOManger() : talking(false), prePareToOutput(false){
+    IOManger() : talking(false) {
         // load friends
     };
     bool talking;
-    bool prePareToOutput;
     ConcQueue<std::shared_ptr<std::stringstream> > outputMsg;
     mutex data_mutex;
     condition_variable data_cond;

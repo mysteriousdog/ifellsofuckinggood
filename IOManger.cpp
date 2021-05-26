@@ -21,19 +21,7 @@ void IOManger::handleTalk()
     cout<<"You say "<<str<<endl;
     if (str.length() >= MAX_TRANS_MSG_LEN) {
         cout<<"talk too much.. your message shoud inside "<< MAX_TRANS_MSG_LEN <<" words."<<endl;
-        return;
-    }
-
-    if (!Player::getInstance().isLogined()) {
-        auto ss = make_shared<stringstream>();
-        (*ss)<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
-        (*ss)<<"Try Regin ==> Regin@yourname|yourpassword\n";
-        (*ss)<<"Try Login ==> Login@yourname|yourpassword\n";
-        (*ss)<<"(-_-)\n";
-        SystemMsgObj* sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
-        SeqToBin::getInstance().putSysMsg(sysObj);
         talking = false;
-        prePareToOutput = true;
         return;
     }
     // TransObj* talkObj = new TransObj(1, MSG_TALK, 0);
@@ -55,5 +43,18 @@ void IOManger::handleOutputMsg()
         cout<<msg->str().c_str()<<endl;
         cout<<"###########################################################################################"<<endl;
     }
-    prePareToOutput = false;
 }
+
+bool IOManger::tryLoginFirst() {
+        if (!Player::getInstance().isLogined()) {
+            auto ss = make_shared<stringstream>();
+            (*ss)<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
+            (*ss)<<"Try Regin ==> Regin@yourname|yourpassword\n";
+            (*ss)<<"Try Login ==> Login@yourname|yourpassword\n";
+            (*ss)<<"(-_-)\n";
+            SystemMsgObj* sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+            SeqToBin::getInstance().putSysMsg(sysObj);
+            return true;
+        }
+        return false;
+    }

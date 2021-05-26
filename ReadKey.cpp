@@ -6,6 +6,12 @@
 #include<unistd.h>
 #include<termios.h>
 #include <string.h>
+#include <sys/time.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <assert.h>
 #include "IOManger.h"
 using namespace std;
 
@@ -27,7 +33,7 @@ bool ReadKey::isActorCmd(CMD_TYPE_UINT32_ENUM type)
 
 bool ReadKey::isTimeToReadKey()
 {
-    return !IOManger::getInstance().isTalking() && !IOManger::getInstance().isOutputing();
+    return !IOManger::getInstance().isTalking();
 }
 
 CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
@@ -35,7 +41,7 @@ CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
     if (!isTimeToReadKey()) {
         return CMD_BUTTON;
     }
-    int in;
+    char in;
     struct termios new_settings;
     struct termios stored_settings;
     tcgetattr(0,&stored_settings);
@@ -50,10 +56,31 @@ CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
     new_settings.c_cc[VMIN] = 1;
     tcsetattr(0,TCSANOW,&new_settings);
     
-    in = getchar();
+    // in = getchar();
+    int keyboard;
+    int ret,i;
+    // char c;
+    fd_set readfd;
+    struct timeval timeout;
+    keyboard = open("/dev/tty",O_RDONLY | O_NONBLOCK);
+    assert(keyboard>0);
+
+    timeout.tv_sec= 1;
+    timeout.tv_usec= 0;
+    FD_ZERO(&readfd);
+    FD_SET(keyboard,&readfd);
+    ret=select(keyboard+1,&readfd,NULL,NULL,&timeout);
+    if(FD_ISSET(keyboard,&readfd))
+    {
+        i=read(keyboard,&in,1);
+        // if('\n'==c)
+        // continue;
+        // printf("hehethe input is %c\n",c);
+        // if ('q'==c)
+    }
     
     tcsetattr(0,TCSANOW,&stored_settings);
-    std::cout<<"get "<<in<<std::endl;
+
     if (cmd.find(in) == cmd.end()) {
         return CMD_BUTTON;
     }

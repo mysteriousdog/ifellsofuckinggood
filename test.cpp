@@ -18,6 +18,7 @@
 #include "Player.h"
 #include "IOManger.h"
 #include "ThreadPool.h"
+#include "SysManger.h"
 #include <unistd.h>
 using namespace std;
 

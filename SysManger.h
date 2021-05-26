@@ -30,7 +30,6 @@ class SysManger : public Singleton<SysManger>
 public:
 
     void handleSystem() {
-        cout<<"handleSystem"<<endl;
         handleSysMsg();
         handleRecvMsg();
         handleSysInput();

@@ -4,6 +4,7 @@
 #include "Singleton.h"
 #include "SeqAbleObj.h"
 #include "ConcQueue.h"
+#include "IOManger.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>

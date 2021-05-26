@@ -12,7 +12,6 @@ static sysMsgHandle sysMsgHandleTable[] = {
 };
 
 void SysManger::handleSysMsg() {
-    cout<<"SysManger::handleSysMsg"<<endl;
         SystemMsgObj* sysObj = nullptr;
         if ((sysObj = SeqToBin::getInstance().tryGetSysMsg()) != nullptr) {
             cout<<"SysManger::handleSysMsg tryGetSysMsg"<<endl;
@@ -30,7 +29,7 @@ void SysManger::handleSysMsgOfShowOutputMsg(SystemMsgObj* sysObj) {
     if (sspt == nullptr) {
         return;
     }
-    cout<<"SysManger::handleSysMsgOfShowOutputMsg "<<sspt->str()<<endl;
+    // cout<<"SysManger::handleSysMsgOfShowOutputMsg "<<sspt->str()<<endl;
     IOManger::getInstance().putOutputMsg(sspt);
     delete(sysObj);
 }
