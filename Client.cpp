@@ -6,6 +6,9 @@
 #include <iostream>
 #include <stdlib.h>
 using namespace std;
+
+const int MAX_LEN_OF_SEND_BUFF = 512;
+
 Client::Client():
 client(0),
 port(0)
@@ -43,8 +46,7 @@ bool Client::init()
 bool Client::run()
 {
     SeqToBin& seq = SeqToBin::getInstance();
-    char buf[255];
-    char buf2[255];
+    char buf[MAX_LEN_OF_SEND_BUFF] = {0};
     int sendLen;
     int objSize = sizeof(TransObj);
     cout<<"client thread begin !!"<<endl;
@@ -58,7 +60,7 @@ bool Client::run()
             cout<<"quit client..."<<endl;
             break;
         }
-        
+        memset(buf, 0, MAX_LEN_OF_SEND_BUFF);
         memcpy((void*)buf, (void*)tansObj, objSize);
         // memcpy((void*)((TransObj*)buf)->msg, tansObj->msg, tansObj->len);
         sendLen = objSize;
@@ -70,7 +72,9 @@ bool Client::run()
 #ifdef CLIENT_COMPARE
         cout<<"send from client ..."<<tansObj->getMsgType()<<endl;
         cout<<"send from client msg ..."<<tansObj->getMsg()<<endl;
-        send(client, buf, sendLen, 0);
+        if (send(client, buf, sendLen, 0) <= 0) {
+            cout<<"send from client err ..."<<endl;
+        }
 #endif
         delete(tansObj);
     }
