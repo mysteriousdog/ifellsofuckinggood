@@ -6,14 +6,17 @@ using namespace std;
 
 
 static sysMsgHandle sysMsgHandleTable[] = {
+    {SYS_OUTPUT_MSG, bind(&SysManger::handleSysMsgOfShowOutputMsg, &SysManger::getInstance(), placeholders::_1)},
     {SYS_SHOW_FRIENDS_MSG, bind(&SysManger::handleSysMsgOfShowFriends, &SysManger::getInstance(), placeholders::_1)},
     {SYS_SHOW_ASK_FOR_FRIEND_REQ, bind(&SysManger::handleSysMsgOfShowAskForFriendReq, &SysManger::getInstance(), placeholders::_1)}
 };
 
 void SysManger::handleSysMsg() {
-        SystemMsgObj* sysObj;
-        if (SeqToBin::getInstance().tryGetSysMsg(sysObj)) {
+        SystemMsgObj* sysObj = nullptr;
+        if ((sysObj = SeqToBin::getInstance().tryGetSysMsg()) != nullptr) {
+            cout<<"SysManger::handleSysMsg tryGetSysMsg"<<endl;
             for (int loop = 0; loop < (sizeof(sysMsgHandleTable) / sizeof(sysMsgHandle)); loop++) {
+                cout<<"SysManger::handleSysMsg tryGetSysMsg msgType"<<sysMsgHandleTable[loop].sysMsgType<<" "<<sysObj->msgType<<endl;
                 if (sysMsgHandleTable[loop].sysMsgType == sysObj->msgType) {
                     sysMsgHandleTable[loop].handler(sysObj);
                 }
@@ -21,6 +24,15 @@ void SysManger::handleSysMsg() {
         }
     }
 
+void SysManger::handleSysMsgOfShowOutputMsg(SystemMsgObj* sysObj) {
+    auto sspt = sysObj->getSysMsgPtr();
+    if (sspt == nullptr) {
+        return;
+    }
+    // cout<<"SysManger::handleSysMsgOfShowOutputMsg "<<sspt->str()<<endl;
+    IOManger::getInstance().putOutputMsg(sspt);
+    delete(sysObj);
+}
 
 void SysManger::handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj) {
     if (sysObj == nullptr) {
@@ -29,7 +41,7 @@ void SysManger::handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj) {
     list<TransObj*> reqs;
     getAllRequests(reqs);
     // show requests
-    stringstream *ss = new stringstream();
+    auto ss = make_shared<stringstream>();
     (*ss)<<"All requests list down here: \n";
     int i = 0;
     for (auto it = reqs.begin(); it != reqs.end(); it++) {
@@ -42,7 +54,7 @@ void SysManger::handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj) {
 void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
 {
     auto friends = player.getAllFriends();
-    stringstream* ss = new stringstream();
+    auto ss = make_shared<stringstream>();
     int i = 1;
     for (auto it = friends.begin(); it != friends.end(); it++) {
         if (it->second == nullptr) {
@@ -60,5 +72,5 @@ void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
    
     cout<<"SysManger::handleSysMsgOfShowFriends "<<ss->str().c_str()<<endl;
     ioManger.putOutputMsg(ss);
-     delete(sysObj);
+    delete(sysObj);
 }

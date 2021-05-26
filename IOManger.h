@@ -10,6 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "CommandDoer.h"
+#include "Player.h"
 #include <string.h>
 #include <list>
 #include <map>
@@ -34,8 +35,10 @@ public:
             unique_lock<mutex> lock(data_mutex);
             data_cond.wait(lock, [this] {return this->talking || !(this->outputMsg.empty());});
             if (!this->talking) {
+                cout<<"get in handleOutputMsg"<<endl;
                 handleOutputMsg();
             } else {
+                cout<<"get in handleTalk"<<endl;
                 handleTalk();
             }
             
@@ -45,6 +48,8 @@ public:
     void operator () () {
         run();
     }
+
+    bool tryLoginFirst();
 
     bool isTalking() {
         unique_lock<mutex> lock(data_mutex);
@@ -60,22 +65,26 @@ public:
         data_cond.notify_one();
     }
 
-    void putOutputMsg(stringstream* msg) {
+    void putOutputMsg(std::shared_ptr<std::stringstream> msg) {
+        unique_lock<mutex> lock(data_mutex);
         std::cout<<"now turn to show msg !!"<<std::endl;
         // TransObj* obj = new TransObj(1, MSG_TALK, 0);
         // talkingQueue.push(obj);
         outputMsg.push(msg);
+        data_cond.notify_one();
     }
 
     void handleOutputMsg();
     void handleTalk();
 
+    
+
 private:
-    IOManger() : talking(false){
+    IOManger() : talking(false) {
         // load friends
     };
     bool talking;
-    ConcQueue<stringstream*> outputMsg;
+    ConcQueue<std::shared_ptr<std::stringstream> > outputMsg;
     mutex data_mutex;
     condition_variable data_cond;
     

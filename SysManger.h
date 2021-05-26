@@ -53,7 +53,7 @@ public:
     }
     void handleRecvMsg() {
         TransObj* rcvObj;
-        if (SeqToBin::getInstance().getRcvBuff().tryAndPop(rcvObj)) {
+        if ((rcvObj = SeqToBin::getInstance().getRcvBuff().tryAndPop()) != nullptr) {
             MsgHandler::getInstance().handle(rcvObj, -1);
         }
     }
@@ -62,6 +62,7 @@ public:
 
     void handleSysMsgOfShowFriends(SystemMsgObj* sysObj);
     void handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj);
+    void handleSysMsgOfShowOutputMsg(SystemMsgObj* sysObj);
 
     void pushBackReq(TransObj* req) {
         reqBuff.push_back(req);

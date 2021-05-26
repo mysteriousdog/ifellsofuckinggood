@@ -68,6 +68,9 @@ TransObj* handleInputOfLogin(string&& input) {
 }
 
 TransObj* handleInputOfLogout(string&& input) {
+    if (IOManger::getInstance().tryLoginFirst()) {
+        return nullptr;
+    }
     TransObj* obj = new TransObj(-1, -1, MSG_LOGOUT, -1, -1);
     obj->setMsgType(MSG_LOGOUT);
     return obj;
@@ -86,6 +89,9 @@ TransObj* handleInputOfRegin(string&& input) {
 }
 
 TransObj* handleInputOfAskForFriend(string&& input) {
+    if (IOManger::getInstance().tryLoginFirst()) {
+        return nullptr;
+    }
     if (input.length() >= NAME_MAX_LEN) {
         cout<<"name length should be in "<<NAME_MAX_LEN - 1<<endl;
         return nullptr;
@@ -96,6 +102,9 @@ TransObj* handleInputOfAskForFriend(string&& input) {
 }
 
 TransObj* handleInputOfChoseTalker(string&& input) {
+    if (IOManger::getInstance().tryLoginFirst()) {
+        return nullptr;
+    }
     if (input.length() >= NAME_MAX_LEN) {
         cout<<"name length should be in "<<NAME_MAX_LEN - 1<<endl;
         return nullptr;
@@ -108,6 +117,9 @@ TransObj* handleInputOfChoseTalker(string&& input) {
 }
 
 TransObj* handleInputOfShowFriends(string&& input) {
+    if (IOManger::getInstance().tryLoginFirst()) {
+        return nullptr;
+    }
     SystemMsgObj* sysObj = new SystemMsgObj(SYS_SHOW_FRIENDS_MSG);
     SeqToBin::getInstance().putSysMsg(sysObj);
     // show 所有的friends
@@ -116,6 +128,9 @@ TransObj* handleInputOfShowFriends(string&& input) {
 
 TransObj* handleInputOfShowRequests(string&& input)
 {
+    if (IOManger::getInstance().tryLoginFirst()) {
+        return nullptr;
+    }
     // SystemMsgObj* sysObj = new SystemMsgObj(SYS_SHOW_FRIENDS_MSG);
     // SeqToBin::getInstance().putSysMsg(sysObj);
     // show 所有的friends
@@ -129,27 +144,33 @@ TransObj* handleInputOfShowRequests(string&& input)
 
 TransObj* handleInputOfAccRequest(string&& input)
 {
+    if (IOManger::getInstance().tryLoginFirst()) {
+        return nullptr;
+    }
     int index = atoi(input.c_str());
     if (SysManger::getInstance().containsReqIdx(index)) {
         TransObj* reqObj = nullptr;
         if (!SysManger::getInstance().getOneRequest(index, reqObj)) {
-            stringstream *ss = new stringstream();
+            shared_ptr<stringstream> ss = make_shared<stringstream>();
             (*ss)<<"Your command of accept the request send err"<<" \n";
-            IOManger::getInstance().putOutputMsg(ss);
+            SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+            SeqToBin::getInstance().putSysMsg(sysObj);
             return nullptr;
         }
         int recvId = reqObj->id;
         string name = reqObj->msg;
         TransObj* obj = new TransObj(Player::getInstance().getPlayerId(), recvId, MSG_ASK_FOR_FRIEND_ACCEPT, MAX_TRANS_MSG_LEN, -1);
-        stringstream *ss = new stringstream();
+        shared_ptr<stringstream> ss = make_shared<stringstream>();
         (*ss)<<"Your command of accept the request have been send"<<" \n";
-        IOManger::getInstance().putOutputMsg(ss);
+        SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        SeqToBin::getInstance().putSysMsg(sysObj);
         Player::getInstance().addFriend(move(name), recvId);
         return obj;
     }
-    stringstream *ss = new stringstream();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"Your input number of accepted request id not exists ==> "<<input<<" \n";
-    IOManger::getInstance().putOutputMsg(ss);
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
     return nullptr;
 }
 
@@ -168,6 +189,9 @@ TransObj* Util::getMsgFromInput(string&& input)
     }
     
     if (n == 1) { // 此时 是 talk
+        if (IOManger::getInstance().tryLoginFirst()) {
+            return nullptr;
+        }
         if (input.length() >= MAX_TRANS_MSG_LEN || input.length() <= 0) {
             std::cout<<"msg length should be in 1 ~  "<<MAX_TRANS_MSG_LEN<<endl;
         }

@@ -21,7 +21,9 @@ port(port_)
 
 bool Client::init()
 {
+    std::cout << "Client::init0" << std::endl;
     client = socket(AF_INET, SOCK_STREAM, 0);
+    std::cout << "Client::init1" << std::endl;
     if (client == -1) {
         std::cout << "Error: socket" << std::endl;
         return false;
@@ -29,10 +31,12 @@ bool Client::init()
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);
     serverAddr.sin_addr.s_addr = inet_addr(ip);
+    std::cout << "Client::init3" << std::endl;
     if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         std::cout << "Error: connect" << std::endl;
         return false;
     }
+    std::cout << "success: connect" << std::endl;
     return true;
 }
 
