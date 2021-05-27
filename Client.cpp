@@ -74,7 +74,11 @@ bool Client::run()
 #ifdef SERVER_COMPARE
         cout<<"send from server msgType is ... "<<(int)tansObj->getMsgType()<<endl;
         int fd = tansObj->fd;
-        send(fd, buf, MAX_LEN_OF_SEND_BUFF, 0);
+        cout<<"fd "<<fd<<endl;
+        if (send(fd, buf, sendLen, 0) <= 0) {
+            cout<<"send from server err ..."<<endl;
+        }
+
 #endif
 #ifdef CLIENT_COMPARE
         cout<<"send from client ..."<<tansObj->getMsgType()<<endl;
