@@ -5,6 +5,7 @@
 #include "Command.h"
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
 using namespace std;
 
 const int MAX_LEN_OF_SEND_BUFF = 512;
@@ -31,9 +32,15 @@ bool Client::init()
         std::cout << "Error: socket" << std::endl;
         return false;
     }
+    // serverAddr.sin_family = AF_INET;
+    // serverAddr.sin_port = htons(port);
+    // serverAddr.sin_addr.s_addr = inet_addr(ip);
+
+    memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(port);
     serverAddr.sin_addr.s_addr = inet_addr(ip);
+    serverAddr.sin_port = htons(port);
+
     std::cout << "Client::init3" << std::endl;
     if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         std::cout << "Error: connect" << std::endl;
@@ -49,7 +56,7 @@ bool Client::run()
     char buf[MAX_LEN_OF_SEND_BUFF] = {0};
     int sendLen;
     int objSize = sizeof(TransObj);
-    cout<<"client thread begin !!"<<endl;
+    cout<<"client thread begin !! "<<client<<endl;
     while (true) {
         cout<<"wait for event..."<<endl;
         TransObj* tansObj = seq.getBuff().pop();
@@ -67,12 +74,12 @@ bool Client::run()
 #ifdef SERVER_COMPARE
         cout<<"send from server msgType is ... "<<(int)tansObj->getMsgType()<<endl;
         int fd = tansObj->fd;
-        send(fd, buf, sendLen, 0);
+        send(fd, buf, MAX_LEN_OF_SEND_BUFF, 0);
 #endif
 #ifdef CLIENT_COMPARE
         cout<<"send from client ..."<<tansObj->getMsgType()<<endl;
         cout<<"send from client msg ..."<<tansObj->getMsg()<<endl;
-        if (send(client, buf, sendLen, 0) <= 0) {
+        if (send(client, buf, MAX_LEN_OF_SEND_BUFF, 0) <= 0) {
             cout<<"send from client err ..."<<endl;
         }
 #endif
@@ -85,41 +92,41 @@ bool Client::run()
 
 bool Client::recvMsg()
 {
-    cout<<"rcv msg!!!"<<endl;
+    cout<<"rcv msg!!! "<<client<<endl;
     // if (connect(client, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
     //     std::cout << "Error: connect" << std::endl;
     //     return false;
     // }
-    char buf[255];
+    char rcvBuf[512] = {0};
     SeqToBin& seq = SeqToBin::getInstance();
     // string s("1");
-    // if (sendMsgOnce(1, MSG_USER_RECV, s)) {
+    // if (sendMsgOnce(1, MSG_CONNECT, s)) {
     //     cout<<"id band success"<<endl;
     // } else {
     //     cout<<"id band err"<<endl;
     //     return false;
     // }
-    while (recv(client, buf, sizeof(buf), 0) > 0) {
-        cout<<"rcv"<<endl;
+    while (recv(client, rcvBuf, sizeof(rcvBuf), 0) > 0) {
+        // cout<<"rcv "<<rcvBuf<<endl;
         // TransObj* recvTansObj = (TransObj*)buf;
         TransObj* recvTansObj = new TransObj();
-        memcpy((void*)recvTansObj, (void*)buf, sizeof(TransObj));
+        memcpy((void*)recvTansObj, (void*)rcvBuf, sizeof(TransObj));
         std::cout << recvTansObj->id << std::endl;
         std::cout << recvTansObj->msgType << std::endl;
         std::cout << recvTansObj->len << std::endl;
-        Command* cmd = (Command*)recvTansObj->msg;
-        std::cout << cmd->getType() << std::endl;
+        std::cout << recvTansObj->getMsg() << std::endl;
+
         seq.getRcvBuff().push(recvTansObj);
     }
+    close(client);
     return true;
 }
 
 bool Client::sendMsgOnce(int id, MSG_TYPE_UINT32_ENUM type, string& str)
 {
-    char buf[255];
+    char buf[MAX_LEN_OF_SEND_BUFF];
     TransObj sendTansObj(id, type, str.length());
-
-    strcpy(sendTansObj.msg, str.c_str());
+    sendTansObj.setMsg(str.c_str());
     memcpy((void*)buf, (void*)(&sendTansObj), sizeof(TransObj));
     if (send(client, buf, sizeof(buf), 0) > 0) {
         return true;

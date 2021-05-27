@@ -25,6 +25,7 @@ using namespace std;
 
 msgHandle g_msgHandle[] = {
     {MSG_CMD, handleMsgCmd},
+    {MSG_CONNECT, handleUserConnectMsg},
     {MSG_TALK, handleUserSendMsg},
     {MSG_REG, handleUserRegMsg},
     {MSG_REG_REFUSE, handleUserRegRefusedMsg},
@@ -49,6 +50,20 @@ void MsgHandler::handle(TransObj* obj, int fd)
             g_msgHandle[loop].handler(obj, fd);
         }
     }
+}
+
+void handleUserConnectMsg(TransObj* obj, int fd) {
+    if (obj == nullptr) {
+        cout<<"get in handleUserConnectMsg err nullptr"<<endl;
+        return;
+    }
+    cout<<"get in handleUserConnectMsg "<<endl;
+#ifdef SERVER_COMPARE
+
+
+
+#endif
+
 }
 
 void handleUserSendMsg(TransObj* obj, int fd) {

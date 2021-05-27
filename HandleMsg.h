@@ -20,6 +20,7 @@ typedef struct MsgHandle{
 } msgHandle;
 
 void handleMsgCmd(TransObj* obj, int fd);
+void handleUserConnectMsg(TransObj* obj, int fd);
 void handleUserSendMsg(TransObj* obj, int fd);
 void handleUserRegMsg(TransObj* obj, int fd);
 void handleUserLogMsg(TransObj* obj, int fd);
