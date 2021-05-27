@@ -43,10 +43,10 @@ void MsgHandler::handle(TransObj* obj, int fd)
         return;
     }
     for (int loop = 0; loop < sizeof(g_msgHandle) / sizeof(msgHandle); loop++) {
-        cout<<"now the g_msgHandle msgType is "<<g_msgHandle[loop].msgTye <<endl;
-        cout<<"now the obj msgType is "<<obj->msgType <<endl;
         if (g_msgHandle[loop].msgTye == obj->msgType) {
+            cout<<"now the obj msgType is "<<obj->msgType <<endl;
             g_msgHandle[loop].handler(obj, fd);
+            break;
         }
     }
 }
@@ -114,16 +114,22 @@ void handleUserRegMsg(TransObj* obj, int fd)
         cout<<"client handleUserRegMsg err nullptr!"<<endl;
         return;
     }
-
 #ifdef SERVER_COMPARE
-    cout << hex << (void *)obj << endl;
     if (obj->len > (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
         return;        
     }
+    cout << hex << (void *)obj << endl;
+    
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
+        cout<<"do reg!  fd-> "<<int(fd)<<endl;
         cout << hex << (void *)obj << endl;
-        cout<<"do reg!"<<endl;
-        cout<<obj->msg<<endl;
+        TransObj* sendObj = new TransObj();
+        // obj->setMsg("its for test!\n");
+        // cout<<obj->msg<<endl;
+        sendObj->setFd(fd);
+        // obj->setMsgType(MSG_REG_REFUSE);
+        // SeqToBin::getInstance().getBuff().push(obj);
+        // return 1;
         char name[NAME_MAX_LEN] {0};
         char passwd[PASSWORD_MAX_LEN] {0};
         // memcpy(name, obj->msg, 4);
@@ -134,37 +140,37 @@ void handleUserRegMsg(TransObj* obj, int fd)
             delete(msqlResSet);
             cout<<"name reg exists already"<<endl;
             // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
-            obj->setMsgType(MSG_REG_REFUSE);
-            obj->setMsg("regin err! name reg exists already!");
-            SeqToBin::getInstance().getBuff().push(obj);
+            sendObj->setMsgType(MSG_REG_REFUSE);
+            sendObj->setMsg("regin err! name reg exists already!");
+            SeqToBin::getInstance().getBuff().push(sendObj);
             return 0;
         }
         memcpy(passwd, (obj->msg + NAME_MAX_LEN), PASSWORD_MAX_LEN);
         cout<<"handleUserRegMsg get passwd is "<<passwd<<endl;
-        bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", name, fd, passwd);
+        bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", name, int(fd), passwd);
         if (res) {
-            auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select max(userid) from userinfo;");
+            auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select max(userid) as id from userinfo;");
             // TransObj* tansObj = new TransObj(-1, MSG_REG_ACCEPT, 1, fd);
-            obj->setMsgType(MSG_REG_ACCEPT);
+            sendObj->setMsgType(MSG_REG_ACCEPT);
             if (!msqlResSet->next()) {
                 // tansObj->setMsgType(MSG_REG_REFUSE);
-                obj->setMsgType(MSG_REG_REFUSE);
-                obj->setMsg("regin err! \n");
+                sendObj->setMsgType(MSG_REG_REFUSE);
+                sendObj->setMsg("regin err! \n");
             } else {
-                int id  = msqlResSet->getInt("userid");
+                int id  = msqlResSet->getInt("id");
                 // tansObj->setId(id);
-                obj->setId(id);
+                sendObj->setId(id);
                 cout<<"handleUserRegMsg insert succed id: "<<id<<endl;
             }
-            SeqToBin::getInstance().getBuff().push(obj);
+            SeqToBin::getInstance().getBuff().push(sendObj);
             
             return 1;
         }
         cout<<"handleUserRegMsg insert failed "<<endl;
         // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
-        obj->setMsgType(MSG_REG_REFUSE);
-        obj->setMsg("regin err! \n");
-        SeqToBin::getInstance().getBuff().push(obj);
+        sendObj->setMsgType(MSG_REG_REFUSE);
+        sendObj->setMsg("regin err! \n");
+        SeqToBin::getInstance().getBuff().push(sendObj);
         return res ? 1: 0;
     });
 #endif

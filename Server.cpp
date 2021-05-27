@@ -48,8 +48,8 @@ int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
     }
     ThreadPool::getInstance().init(threadPoolSize);
     MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", mysqlPoolSize, "user");
-    Client client;
-    auto res = ThreadPool::getInstance().enqueue(client);
+    Client* client = new Client();
+    auto res = ThreadPool::getInstance().enqueue(*client);
 
     ServerHandler serverhandler(8877);
 	IOLoop::Instance()->start();
@@ -58,6 +58,27 @@ int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
 }
 
 void serverEnd() {
+    cout<<"end server  start"<<endl;
+    TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
+    sleep(3);
+    SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
+    cout<<"end server complete"<<endl;
+}
+
+
+void testServerInit(size_t threadPoolSize, size_t mysqlPoolSize) {
+    if (!ComManger::getInstance().init()) {
+        cout<<"ComManger init err"<<endl;
+        return;
+    }
+    ThreadPool::getInstance().init(threadPoolSize);
+    MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", mysqlPoolSize, "user");
+    Client* client = new Client();
+    auto res = ThreadPool::getInstance().enqueue(*client);
+    cout<<"init server complete"<<endl;
+}
+
+void testServerEnd() {
     cout<<"end server  start"<<endl;
     TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
     sleep(3);
@@ -172,9 +193,24 @@ bool serverTest() {
     return true;
 }
 
+void mysqlTest() {
+    bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", "name", 10, "123");
+    assert(res == true);
+    auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select max(userid) as id from userinfo;");
+    res = msqlResSet->next();
+    assert(res == true);
+    int id  = msqlResSet->getInt("id");
+    assert(id > 0);
+    cout<<"id "<<id;
+}
+
 int main(int argc, char** argv) {
-    serverInit(4, 4);
-    serverEnd();
+    testServerInit(4, 4);
+    mysqlTest();
+    testServerEnd();
+
+    // serverInit(4, 4);
+    // serverEnd();
 	return 0;
 }
 #endif

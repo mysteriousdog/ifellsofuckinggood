@@ -199,7 +199,7 @@ ResultSet* MysqlPool::ExecQuery(const char* format, ...)
         return reply;
     }
     conn->setSchema(databaseName);
-    char cmdBuf[100];
+    char cmdBuf[200];
     Statement *state = conn->createStatement();
     va_list args;
     va_start(args, format);
@@ -231,20 +231,24 @@ bool MysqlPool::ExecInsert(const char* format, ...)
         return reply;
     }
     conn->setSchema(databaseName);
-    char cmdBuf[100];
+    char cmdBuf[200];
     va_list args;
     va_start(args, format);
     vsnprintf(cmdBuf, 100, format, args);
     va_end(args);
-    bool res = false;
+    cout<<"in fun MysqlPool::ExecInsert "<<cmdBuf<<endl;
+    bool res = false;;
     try
     {
         auto prep_stmt = conn->prepareStatement(cmdBuf);
-        res = prep_stmt->execute();
+        if (prep_stmt->executeUpdate() > 0) {
+            res = true;
+        }
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        return false;
     }
     return res;
 }

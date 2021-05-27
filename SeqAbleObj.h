@@ -5,6 +5,7 @@
 #include "MyEnum.h"
 #include <iostream>
 #include <string.h>
+#include <memory>
 
 const int MAX_TRANS_MSG_LEN = 64;
 
@@ -17,7 +18,10 @@ typedef struct TransObj
     int recverId;
     int fd;
     char msg[MAX_TRANS_MSG_LEN];
-    TransObj():msgType(0),len(0){}
+
+    TransObj():msgType(0),len(0), id(0), recverId(0), fd(0){
+        memset(msg, 0, MAX_TRANS_MSG_LEN);
+    }
     TransObj(MSG_TYPE_UINT32_ENUM msgType_, unsigned int len_):msgType(msgType_),len(len_){
         id = 1;
     }
@@ -68,7 +72,7 @@ typedef struct TransObj
         return msg;
     }
 
-    virtual ~TransObj(){}
+    virtual ~TransObj(){std::cout<<"~TransObj() "<<std::endl;}
 } tansObj;
 
 typedef struct SystemMsgObj

@@ -20,9 +20,9 @@
 #include "Actor.h"
 #include "ComManger.h"
 #include <string.h>
-
+#include "SeqToBin.h"
 #define MAX_PENDING 1024
-#define BUFFER_SIZE 255
+#define BUFFER_SIZE 512
 
 class Handler {
 public:
@@ -150,7 +150,7 @@ public:
 
 				
 
-				std::cout << "Reading: " << std::endl;
+				std::cout << "Reading: " <<std::endl;
 				if (strcmp(buffer, "stop") == 0) {
 					std::cout << "stop----" << std::endl;
 				}
@@ -158,11 +158,21 @@ public:
 				MsgHandler& msgHandler =  MsgHandler::getInstance();
 				TransObj* obj = new TransObj();
 				memcpy(obj, buffer, sizeof(TransObj));
+				cout << hex << (void *)obj << endl;
 				msgHandler.handle(obj, fd);
-				// TransObj* obj = (TransObj*)buffer;
+
+				
+
+				// TransObj* obj = new TransObj();
 				// cout<<"obj->msgType "<<obj->msgType<<endl;
 				// cout<<"obj->id "<<obj->id<<endl;
 				// cout<<"obj->len "<<obj->len<<endl;
+				// cout<<"obj->fd "<<obj->fd<<endl;
+				// cout<<"fd "<<fd<<endl;
+				// cout<<"obj->msg "<<obj->getMsg()<<endl;
+				// obj->setFd(fd);
+				// obj->setMsg("hdjsjdhsjdhjs");
+				// SeqToBin::getInstance().getBuff().push(obj);
 				// Command* cmd = (Command*)obj->msg;
 				// Command cmd(0);
 				// memcpy((void*)&cmd, (void*)obj->msg, obj->len);
@@ -221,7 +231,7 @@ public:
 			std::cout << "Failed to listen on server socket" << std::endl;
 			exit(1);
 		}
-		// setnonblocking(fd);
+		setnonblocking(fd);
         std::cout << "server !!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 		IOLoop::Instance()->addHandler(fd, this, EPOLLIN);
 	}
