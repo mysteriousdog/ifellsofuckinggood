@@ -156,10 +156,10 @@ public:
 				}
                 std::cout << "Writing: " << std::endl;
 				MsgHandler& msgHandler =  MsgHandler::getInstance();
-				TransObj* obj = new TransObj();
-				memcpy(obj, buffer, sizeof(TransObj));
-				cout << hex << (void *)obj << endl;
-				msgHandler.handle(obj, fd);
+				TransObj obj;
+				memcpy(&obj, buffer, sizeof(TransObj));
+				cout << hex << (void *)(&obj) << endl;
+				msgHandler.handle(&obj, fd);
 
 				
 
