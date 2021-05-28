@@ -202,15 +202,20 @@ void mysqlTest() {
     int id  = msqlResSet->getInt("id");
     assert(id > 0);
     cout<<"id "<<id;
+    msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where username = \'%s\';", "name");
+    res = msqlResSet->next();
+    assert(res == true);
+    auto passwd = msqlResSet->getString("password");
+    assert(passwd == "123");
 }
 
 int main(int argc, char** argv) {
-    testServerInit(4, 4);
-    mysqlTest();
-    testServerEnd();
+    // testServerInit(4, 4);
+    // mysqlTest();
+    // testServerEnd();
 
-    // serverInit(4, 4);
-    // serverEnd();
+    serverInit(4, 4);
+    serverEnd();
 	return 0;
 }
 #endif

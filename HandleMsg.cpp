@@ -118,22 +118,16 @@ void handleUserRegMsg(TransObj* obj, int fd)
     if (obj->len > (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
         return;        
     }
-    cout << hex << (void *)obj << endl;
-    
-    ThreadPool::getInstance().enqueue([obj, fd] () mutable {
+    char str[MAX_TRANS_MSG_LEN] {0};
+    snprintf(str, MAX_TRANS_MSG_LEN, obj->getMsg());
+    cout<<"str in handleUserRegMsg "<<str<<endl;
+    ThreadPool::getInstance().enqueue([str, fd] () mutable {
         cout<<"do reg!  fd-> "<<int(fd)<<endl;
-        cout << hex << (void *)obj << endl;
         TransObj* sendObj = new TransObj();
-        // obj->setMsg("its for test!\n");
-        // cout<<obj->msg<<endl;
         sendObj->setFd(fd);
-        // obj->setMsgType(MSG_REG_REFUSE);
-        // SeqToBin::getInstance().getBuff().push(obj);
-        // return 1;
         char name[NAME_MAX_LEN] {0};
         char passwd[PASSWORD_MAX_LEN] {0};
-        // memcpy(name, obj->msg, 4);
-        strncpy(name, obj->msg, NAME_MAX_LEN);
+        strncpy(name, str, NAME_MAX_LEN);
         cout<<"handleUserRegMsg get name is "<<name<<endl;
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where username = \'%s\';", name);
         if (msqlResSet->next()) {
@@ -145,7 +139,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
             SeqToBin::getInstance().getBuff().push(sendObj);
             return 0;
         }
-        memcpy(passwd, (obj->msg + NAME_MAX_LEN), PASSWORD_MAX_LEN);
+        memcpy(passwd, (str + NAME_MAX_LEN), PASSWORD_MAX_LEN);
         cout<<"handleUserRegMsg get passwd is "<<passwd<<endl;
         bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", name, int(fd), passwd);
         if (res) {
@@ -155,11 +149,12 @@ void handleUserRegMsg(TransObj* obj, int fd)
             if (!msqlResSet->next()) {
                 // tansObj->setMsgType(MSG_REG_REFUSE);
                 sendObj->setMsgType(MSG_REG_REFUSE);
-                sendObj->setMsg("regin err! \n");
+                sendObj->setMsg("regin err no found current id! \n");
             } else {
                 int id  = msqlResSet->getInt("id");
                 // tansObj->setId(id);
                 sendObj->setId(id);
+                sendObj->setMsg("regin accepted! \n");
                 cout<<"handleUserRegMsg insert succed id: "<<id<<endl;
             }
             SeqToBin::getInstance().getBuff().push(sendObj);
@@ -169,7 +164,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
         cout<<"handleUserRegMsg insert failed "<<endl;
         // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
         sendObj->setMsgType(MSG_REG_REFUSE);
-        sendObj->setMsg("regin err! \n");
+        sendObj->setMsg("regin err! insert error!\n");
         SeqToBin::getInstance().getBuff().push(sendObj);
         return res ? 1: 0;
     });
