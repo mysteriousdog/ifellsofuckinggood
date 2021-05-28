@@ -25,7 +25,6 @@ using namespace std;
 
 msgHandle g_msgHandle[] = {
     {MSG_CMD, handleMsgCmd},
-    {MSG_CONNECT, handleUserConnectMsg},
     {MSG_TALK, handleUserSendMsg},
     {MSG_REG, handleUserRegMsg},
     {MSG_REG_REFUSE, handleUserRegRefusedMsg},
