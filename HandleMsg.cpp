@@ -219,6 +219,8 @@ void handleUserRegAcceptedMsg(TransObj* obj, int fd)
 
     // Player::getInstance().setLoginStatus(false);
     shared_ptr<stringstream> ss = make_shared<stringstream>();
+    int id = obj->getId();
+    Player::getInstance().setPlayerId(id);
     (*ss)<<"Regin success!\n";
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);

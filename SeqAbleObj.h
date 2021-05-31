@@ -72,6 +72,10 @@ typedef struct TransObj
         return msg;
     }
 
+    int getId() {
+        return id;
+    }
+
     virtual ~TransObj(){std::cout<<"~TransObj() "<<std::endl;}
 } tansObj;
 
