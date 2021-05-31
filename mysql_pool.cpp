@@ -72,22 +72,22 @@ Connection* MysqlPool::CreateConnection()
 {
     Connection* conn;  
     try{  
-        cout<<"CreateConnection"<<endl;
+        cout<<"CreateConnection start"<<endl;
         conn = driver->connect(this->url,this->user,this->password);  //create a conn 
-        cout<<"CreateConnection2"<<endl;
+        cout<<"CreateConnection end"<<endl;
         return conn;  
     }  
     catch(sql::SQLException& e)  
     {  
         perror("link error"); 
-        cout<<"link error"<<endl;   
-        return NULL;  
+        cout<<"link error in MysqlPool::CreateConnection"<<endl;   
+        return nullptr;  
     }  
     catch(std::runtime_error& e)  
     {  
         perror("run error");
-        cout<<"run error"<<endl;   
-        return NULL;  
+        cout<<"run error in MysqlPool::CreateConnection"<<endl;   
+        return nullptr;  
     }  
 }
  
@@ -97,19 +97,22 @@ Connection* MysqlPool::GetConnection()
  
     pthread_mutex_lock(&lock);
  
-    if(connList.size()>0)//the pool have a conn 
+    if(connList.size() > 0)//the pool have a conn 
     {  
+        cout<<"mysql conn poll have conn "<<connList.size()<<endl;
         conn = connList.front(); 
         connList.pop_front();//move the first conn 
         if(conn->isClosed())//if the conn is closed, delete it and recreate it
         {  
             delete conn;  
+            cout<<"mysql conn poll the conn is closed "<<endl;
             conn = this->CreateConnection();  
         }  
  
-        if(conn == NULL)  
+        if(conn == nullptr)  
         {  
-            --curSize;  
+            --curSize; 
+            cout<<"mysql conn poll the conn is nullptr "<<endl;
         }
  
         pthread_mutex_unlock(&lock);
@@ -118,25 +121,29 @@ Connection* MysqlPool::GetConnection()
     }  
     else
     {  
-        if(curSize< maxSize)//the pool no conn
+        if(curSize < maxSize)//the pool no conn
         {
+            cout<<"mysql conn poll empty "<<endl;
             conn = this->CreateConnection();  
             if(conn)
             {  
+                cout<<"mysql conn poll empty create new con success!"<<endl;
                 ++curSize;  
                 pthread_mutex_unlock(&lock);  
                 return conn;  
             }  
             else
             {  
+                cout<<"mysql conn poll empty create new con error!"<<endl;
                 pthread_mutex_unlock(&lock);  
-                return NULL;  
+                return nullptr;  
             }  
         }  
         else //the conn count > maxSize
         { 
+            cout<<"mysql conn poll size over maxSize!"<<endl;
             pthread_mutex_unlock(&lock);  
-            return NULL;  
+            return nullptr;  
         }  
     }  
 }  
@@ -213,12 +220,16 @@ ResultSet* MysqlPool::ExecQuery(const char* format, ...)
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        state->close();
+        delete(state);
+        ReleaseConnection(conn);
         return nullptr;
     }
 
     cout<<"in fun MysqlPool::ExecQuery reply is end"<<endl;
     state->close();
     delete(state);
+    ReleaseConnection(conn);
     return reply;
 }
 
@@ -248,7 +259,9 @@ bool MysqlPool::ExecInsert(const char* format, ...)
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        ReleaseConnection(conn);
         return false;
     }
+    ReleaseConnection(conn);
     return res;
 }
