@@ -1,3 +1,4 @@
+#ifdef CLIENT_COMPARE
 #include "Singleton.h"
 #include "CommandDoer.h"
 #include "MyEnum.h"
@@ -122,3 +123,6 @@ int main()
     clientEnd();
     return 0;
 }
+
+#endif
+

@@ -1,3 +1,5 @@
+#ifdef CLIENT_COMPARE
+
 #include "ReadKey.h"
 #include "Command.h"
 #include "SeqToBin.h"
@@ -133,3 +135,5 @@ Command* ReadKey::getSysCmd()
     sysCmdQue.pop();
     return cmd;
 }
+
+#endif

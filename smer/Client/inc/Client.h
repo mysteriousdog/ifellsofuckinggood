@@ -24,7 +24,7 @@ class Client
 
 public:
     Client();
-    Client(char* ip, int port);
+    Client(const char* ip, int port);
     bool run();
     bool recvMsg();
     bool sendMsgOnce(int id, MSG_TYPE_UINT32_ENUM type, string& str);

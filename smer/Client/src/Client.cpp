@@ -17,7 +17,7 @@ port(0)
 }
 
 
-Client::Client(char* ip_, int port_):
+Client::Client(const char* ip_, int port_):
 ip(ip_),
 port(port_)
 {

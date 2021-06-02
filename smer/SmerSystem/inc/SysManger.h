@@ -31,10 +31,13 @@ public:
 
     void handleSystem() {
         handleSysMsg();
+#ifdef CLIENT_COMPARE
         handleRecvMsg();
         handleSysInput();
+#endif
     }
 
+#ifdef CLIENT_COMPARE
     void handleSysInput() {
         Command* cmd = ReadKey::getInstance().getSysCmd();
         if (cmd == nullptr) {
@@ -51,12 +54,14 @@ public:
             break;
         }
     }
+
     void handleRecvMsg() {
         TransObj* rcvObj;
         if ((rcvObj = SeqToBin::getInstance().getRcvBuff().tryAndPop()) != nullptr) {
             MsgHandler::getInstance().handle(rcvObj, -1);
         }
     }
+#endif
 
     void handleSysMsg();
 
@@ -72,10 +77,10 @@ public:
     }
 
     TransObj* popBackReq() {
-        reqBuff.pop_back();
+        return reqBuff.pop_back();
     }
     TransObj* popFrontReq() {
-        reqBuff.pop_front();
+        return reqBuff.pop_front();
     }
     bool eraseOneReq(int index) {
        return reqBuff.erase(index);
