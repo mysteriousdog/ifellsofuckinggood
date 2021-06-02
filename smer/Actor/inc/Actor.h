@@ -1,6 +1,8 @@
 #ifndef _ACTOT_H_
 #define _ACTOT_H_
 
+#ifdef CLIENT_COMPARE
+
 #include "Singleton.h"
 #include "CommandDoer.h"
 #include "MyEnum.h"
@@ -23,4 +25,5 @@ private:
 friend class Singleton;
 };
 
+#endif
 #endif

@@ -1,3 +1,5 @@
+
+#ifdef CLIENT_COMPARE
 #include "Game.h"
 #include "ReadKey.h"
 #include "MyEnum.h"
@@ -46,3 +48,5 @@ void Game::update()
     (void)ReadKey::getInstance().scanKeyBoard();
     actor.update();
 }
+
+#endif

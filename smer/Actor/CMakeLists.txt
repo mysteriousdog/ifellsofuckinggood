@@ -6,5 +6,5 @@ set(SMER_ACTOR_HEADER
 
 set(SMER_ACTOR_SRC
 
-    ACTOR/src/Actor.cpp
+    Actor/src/Actor.cpp
 )

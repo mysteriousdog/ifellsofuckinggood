@@ -1,5 +1,6 @@
 #ifndef _GAME_H_
 #define _GAME_H_
+#ifdef CLIENT_COMPARE
 
 #include "Singleton.h"
 #include "Actor.h"
@@ -24,4 +25,5 @@ private:
 friend class Singleton;
 };
 
+#endif
 #endif

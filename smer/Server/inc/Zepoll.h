@@ -18,7 +18,6 @@
 #include <unordered_map>
 #include "ConRedis.h"
 #include "HandleMsg.h"
-#include "Actor.h"
 #include "ComManger.h"
 #include <string.h>
 #include "SeqToBin.h"
@@ -179,8 +178,6 @@ public:
 				// memcpy((void*)&cmd, (void*)obj->msg, obj->len);
 				// // CMD_TYPE_UINT32_ENUM a = cmd->getType();
 				// cout<<"cmd->type "<<cmd.getType()<<endl;
-				// Actor& actor = Actor::getInstance();
-				// cmd.doCommand(actor);
                 // if (send(fd, buffer, received, 0) != received)
 				// {
 				// 	std::cout << "Error writing to socket" << std::endl;
