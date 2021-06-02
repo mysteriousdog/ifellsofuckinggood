@@ -1,10 +1,10 @@
 
 set(SMER_ACTOR_HEADER
 
-    Actor/inc/ACTOR.h
+    Actor/inc/Actor.h
 )
 
 set(SMER_ACTOR_SRC
 
-    ACTOR/src/ACTOR.cpp
+    ACTOR/src/Actor.cpp
 )

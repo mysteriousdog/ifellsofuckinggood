@@ -1,6 +1,8 @@
 #ifndef _COM_MANGER_H_
 #define _COM_MANGER_H_
 
+#ifdef SERVER_COMPARE
+
 #include "Singleton.h"
 #include <vector>
 #include <string>
@@ -63,5 +65,5 @@ private:
 friend class Singleton;
 };
 
-
+#endif
 #endif // _COM_MANGER_H_

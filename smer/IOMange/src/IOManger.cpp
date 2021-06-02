@@ -46,15 +46,15 @@ void IOManger::handleOutputMsg()
 }
 
 bool IOManger::tryLoginFirst() {
-        if (!Player::getInstance().isLogined()) {
-            auto ss = make_shared<stringstream>();
-            (*ss)<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
-            (*ss)<<"Try Regin ==> Regin@yourname|yourpassword\n";
-            (*ss)<<"Try Login ==> Login@yourname|yourpassword\n";
-            (*ss)<<"(-_-)\n";
-            SystemMsgObj* sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
-            SeqToBin::getInstance().putSysMsg(sysObj);
-            return true;
-        }
-        return false;
+    if (!Player::getInstance().isLogined()) {
+        auto ss = make_shared<stringstream>();
+        (*ss)<<"You should login first.(if not regin -- regin and login first to use the function!)\n";
+        (*ss)<<"Try Regin ==> Regin@yourname|yourpassword\n";
+        (*ss)<<"Try Login ==> Login@yourname|yourpassword\n";
+        (*ss)<<"(-_-)\n";
+        SystemMsgObj* sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        SeqToBin::getInstance().putSysMsg(sysObj);
+        return true;
     }
+    return false;
+}

@@ -1,9 +1,9 @@
 set(SMER_MYSQL_HEADER
 
-    Mysql/inc/Mysql.h
+    Mysql/inc/mysql_pool.h
 )
 
 set(SMER_MYSQL_SRC
 
-    Mysql/src/Mysql.cpp
+    Mysql/src/mysql_pool.cpp
 )

@@ -1,9 +1,9 @@
 set(SMER_IOMANGE_HEADER
 
-    IOMange/inc/IOMange.h
+    IOMange/inc/IOManger.h
 )
 
-set(SMER_IOMANGE__SRC
+set(SMER_IOMANGE_SRC
 
-    IOMange/src/IOMange.cpp
+    IOMange/src/IOManger.cpp
 )

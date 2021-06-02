@@ -5,6 +5,7 @@
 
 #ifndef __REDIS_POOL_H__
 #define __REDIS_POOL_H__
+#ifdef SERVER_COMPARE
 #include <iostream>
 #include <string.h>
 #include <string>
@@ -101,4 +102,6 @@ private:
 friend class Singleton;
 };
 
+
+#endif
 #endif // __REDIS_POOL_H__

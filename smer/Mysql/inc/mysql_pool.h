@@ -1,6 +1,7 @@
 #ifndef _MYSQL_POOL_H_
 #define _MYSQL_POOL_H_
- 
+
+#ifdef SERVER_COMPARE
 #include <iostream>
 #include <mysql_connection.h>  
 #include <mysql_driver.h>  
@@ -71,5 +72,5 @@ private:
     static pthread_mutex_t lock;     
 };
 
- 
+#endif
 #endif // _MYSQL_POOL_H_

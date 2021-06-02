@@ -1,9 +1,9 @@
 set(SMER_INPUT_HEADER
 
-    Input/inc/Readkey.h
+    Input/inc/ReadKey.h
 )
 
 set(SMER_INPUT_SRC
 
-    Input/src/Readkey.cpp
+    Input/src/ReadKey.cpp
 )

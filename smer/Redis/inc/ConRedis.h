@@ -1,6 +1,8 @@
 #ifndef _CONREDIS_H_
 #define _CONREDIS_H_
 
+#ifdef SERVER_COMPARE
+
 #include <hiredis/hiredis.h>
 #include <iostream>
 
@@ -39,5 +41,5 @@ private:
     redisContext *c;
 };
 
-
+#endif
 #endif //_CONREDIS_H_
