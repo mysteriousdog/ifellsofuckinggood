@@ -10,7 +10,6 @@ else()
     set(APP_NAME main)
 endif()
 
-add_compile_options(-lpthread)
 
 if(CLIENT_COMPARE)
     add_compile_options(-D CLIENT_COMPARE)
