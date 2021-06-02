@@ -1,3 +1,5 @@
+#ifdef CLIENT_COMPARE
+
 #include "Actor.h"
 #include "MyEnum.h"
 #include "ReadKey.h"
@@ -66,3 +68,5 @@ void Actor::update()
 {
     action();
 }
+
+#endif

@@ -86,7 +86,21 @@ target_include_directories(smer
     PUBLIC ${APP_SOURCE_DIR}/Server/inc
     PUBLIC ${APP_SOURCE_DIR}/SmerSystem/inc
     PUBLIC ${APP_SOURCE_DIR}/Util/inc
+)
+
+if(CLIENT_COMPARE)
+    target_include_directories(smer
     PUBLIC /usr/local/Cellar/boost/1.70.0/include
 )
+endif()
+
+if(SERVER_COMPARE)
+    target_include_directories(smer
+    PUBLIC /usr/include
+    PUBLIC /usr/local/include
+#    PUBLIC /usr/include/boost/chrono/typeof/boost
+#    PUBLIC /usr/include/boost/hana/ext/boost
+)
+endif()
 
 Message(${PROJECT_SOURCE_DIR})
