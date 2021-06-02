@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string.h>
 #include <memory>
+#include "Player.h"
 
 const int MAX_TRANS_MSG_LEN = 64;
 
@@ -62,6 +63,17 @@ typedef struct TransObj
         strncpy(msg, msg_, strlen(msg_));
         return true;
     }
+
+    bool setNamePasswd(const char* name_, const char* passwd_) {
+        if (strlen(name_) >= NAME_MAX_LEN || strlen(passwd_) >= PASSWORD_MAX_LEN) {
+            return false;
+        }
+        clearMsg();
+        strncpy(msg, name_, NAME_MAX_LEN);
+        strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
+        return true;
+    }
+
     void clearMsg() {
         memset(msg, 0, MAX_TRANS_MSG_LEN);
     }

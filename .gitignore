@@ -5,5 +5,5 @@ appendonly_6380.aof
 nodes.conf
 appendonly.aof
 *.rdb
-build/.*
-bin/.*
+build
+bin

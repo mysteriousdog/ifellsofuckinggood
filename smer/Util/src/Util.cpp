@@ -62,9 +62,11 @@ TransObj* handleInputOfLogin(string&& input) {
         return nullptr;
     }
     TransObj* obj = new TransObj(-1, -1, MSG_LOGIN, MAX_TRANS_MSG_LEN, -1);
-    snprintf(obj->msg, NAME_MAX_LEN, res[0].c_str());
-    snprintf(obj->msg + NAME_MAX_LEN, PASSWORD_MAX_LEN, res[1].c_str());
-    return obj;
+    if(obj->setNamePasswd(res[0].c_str(), res[1].c_str())) {
+        return obj;
+    }
+    delete(obj);
+    return nullptr;
 }
 
 TransObj* handleInputOfLogout(string&& input) {
@@ -82,10 +84,12 @@ TransObj* handleInputOfRegin(string&& input) {
         return nullptr;
     }
     TransObj* obj = new TransObj(-1, -1, MSG_REG, MAX_TRANS_MSG_LEN, -1);
-    snprintf(obj->msg, NAME_MAX_LEN, res[0].c_str());
-    snprintf(obj->msg + NAME_MAX_LEN, PASSWORD_MAX_LEN, res[1].c_str());
-    Player::getInstance().init(res[0], res[1], -1);
-    return obj;
+    if(obj->setNamePasswd(res[0].c_str(), res[1].c_str())) {
+        Player::getInstance().init(res[0], res[1], -1);
+        return obj;
+    }
+    delete(obj);
+    return nullptr;
 }
 
 TransObj* handleInputOfAskForFriend(string&& input) {
@@ -97,7 +101,7 @@ TransObj* handleInputOfAskForFriend(string&& input) {
         return nullptr;
     }
     TransObj* obj = new TransObj(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
-    snprintf(obj->msg, NAME_MAX_LEN, input.c_str());
+    obj->setMsg(input.c_str());
     return obj;
 }
 
@@ -112,7 +116,7 @@ TransObj* handleInputOfChoseTalker(string&& input) {
     // 首先要判断这个人存不存在 然后判断是不是好友 最后判断是不是在线
     Player::getInstance().setTalkerName(move(input));
     TransObj* obj = new TransObj(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
-    snprintf(obj->msg, NAME_MAX_LEN, input.c_str());
+    obj->setMsg(input.c_str());
     return obj;
 }
 
@@ -196,7 +200,7 @@ TransObj* Util::getMsgFromInput(string&& input)
             std::cout<<"msg length should be in 1 ~  "<<MAX_TRANS_MSG_LEN<<endl;
         }
         TransObj* obj = new TransObj(1, 1, MSG_TALK, 1, 1);
-        snprintf(obj->msg, MAX_TRANS_MSG_LEN, input.c_str());
+        obj->setMsg(input.c_str());
         // 设置talk对象 recverId_
         return obj;
     }

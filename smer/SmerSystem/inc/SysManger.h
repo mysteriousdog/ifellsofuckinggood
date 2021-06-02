@@ -77,10 +77,10 @@ public:
     }
 
     TransObj* popBackReq() {
-        reqBuff.pop_back();
+        return reqBuff.pop_back();
     }
     TransObj* popFrontReq() {
-        reqBuff.pop_front();
+        return reqBuff.pop_front();
     }
     bool eraseOneReq(int index) {
        return reqBuff.erase(index);
