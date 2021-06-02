@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-option(TESTING "enable test compilation" ON)
+option(TESTING "enable test compilation" OFF)
 option(SERVER_COMPARE "enable server compilation" OFF)
-option(CLIENT_COMPARE "enable client compilation" ON)
+option(CLIENT_COMPARE "enable client compilation" OFF)
 
 if(TESTING)
     set(APP_NAME test)
