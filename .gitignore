@@ -13,3 +13,4 @@ nodes.conf
 appendonly.aof
 *.rdb
 server
+build/.*

@@ -77,8 +77,6 @@ public:
     void handleOutputMsg();
     void handleTalk();
 
-    
-
 private:
     IOManger() : talking(false) {
         // load friends

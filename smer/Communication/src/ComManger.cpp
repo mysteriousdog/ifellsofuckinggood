@@ -1,3 +1,4 @@
+#ifdef SERVER_COMPARE
 #include "ComManger.h"
 #include <utility>
 #include <vector>
@@ -95,3 +96,5 @@ bool ComManger::getTalkerName(int id, string& res)
     cout<<"getTalkerName ExecHget"<<endl;
     return false;
 }
+
+#endif

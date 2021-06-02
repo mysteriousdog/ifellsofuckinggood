@@ -1,3 +1,4 @@
+#ifdef SERVER_COMPARE
 #include "redis_pool.h"
 #include "ComManger.h"
 #include <stdio.h>
@@ -354,3 +355,5 @@ bool KGRedisClient::ExecSremove(std::vector<std::string>& response, string&& set
 {
     return ExecuteCmd_spop(response, "SREM %s %s", setName.c_str(), val.c_str());
 }
+
+#endif

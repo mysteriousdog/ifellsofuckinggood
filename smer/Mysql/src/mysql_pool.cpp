@@ -1,3 +1,4 @@
+#ifdef SERVER_COMPARE
 #include <iostream>
 #include <stdexcept>  
 #include <exception>  
@@ -265,3 +266,5 @@ bool MysqlPool::ExecInsert(const char* format, ...)
     ReleaseConnection(conn);
     return res;
 }
+
+#endif
