@@ -58,4 +58,5 @@ if(SERVER_COMPARE)
     target_link_libraries(${APP_NAME} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
