@@ -1,5 +1,8 @@
 #ifndef _READKEY_
 #define _READKEY_
+
+#ifdef CLIENT_COMPARE
+
 #include "Singleton.h"
 #include "CommandDoer.h"
 #include "MyEnum.h"
@@ -28,4 +31,5 @@ private:
 friend class Singleton;
 };
 
+#endif
 #endif

@@ -14,3 +14,4 @@ appendonly.aof
 *.rdb
 server
 build/.*
+bin/.*
