@@ -83,6 +83,8 @@ bool Client::run()
 #ifdef CLIENT_COMPARE
         cout<<"send from client ..."<<tansObj->getMsgType()<<endl;
         cout<<"send from client msg ..."<<tansObj->getMsg()<<endl;
+        cout<<"send from client name ..."<<tansObj->getName()<<endl;
+        cout<<"send from client Passwd ..."<<tansObj->getPasswd()<<endl;
         if (send(client, buf, MAX_LEN_OF_SEND_BUFF, 0) <= 0) {
             cout<<"send from client err ..."<<endl;
         }
