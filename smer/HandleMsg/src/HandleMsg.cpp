@@ -337,12 +337,17 @@ void handleUserLogAcceptedMsg(TransObj* obj, int fd)
     }
 
 #ifdef CLIENT_COMPARE
+    cout << hex << (void *)(obj) << endl;
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"you have login in success!\n";
+    cout<<"1"<<endl;
     Player::getInstance().setPlayerLogin(obj->getId(), obj->getName(), obj->getPasswd());
+    cout<<"2"<<endl;
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
+    cout<<"3"<<endl;
     delete(obj);
+    cout<<"4"<<endl;
 #endif
 }
 

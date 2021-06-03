@@ -58,6 +58,7 @@ public:
     void handleRecvMsg() {
         TransObj* rcvObj;
         if ((rcvObj = SeqToBin::getInstance().getRcvBuff().tryAndPop()) != nullptr) {
+            cout << hex << (void *)(rcvObj) << endl;
             MsgHandler::getInstance().handle(rcvObj, -1);
         }
     }

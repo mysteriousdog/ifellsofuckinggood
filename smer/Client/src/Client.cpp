@@ -104,7 +104,6 @@ bool Client::recvMsg()
     //     return false;
     // }
     char rcvBuf[512] = {0};
-    SeqToBin& seq = SeqToBin::getInstance();
     // string s("1");
     // if (sendMsgOnce(1, MSG_CONNECT, s)) {
     //     cout<<"id band success"<<endl;
@@ -116,13 +115,22 @@ bool Client::recvMsg()
         // cout<<"rcv "<<rcvBuf<<endl;
         // TransObj* recvTansObj = (TransObj*)buf;
         TransObj* recvTansObj = new TransObj();
-        memcpy((void*)recvTansObj, (void*)rcvBuf, sizeof(TransObj));
+        // recvTansObj->setFd(((TransObj*)rcvBuf)->getFd());
+        // recvTansObj->setId(((TransObj*)rcvBuf)->getId());
+        // recvTansObj->setMsgType(((TransObj*)rcvBuf)->getMsgType());
+        // recvTansObj->setMsg(((TransObj*)rcvBuf)->getMsg());
+        if (!recvTansObj->transBuff2Obj(rcvBuf)) {
+            delete(recvTansObj);
+            continue;
+        }
+
+        // memcpy((void*)recvTansObj, (void*)rcvBuf, sizeof(TransObj));
         std::cout << recvTansObj->id << std::endl;
         std::cout << recvTansObj->msgType << std::endl;
         std::cout << recvTansObj->len << std::endl;
         std::cout << recvTansObj->getMsg() << std::endl;
-
-        seq.getRcvBuff().push(recvTansObj);
+        cout << hex << (void *)(recvTansObj) << endl;
+        SeqToBin::getInstance().getRcvBuff().push(recvTansObj);
     }
     close(client);
     return true;

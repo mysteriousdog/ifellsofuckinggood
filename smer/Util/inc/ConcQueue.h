@@ -50,6 +50,9 @@ public:
         }
         T value = data.front();
         data.pop();
+        if (data.empty()) {
+            empty_cond.notify_one();
+        }
         return value;
     }
 

@@ -51,6 +51,9 @@ typedef struct TransObj
     void setrecverId(int recverId_) {
         recverId = recverId_;
     }
+    int getrecverId() {
+        return recverId;
+    }
     void setLen(int len_) {
         len = len_;
     }
@@ -110,6 +113,18 @@ typedef struct TransObj
         return true;
     }
 
+    bool transBuff2Obj(char* buff) {
+        if (buff == nullptr) {
+            return false;
+        }
+        this->setrecverId(((TransObj*)buff)->getrecverId());
+        this->setFd(((TransObj*)buff)->getFd());
+        this->setId(((TransObj*)buff)->getId());
+        this->setMsgType(((TransObj*)buff)->getMsgType());
+        this->setMsg(((TransObj*)buff)->getMsg());
+        return true;
+    }
+
     void clearMsg() {
         memset(msg, 0, MAX_TRANS_MSG_LEN);
     }
@@ -131,6 +146,10 @@ typedef struct TransObj
 
     int getId() {
         return id;
+    }
+
+    int getFd() {
+        return fd;
     }
 
     virtual ~TransObj(){std::cout<<"~TransObj() "<<std::endl;}
