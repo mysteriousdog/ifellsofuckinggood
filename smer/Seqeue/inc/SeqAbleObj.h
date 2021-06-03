@@ -101,13 +101,13 @@ typedef struct TransObj
     void clearPasswd() {
         memset(msg + NAME_MAX_LEN, 0 , PASSWORD_MAX_LEN);
     }
-    char* getName() {
+    const char* getName() {
         return msg;
     }
-    char* getPasswd() {
+    const char* getPasswd() {
         return msg + NAME_MAX_LEN;
     }
-    char* getMsg() {
+    const char* getMsg() {
         return msg;
     }
 
