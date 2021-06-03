@@ -237,27 +237,27 @@ void handleUserLogMsg(TransObj* obj, int fd)
         return;
     }
 #ifdef SERVER_COMPARE
-    cout << hex << (void *)obj << endl;
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
-
         int id = obj->id;
         cout<<"id "<<id<<endl;
+        TransObj* sendObj = new TransObj();
+        sendObj->setId(id);
+
+        if (obj->len > MAX_TRANS_MSG_LEN) {
+            cout<<"msg len too long!"<<endl;
+            sendObj->setMsgType(MSG_LOGIN_REFUSE);
+            sendObj->setMsg("Login err! msg len too long! \n");
+            SeqToBin::getInstance().getBuff().push(sendObj);
+            return 0;
+        }
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password, username from userinfo where userid = %d;", id);
         if (msqlResSet == nullptr) {
             cout<<"no find id,"<<id <<endl;
             // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
             // SeqToBin::getInstance().getBuff().push(tansObj);
-            obj->setMsgType(MSG_LOGIN_REFUSE);
-            obj->setMsg("Login err! not found id\n");
-            SeqToBin::getInstance().getBuff().push(obj);
-            delete(msqlResSet);
-            return 0;
-        }
-        if (obj->len > PASSWORD_MAX_LEN) {
-            cout<<"msg len too long!"<<endl;
-            obj->setMsgType(MSG_LOGIN_REFUSE);
-            obj->setMsg("Login err! \n");
-            SeqToBin::getInstance().getBuff().push(obj);
+            sendObj->setMsgType(MSG_LOGIN_REFUSE);
+            sendObj->setMsg("Login err! not found id\n");
+            SeqToBin::getInstance().getBuff().push(sendObj);
             delete(msqlResSet);
             return 0;
         }
@@ -266,27 +266,27 @@ void handleUserLogMsg(TransObj* obj, int fd)
             string relPasswd = msqlResSet->getString("password");
             string userName = msqlResSet->getString("username");
             cout<<"getted the password!"<<endl;
-            char tansPasswd[PASSWORD_MAX_LEN];
-            memcpy(tansPasswd, (obj->msg + NAME_MAX_LEN), obj->len);
+            char* tansPasswd = obj->getPasswd();
+
             if (strcmp(tansPasswd, relPasswd.c_str()) != 0) {
                 cout<<"password not equal!"<<endl;
                 cout<<"realPassword is "<<relPasswd<<endl;
                 cout<<"ransPassword is "<<tansPasswd<<endl;
                 // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
                 // SeqToBin::getInstance().getBuff().push(tansObj);
-                obj->setMsgType(MSG_LOGIN_REFUSE);
-                obj->setMsg("Login err!\n");
-                SeqToBin::getInstance().getBuff().push(obj);
+                sendObj->setMsgType(MSG_LOGIN_REFUSE);
+                sendObj->setMsg("Login err! password not equal!\n");
+                SeqToBin::getInstance().getBuff().push(sendObj);
                 delete(msqlResSet);
                 return 0;
             }
-            ComManger::getInstance().addSessionTalker(obj->id, move(userName), fd);
+            ComManger::getInstance().addSessionTalker(sendObj->id, move(userName), fd);
         }
         cout<<"now do the send thing!"<<endl;
         // TransObj* tansObj = new TransObj(id, MSG_LOGIN_ACCEPT, 1, fd);
         // SeqToBin::getInstance().getBuff().push(tansObj);
-        obj->setMsgType(MSG_LOGIN_ACCEPT);
-        SeqToBin::getInstance().getBuff().push(obj);
+        sendObj->setMsgType(MSG_LOGIN_ACCEPT);
+        SeqToBin::getInstance().getBuff().push(sendObj);
         delete(msqlResSet);
         
         return 1;
