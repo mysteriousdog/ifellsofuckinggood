@@ -327,7 +327,9 @@ void handleUserLogAcceptedMsg(TransObj* obj, int fd)
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"you have login in success!\n";
     Player::getInstance().setLoginStatus(true);
-    Player::getInstance().setPlayerId(obj->id);
+    Player::getInstance().setPlayerId(obj->getId());
+    Player::getInstance().getPlayerName(obj->getPasswd());
+    Player::getInstance().getPlayerName(obj->getName());
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
     delete(obj);

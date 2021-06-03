@@ -85,7 +85,7 @@ TransObj* handleInputOfRegin(string&& input) {
     }
     TransObj* obj = new TransObj(-1, -1, MSG_REG, MAX_TRANS_MSG_LEN, -1);
     if(obj->setNamePasswd(res[0].c_str(), res[1].c_str())) {
-        Player::getInstance().init(res[0], res[1], -1);
+        // Player::getInstance().init(res[0], res[1], -1);
         return obj;
     }
     delete(obj);
