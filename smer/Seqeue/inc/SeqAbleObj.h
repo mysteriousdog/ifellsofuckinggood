@@ -51,6 +51,9 @@ typedef struct TransObj
     void setrecverId(int recverId_) {
         recverId = recverId_;
     }
+    int getrecverId() {
+        return recverId;
+    }
     void setLen(int len_) {
         len = len_;
     }
@@ -64,6 +67,42 @@ typedef struct TransObj
         return true;
     }
 
+    bool setName(string& name_) {
+        if (name_.length() >= NAME_MAX_LEN) {
+            return false;
+        }
+        clearName();
+        strncpy(msg, name_.c_str(), NAME_MAX_LEN);
+        return true;
+    }
+
+    bool setName(const char* name_) {
+        if (strlen(name_)>= NAME_MAX_LEN) {
+            return false;
+        }
+        clearName();
+        strncpy(msg, name_, NAME_MAX_LEN);
+        return true;
+    }
+
+    bool setPasswd(string& passwd_) {
+        if (passwd_.length() >= PASSWORD_MAX_LEN) {
+            return false;
+        }
+        clearPasswd();
+        strncpy(msg + NAME_MAX_LEN, passwd_.c_str(), PASSWORD_MAX_LEN);
+        return true;
+    }
+
+    bool setPasswd(const char* passwd_) {
+        if (strlen(passwd_) >= PASSWORD_MAX_LEN) {
+            return false;
+        }
+        clearPasswd();
+        strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
+        return true;
+    }
+
     bool setNamePasswd(const char* name_, const char* passwd_) {
         if (strlen(name_) >= NAME_MAX_LEN || strlen(passwd_) >= PASSWORD_MAX_LEN) {
             return false;
@@ -74,18 +113,43 @@ typedef struct TransObj
         return true;
     }
 
+    bool transBuff2Obj(char* buff) {
+        if (buff == nullptr) {
+            return false;
+        }
+        this->setrecverId(((TransObj*)buff)->getrecverId());
+        this->setFd(((TransObj*)buff)->getFd());
+        this->setId(((TransObj*)buff)->getId());
+        this->setMsgType(((TransObj*)buff)->getMsgType());
+        this->setMsg(((TransObj*)buff)->getMsg());
+        return true;
+    }
+
     void clearMsg() {
         memset(msg, 0, MAX_TRANS_MSG_LEN);
     }
-    char* getName() {
+    void clearName() {
+        memset(msg, 0 , NAME_MAX_LEN);
+    }
+    void clearPasswd() {
+        memset(msg + NAME_MAX_LEN, 0 , PASSWORD_MAX_LEN);
+    }
+    const char* getName() {
         return msg;
     }
-    char* getMsg() {
+    const char* getPasswd() {
+        return msg + NAME_MAX_LEN;
+    }
+    const char* getMsg() {
         return msg;
     }
 
     int getId() {
         return id;
+    }
+
+    int getFd() {
+        return fd;
     }
 
     virtual ~TransObj(){std::cout<<"~TransObj() "<<std::endl;}

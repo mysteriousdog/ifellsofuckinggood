@@ -48,6 +48,21 @@ public:
         data.id = id_;
     }
 
+    void setPlayerName(const char* name_) {
+        data.name = name_;
+    }
+
+    void setPlayerPasswd(const char* passwd_) {
+        data.password = passwd_;
+    }
+
+    void setPlayerLogin(int id_, const char* name_, const char* passwd_) {
+        setLoginStatus(true);
+        setPlayerId(id_);
+        setPlayerName(name_);
+        setPlayerPasswd(passwd_);
+    }
+
     int getPlayerId() {
         return data.id;
     }

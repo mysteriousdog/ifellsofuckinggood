@@ -115,12 +115,27 @@ void UtilTestUnit() {
 }
 
 
+void test_clientReginAccHandle()
+{
+    TransObj* obj = new TransObj();
+    obj->setName("zlh");
+    obj->setPasswd("123");
+    obj->setId(48);
+    obj->setMsgType(MSG_LOGIN_ACCEPT);
+    SeqToBin::getInstance().getRcvBuff().push(obj);
+    SysManger::getInstance().handleRecvMsg();
+}
+
+
 int main()
 {
     clientInit(4);
     Game& game =  Game::getInstance();
     game();
     clientEnd();
+
+    // test_clientReginAccHandle();
+
     return 0;
 }
 
