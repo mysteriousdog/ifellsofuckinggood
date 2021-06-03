@@ -132,16 +132,12 @@ void handleUserRegMsg(TransObj* obj, int fd)
     if (obj->len > (NAME_MAX_LEN + PASSWORD_MAX_LEN)) {
         return;        
     }
-    char str[MAX_TRANS_MSG_LEN] {0};
-    snprintf(str, MAX_TRANS_MSG_LEN, obj->getMsg());
-    cout<<"str in handleUserRegMsg "<<str<<endl;
-    ThreadPool::getInstance().enqueue([str, fd] () mutable {
+
+    ThreadPool::getInstance().enqueue([obj, fd] () mutable {
         cout<<"do reg!  fd-> "<<int(fd)<<endl;
         TransObj* sendObj = new TransObj();
         sendObj->setFd(fd);
-        char name[NAME_MAX_LEN] {0};
-        char passwd[PASSWORD_MAX_LEN] {0};
-        strncpy(name, str, NAME_MAX_LEN);
+        const char* name = obj->getName();
         cout<<"handleUserRegMsg get name is "<<name<<endl;
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where username = \'%s\';", name);
         if (msqlResSet->next()) {
@@ -153,7 +149,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
             SeqToBin::getInstance().getBuff().push(sendObj);
             return 0;
         }
-        memcpy(passwd, (str + NAME_MAX_LEN), PASSWORD_MAX_LEN);
+        const char* passwd = obj->getPasswd();
         cout<<"handleUserRegMsg get passwd is "<<passwd<<endl;
         bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", name, int(fd), passwd);
         if (res) {
@@ -238,10 +234,8 @@ void handleUserLogMsg(TransObj* obj, int fd)
     }
 #ifdef SERVER_COMPARE
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
-        int id = obj->id;
-        cout<<"id "<<id<<endl;
+
         TransObj* sendObj = new TransObj();
-        sendObj->setId(id);
 
         if (obj->len > MAX_TRANS_MSG_LEN) {
             cout<<"msg len too long!"<<endl;
@@ -250,13 +244,14 @@ void handleUserLogMsg(TransObj* obj, int fd)
             SeqToBin::getInstance().getBuff().push(sendObj);
             return 0;
         }
-        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password, username from userinfo where userid = %d;", id);
+        const char* name = obj->getName();
+        auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password, userid from userinfo where username = \'%s\';", name);
         if (msqlResSet == nullptr) {
-            cout<<"no find id,"<<id <<endl;
+            cout<<"no find name "<<name <<endl;
             // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
             // SeqToBin::getInstance().getBuff().push(tansObj);
             sendObj->setMsgType(MSG_LOGIN_REFUSE);
-            sendObj->setMsg("Login err! not found id\n");
+            sendObj->setMsg("Login err! not found name\n");
             SeqToBin::getInstance().getBuff().push(sendObj);
             delete(msqlResSet);
             return 0;
@@ -264,9 +259,8 @@ void handleUserLogMsg(TransObj* obj, int fd)
         if (msqlResSet->next()) {
             cout<<"now getting the password!"<<endl;
             string relPasswd = msqlResSet->getString("password");
-            string userName = msqlResSet->getString("username");
             cout<<"getted the password!"<<endl;
-            char* tansPasswd = obj->getPasswd();
+            const char* tansPasswd = obj->getPasswd();
 
             if (strcmp(tansPasswd, relPasswd.c_str()) != 0) {
                 cout<<"password not equal!"<<endl;
@@ -280,7 +274,26 @@ void handleUserLogMsg(TransObj* obj, int fd)
                 delete(msqlResSet);
                 return 0;
             }
-            ComManger::getInstance().addSessionTalker(sendObj->id, move(userName), fd);
+            int id = -1;
+            try
+            {
+                id = msqlResSet->getInt("userid");
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+                cout<<"id not find!"<<endl;
+                sendObj->setMsgType(MSG_LOGIN_REFUSE);
+                sendObj->setMsg("Login err! id not found!\n");
+                SeqToBin::getInstance().getBuff().push(sendObj);
+                delete(msqlResSet);
+                return 0;
+            }
+            sendObj->setId(id);
+            sendObj->setName(name);
+            sendObj->setPasswd(tansPasswd);
+            sendObj->setFd(fd);
+            ComManger::getInstance().addSessionTalker(sendObj->id, string(name), fd);
         }
         cout<<"now do the send thing!"<<endl;
         // TransObj* tansObj = new TransObj(id, MSG_LOGIN_ACCEPT, 1, fd);
