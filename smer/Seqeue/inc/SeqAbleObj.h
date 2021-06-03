@@ -64,6 +64,24 @@ typedef struct TransObj
         return true;
     }
 
+    bool setName(string& name_) {
+        if (name_.length() >= NAME_MAX_LEN) {
+            return false;
+        }
+        clearName();
+        strncpy(msg, name_.c_str(), NAME_MAX_LEN);
+        return true;
+    }
+
+    bool setPasswd(string& passwd_) {
+        if (passwd_.length() >= PASSWORD_MAX_LEN) {
+            return false;
+        }
+        clearPasswd();
+        strncpy(msg + NAME_MAX_LEN, passwd_.c_str(), PASSWORD_MAX_LEN);
+        return true;
+    }
+
     bool setNamePasswd(const char* name_, const char* passwd_) {
         if (strlen(name_) >= NAME_MAX_LEN || strlen(passwd_) >= PASSWORD_MAX_LEN) {
             return false;
@@ -77,8 +95,17 @@ typedef struct TransObj
     void clearMsg() {
         memset(msg, 0, MAX_TRANS_MSG_LEN);
     }
+    void clearName() {
+        memset(msg, 0 , NAME_MAX_LEN);
+    }
+    void clearPasswd() {
+        memset(msg + NAME_MAX_LEN, 0 , PASSWORD_MAX_LEN);
+    }
     char* getName() {
         return msg;
+    }
+    char* getPasswd() {
+        return msg + NAME_MAX_LEN;
     }
     char* getMsg() {
         return msg;
