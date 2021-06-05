@@ -19,6 +19,7 @@ include(Seqeue/CMakeLists.txt)
 include(Server/CMakeLists.txt)
 include(SmerSystem/CMakeLists.txt)
 include(Util/CMakeLists.txt)
+include(Log/CMakeLists.txt)
 
 set(ALL_LIB_SOURCE)
 set(ALL_LIB_HEADER)
@@ -39,6 +40,7 @@ ${SMER_SEQEUE_HEADER}
 ${SMER_SMERSYSTEM_HEADER}
 ${SMER_UTIL_HEADER}
 ${SMER_SERVER_HEADER}
+${SMER_LOG_HEADER}
 )
 
 set(SMER_SRC
@@ -57,6 +59,7 @@ ${SMER_SEQEUE_SRC}
 ${SMER_SMERSYSTEM_SRC}
 ${SMER_UTIL_SRC}
 ${SMER_SERVER_SRC}
+${SMER_LOG_SRC}
 )
 
 
@@ -86,6 +89,7 @@ target_include_directories(smer
     PUBLIC ${APP_SOURCE_DIR}/Server/inc
     PUBLIC ${APP_SOURCE_DIR}/SmerSystem/inc
     PUBLIC ${APP_SOURCE_DIR}/Util/inc
+    PUBLIC ${APP_SOURCE_DIR}/Log/inc
 )
 
 if(CLIENT_COMPARE)

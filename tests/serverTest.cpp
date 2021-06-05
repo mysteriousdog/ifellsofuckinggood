@@ -1,5 +1,5 @@
 #ifdef SERVER_COMPARE
-
+#include "Log.h"
 #include "Zepoll.h"
 #include "redis_pool.h"
 #include <vector>
@@ -23,6 +23,9 @@ using namespace std;
 
 int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
     cout<<"init   start"<<endl;
+
+    MyLog::getInstance().Init(LOG_PATH);
+    cout<<"MyLog init succ"<<endl;
     int ret = 0;
     if (!ComManger::getInstance().init()) {
         cout<<"ComManger init err"<<endl;
@@ -190,6 +193,8 @@ void mysqlTest() {
     auto passwd = msqlResSet->getString("password");
     assert(passwd == "123");
 }
+
+
 
 int main(int argc, char** argv) {
     // testServerInit(4, 4);
