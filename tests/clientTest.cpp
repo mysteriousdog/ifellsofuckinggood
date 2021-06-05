@@ -20,11 +20,14 @@
 #include "IOManger.h"
 #include "ThreadPool.h"
 #include "SysManger.h"
+#include "Log.h"
 #include <unistd.h>
 using namespace std;
 
 bool clientInit(size_t threadPoolSize) {
     cout<<"init client  start"<<endl;
+    MyLog::getInstance().Init(LOG_PATH);
+    cout<<"init MyLog  succ"<<endl;
     int ret = 0;
     ThreadPool::getInstance().init(threadPoolSize);
     cout<<"init ThreadPool  succ"<<endl;
@@ -126,13 +129,24 @@ void test_clientReginAccHandle()
     SysManger::getInstance().handleRecvMsg();
 }
 
+void test_clientLog()
+{
+    MyLog::getInstance().Init(LOG_PATH);
+    MyLog::getInstance().Log("test");
+    MyLog::getInstance().Log("test2");
+    LOG_DEBUG("test3");
+    LOG_INFO("test4");
+    LOG_ERROR("test5");
+}
+
 
 int main()
 {
-    clientInit(4);
-    Game& game =  Game::getInstance();
-    game();
-    clientEnd();
+    // clientInit(4);
+    // Game& game =  Game::getInstance();
+    // game();
+    // clientEnd();
+    test_clientLog();
 
     // test_clientReginAccHandle();
 
