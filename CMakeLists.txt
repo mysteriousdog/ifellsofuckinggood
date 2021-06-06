@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required (VERSION 3.0.2)
 
 option(TESTING "enable test compilation" OFF)
 option(SERVER_COMPARE "enable server compilation" OFF)
@@ -52,13 +52,17 @@ set(all_code_files
 
 LINK_DIRECTORIES(/usr/local/lib)
 
+
+
 add_executable(${APP_NAME} ${all_code_files})
 target_link_libraries(${APP_NAME} smer)
 
 if(SERVER_COMPARE)
-    target_link_libraries(${APP_NAME} libmysqlcppconn.so)
+    target_link_libraries(${APP_NAME} libmysqlcppconn.so.7.1.1.8)
     target_link_libraries(${APP_NAME} librediscluster.so)
+    target_link_libraries(${APP_NAME} libboost_filesystem.so)
     target_link_libraries(${APP_NAME} libboost_system.so)
+    target_link_libraries(${APP_NAME} libboost_date_time.so)
     find_package(Threads)
     target_link_libraries(${APP_NAME} ${CMAKE_THREAD_LIBS_INIT})
 endif()

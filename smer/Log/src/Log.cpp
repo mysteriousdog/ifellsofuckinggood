@@ -74,51 +74,6 @@ void MyLog::Log(const std::string& msg)
 
 #ifdef SERVER_COMPARE
 
-#include "Log.h"
 
-Logger Log::_logger = log4cplus::Logger::getInstance("main_log");  
-  
-Log::Log()  
-{  
-    snprintf(_log_path, sizeof(_log_path), "%s", "../log");  
-    snprintf(_log_name, sizeof(_log_name), "%s/%s.%s", _log_path, execname, "log");  
-}  
-  
-Log::~Log()  
-{  
-}  
-  
-Log& Log::instance()  
-{  
-    static Log log;  
-    return log;  
-}  
-  
-bool Log::open_log()  
-{  
-      
-    int Log_level = Main_config::instance().get_config().Read("LOG_LEVEL", 0);    
-  
-    /* step 1: Instantiate an appender object */  
-    SharedAppenderPtr _append(new FileAppender(_log_name));  
-    _append->setName("file log test");  
-  
-    /* step 2: Instantiate a layout object */  
-    std::string pattern = "[%p] [%d{%m/%d/%y %H:%M:%S}] [%t] - %m %n";  
-    std::auto_ptr<Layout> _layout(new PatternLayout(pattern));  
-  
-    /* step 3: Attach the layout object to the appender */  
-    _append->setLayout(_layout);  
-  
-    /* step 4: Instantiate a logger object */  
-  
-    /* step 5: Attach the appender object to the logger  */  
-    Log::_logger.addAppender(_append);  
-  
-    /* step 6: Set a priority for the logger  */  
-    Log::_logger.setLogLevel(Log_level);  
-  
-    return true;  
-}  
 
 #endif //server

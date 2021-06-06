@@ -8,6 +8,7 @@
 #include <map>
 using namespace std;
 
+#define PLAYER_DATA_FILE "../data/player.data"
 extern const int NAME_MAX_LEN;
 extern const int PASSWORD_MAX_LEN;
 int const MAX_FRIENDS_NUM = 3000;

@@ -11,6 +11,10 @@
 #include "SeqToBin.h"
 #include "Player.h"
 #include <stdio.h>
+#include "ZTime.h"
+#include "FileIO.h"
+#include "Log.h"
+#include <map>
 using namespace std;
 
 
@@ -23,15 +27,17 @@ using namespace std;
 
 int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
     cout<<"init   start"<<endl;
-
-    MyLog::getInstance().Init(LOG_PATH);
-    cout<<"MyLog init succ"<<endl;
     int ret = 0;
     if (!ComManger::getInstance().init()) {
         cout<<"ComManger init err"<<endl;
         return 0;
     }
+    
     ThreadPool::getInstance().init(threadPoolSize);
+    cout<<"ThreadPool init succ"<<endl;
+    MyLog& mylog = MyLog::getInstance();
+    ThreadPool::getInstance().enqueue(&MyLog::run, &mylog);
+    cout<<"MyLog init succ"<<endl;
     MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", mysqlPoolSize, "user");
     Client* client = new Client();
     auto res = ThreadPool::getInstance().enqueue(*client);
@@ -195,14 +201,60 @@ void mysqlTest() {
 }
 
 
-
 int main(int argc, char** argv) {
     // testServerInit(4, 4);
     // mysqlTest();
     // testServerEnd();
 
     serverInit(4, 4);
+    LOG_ERR("fuck");
+    LOG_DEBUG("fuck2");
+    LOG_INFO("fuck3");
+    LOG_WARNING("fuck4");
     serverEnd();
+
+
+    // std::string path = "wwww1.txt";
+ 
+    // history history1;
+    // history1.m_id = 20;
+    // history1.m_kk = 20;
+    // history1.m_sec = 20;
+    // history1.name = "abacdefasdfasdfwerwer";
+ 
+    // //file path
+    // boost::filesystem::path fpath(path);
+    // boost::filesystem::fstream fstream(fpath, std::ios_base::out);
+ 
+    // //write data to file
+    // fstream << history1;
+    // fstream.close();
+ 
+ 
+    // boost::filesystem::fstream fstream1(fpath, std::ios_base::in);
+    // history history2;
+    // //read data from file
+    // fstream1 >> history2;
+ 
+    // std::cout << history2.m_id << std::endl;
+    // std::cout << history2.name << std::endl;
+ 
+ 
+    // fstream1.close();
+
+
+    // string strPosixTime = Ztime::getInstance().getCurTimeWithYmdhms();
+    // cout<<strPosixTime<<endl;
+    
+    // strPosixTime = Ztime::getInstance().getCurTimeWithYmd();
+    // cout<<strPosixTime<<endl;
+
+    // strPosixTime = Ztime::getInstance().getCurTimeWithHms();
+    // cout<<strPosixTime<<endl;
+
+    // FileIo::getInstance().writeToFile("1.txt", "sghsdghsgd");
+    // LOG_ERR("fuck");
+    // MyLog::getInstance().run();
 	return 0;
 }
 #endif
