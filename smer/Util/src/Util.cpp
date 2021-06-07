@@ -49,8 +49,6 @@ static CommunicationCmd communicationCmdTable[] = {
 bool splitInputStr2NameAndPwd(vector<string>& res, string&& input) {
     Util::getInstance().splitStr(res, move(input), "|");
     if (res.size() <= 1 || res.size() > 2 || res[0].length() > NAME_MAX_LEN - 1 || res[1].length() > PASSWORD_MAX_LEN - 1) {
-        std::cout<<"name length should be in "<<NAME_MAX_LEN - 1<<endl;
-        std::cout<<"passwd length should be in "<<PASSWORD_MAX_LEN<<endl;
         return false;
     }
     return true;
@@ -85,7 +83,6 @@ TransObj* handleInputOfRegin(string&& input) {
     }
     TransObj* obj = new TransObj(-1, -1, MSG_REG, MAX_TRANS_MSG_LEN, -1);
     if(obj->setNamePasswd(res[0].c_str(), res[1].c_str())) {
-        // Player::getInstance().init(res[0], res[1], -1);
         return obj;
     }
     delete(obj);
@@ -97,7 +94,7 @@ TransObj* handleInputOfAskForFriend(string&& input) {
         return nullptr;
     }
     if (input.length() >= NAME_MAX_LEN) {
-        cout<<"name length should be in "<<NAME_MAX_LEN - 1<<endl;
+        LOG_INFO("name length should be in " + to_string(NAME_MAX_LEN - 1));
         return nullptr;
     }
     TransObj* obj = new TransObj(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
@@ -110,7 +107,7 @@ TransObj* handleInputOfChoseTalker(string&& input) {
         return nullptr;
     }
     if (input.length() >= NAME_MAX_LEN) {
-        cout<<"name length should be in "<<NAME_MAX_LEN - 1<<endl;
+        LOG_INFO("name length should be in " + to_string(NAME_MAX_LEN - 1));
         return nullptr;
     }
     // 首先要判断这个人存不存在 然后判断是不是好友 最后判断是不是在线
@@ -197,7 +194,7 @@ TransObj* Util::getMsgFromInput(string&& input)
             return nullptr;
         }
         if (input.length() >= MAX_TRANS_MSG_LEN || input.length() <= 0) {
-            std::cout<<"msg length should be in 1 ~  "<<MAX_TRANS_MSG_LEN<<endl;
+            LOG_INFO("name length should be in 1 ~ " + to_string(MAX_TRANS_MSG_LEN));
         }
         TransObj* obj = new TransObj(1, 1, MSG_TALK, 1, 1);
         obj->setMsg(input.c_str());
@@ -208,7 +205,6 @@ TransObj* Util::getMsgFromInput(string&& input)
     string cmd = res[1];
 
     for (int loop = 0; loop < (sizeof(communicationCmdTable) / sizeof(CommunicationCmd)); loop++) {
-        cout<<"cmdType is "<<cmdType<<" communicationCmdTable now is "<<communicationCmdTable[loop].comtype<<endl;
         if (cmdType == communicationCmdTable[loop].comtype) {
             return communicationCmdTable[loop].handler(move(cmd));
         }

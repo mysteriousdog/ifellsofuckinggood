@@ -24,9 +24,7 @@ void IOManger::handleTalk()
         talking = false;
         return;
     }
-    // TransObj* talkObj = new TransObj(1, MSG_TALK, 0);
-    // memcpy(talkObj->msg, str.c_str(), str.length());
-    // SeqToBin::getInstance().getBuff().push(talkObj);
+
     TransObj* talkObj = Util::getInstance().getMsgFromInput(move(str));
     if (talkObj != nullptr) {
         SeqToBin::getInstance().getBuff().push(talkObj);
@@ -37,11 +35,10 @@ void IOManger::handleTalk()
 void IOManger::handleOutputMsg()
 {
     std::shared_ptr<std::stringstream> msg;
-    cout<<"IOManger::handleOutputMsg"<<endl;
     if ((msg = outputMsg.tryAndPop()) != nullptr) {
-        cout<<"###########################################################################################"<<endl;
+        cout<<"|----------------------------------------------------------------------------------------------------|"<<endl;
         cout<<msg->str().c_str()<<endl;
-        cout<<"###########################################################################################"<<endl;
+        cout<<"|----------------------------------------------------------------------------------------------------|"<<endl;
     }
 }
 

@@ -1,4 +1,5 @@
 #include "HandleMsg.h"
+#include "Log.h"
 #ifdef SERVER_COMPARE
 #include "redis_pool.h"
 #include "ThreadPool.h"
@@ -44,7 +45,7 @@ void MsgHandler::handle(TransObj* obj, int fd)
     }
     for (int loop = 0; loop < sizeof(g_msgHandle) / sizeof(msgHandle); loop++) {
         if (g_msgHandle[loop].msgTye == obj->msgType) {
-            cout<<"now the obj msgType is "<<obj->msgType <<endl;
+            LOG_DEBUG("now the obj msgType is " + to_string(obj->msgType ));
             g_msgHandle[loop].handler(obj, fd);
             break;
         }
@@ -53,10 +54,8 @@ void MsgHandler::handle(TransObj* obj, int fd)
 
 void handleUserConnectMsg(TransObj* obj, int fd) {
     if (obj == nullptr) {
-        cout<<"get in handleUserConnectMsg err nullptr"<<endl;
         return;
     }
-    cout<<"get in handleUserConnectMsg "<<endl;
 #ifdef SERVER_COMPARE
 
 
@@ -68,10 +67,9 @@ void handleUserConnectMsg(TransObj* obj, int fd) {
 void handleUserSendMsg(TransObj* obj, int fd) {
 
     if (obj == nullptr) {
-        cout<<"get in handleUserSendMsg err nullptr"<<endl;
+        LOG_ERR("get in handleUserSendMsg err nullptr ");
         return;
     }
-    cout<<"get in handleUserSendMsg "<<endl;
 #ifdef SERVER_COMPARE
 
     ThreadPool::getInstance().enqueue([obj] () mutable {
@@ -82,13 +80,10 @@ void handleUserSendMsg(TransObj* obj, int fd) {
 #endif
 
 #ifdef CLIENT_COMPARE
-
-    cout<<"client  handleUserSendMsg get!"<<endl;
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"You just got message from ";
     (*ss)<<obj->id<<" :\n";
     (*ss)<<obj->msg<<" \n";
-    cout<<"client  handleUserSendMsg get "<<ss->str().c_str()<<endl;
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
     delete(obj);
@@ -97,14 +92,10 @@ void handleUserSendMsg(TransObj* obj, int fd) {
 }
 
 void handleMsgCmd(TransObj* obj, int fd) {
-    cout<<"get in handleMsgCmd "<<endl;
     Command *cmd = (Command*)obj->msg;
-    cout<<"get in handleMsgCmd2 "<<endl;
-    cout<<"handle msg cmd "<<(int)cmd->getType()<<endl;
 #ifdef CLIENT_COMPARE
     if (fd == -1) {
         // 此时是客户端
-        cout<<"此时是客户端 handleMsgCmd"<<endl;
         
         return;
     }
@@ -115,9 +106,8 @@ void handleMsgCmd(TransObj* obj, int fd) {
     for (auto iter = userMap.begin(); iter != userMap.end(); iter++) {
         if (send(iter->second, (void*)obj, obj->len, 0) != obj->len)
         {
-            std::cout << "Error writing to socket" << std::endl;
+            LOG_ERR("Error writing to socket" );
         }
-        std::cout << "end "<<iter->second<<" "<<cmd->getType()<<std::endl;
     }
 #endif
 }
@@ -125,7 +115,7 @@ void handleMsgCmd(TransObj* obj, int fd) {
 void handleUserRegMsg(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
-        cout<<"client handleUserRegMsg err nullptr!"<<endl;
+        LOG_ERR("client handleUserRegMsg err nullptr!");
         return;
     }
 #ifdef SERVER_COMPARE
@@ -134,15 +124,14 @@ void handleUserRegMsg(TransObj* obj, int fd)
     }
 
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
-        cout<<"do reg!  fd-> "<<int(fd)<<endl;
+        LOG_INFO("do reg!  fd-> " + to_string(fd));
         TransObj* sendObj = new TransObj();
         sendObj->setFd(fd);
         const char* name = obj->getName();
-        cout<<"handleUserRegMsg get name is "<<name<<endl;
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where username = \'%s\';", name);
         if (msqlResSet->next()) {
             delete(msqlResSet);
-            cout<<"name reg exists already"<<endl;
+            LOG_ERR("name reg exists already " + string(name));
             // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
             sendObj->setMsgType(MSG_REG_REFUSE);
             sendObj->setMsg("regin err! name reg exists already!");
@@ -150,7 +139,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
             return 0;
         }
         const char* passwd = obj->getPasswd();
-        cout<<"handleUserRegMsg get passwd is "<<passwd<<endl;
+        LOG_INFO("handleUserRegMsg get passwd is-> " + string(passwd));
         bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", name, int(fd), passwd);
         if (res) {
             auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select max(userid) as id from userinfo;");
@@ -165,13 +154,12 @@ void handleUserRegMsg(TransObj* obj, int fd)
                 // tansObj->setId(id);
                 sendObj->setId(id);
                 sendObj->setMsg("regin accepted! \n");
-                cout<<"handleUserRegMsg insert succed id: "<<id<<endl;
             }
             SeqToBin::getInstance().getBuff().push(sendObj);
             
             return 1;
         }
-        cout<<"handleUserRegMsg insert failed "<<endl;
+        LOG_ERR("handleUserRegMsg insert failed ");
         // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
         sendObj->setMsgType(MSG_REG_REFUSE);
         sendObj->setMsg("regin err! insert error!\n");
@@ -182,7 +170,6 @@ void handleUserRegMsg(TransObj* obj, int fd)
 
 #ifdef CLIENT_COMPARE
     
-    cout<<"CLIENT_COMPARE handleUserRegMsg"<<endl;
 
 #endif
 
@@ -191,7 +178,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
 void handleUserRegRefusedMsg(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
-        cout<<"client handleUserRegRefusedMsg err nullptr!"<<endl;
+        LOG_ERR("client handleUserRegRefusedMsg err nullptr!");
         return;
     }
 #ifdef CLIENT_COMPARE 
@@ -207,13 +194,12 @@ void handleUserRegRefusedMsg(TransObj* obj, int fd)
 void handleUserRegAcceptedMsg(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
-        cout<<"client handleUserRegAcceptedMsg err nullptr!"<<endl;
+        LOG_ERR("client handleUserRegAcceptedMsg err nullptr!");
         return;
     }
 
 #ifdef CLIENT_COMPARE 
 
-    // Player::getInstance().setLoginStatus(false);
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     int id = obj->getId();
     Player::getInstance().setPlayerId(id);
@@ -229,7 +215,7 @@ void handleUserRegAcceptedMsg(TransObj* obj, int fd)
 void handleUserLogMsg(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
-        cout<<"get in handleUserLogMsg err nullptr"<<endl;
+        LOG_ERR("get in handleUserLogMsg err nullptr");
         return;
     }
 #ifdef SERVER_COMPARE
@@ -238,7 +224,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
         TransObj* sendObj = new TransObj();
 
         if (obj->len > MAX_TRANS_MSG_LEN) {
-            cout<<"msg len too long!"<<endl;
+            LOG_ERR("msg len too long! -> " + to_string(obj->len));
             sendObj->setMsgType(MSG_LOGIN_REFUSE);
             sendObj->setMsg("Login err! msg len too long! \n");
             SeqToBin::getInstance().getBuff().push(sendObj);
@@ -247,7 +233,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
         const char* name = obj->getName();
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password, userid from userinfo where username = \'%s\';", name);
         if (msqlResSet == nullptr) {
-            cout<<"no find name "<<name <<endl;
+            LOG_ERR("no find name -> " + name);
             // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
             // SeqToBin::getInstance().getBuff().push(tansObj);
             sendObj->setMsgType(MSG_LOGIN_REFUSE);
@@ -257,17 +243,11 @@ void handleUserLogMsg(TransObj* obj, int fd)
             return 0;
         }
         if (msqlResSet->next()) {
-            cout<<"now getting the password!"<<endl;
             string relPasswd = msqlResSet->getString("password");
-            cout<<"getted the password!"<<endl;
             const char* tansPasswd = obj->getPasswd();
 
             if (strcmp(tansPasswd, relPasswd.c_str()) != 0) {
-                cout<<"password not equal!"<<endl;
-                cout<<"realPassword is "<<relPasswd<<endl;
-                cout<<"ransPassword is "<<tansPasswd<<endl;
-                // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
-                // SeqToBin::getInstance().getBuff().push(tansObj);
+                LOG_INFO("password not equal! -> " + string(tansPasswd));
                 sendObj->setMsgType(MSG_LOGIN_REFUSE);
                 sendObj->setMsg("Login err! password not equal!\n");
                 SeqToBin::getInstance().getBuff().push(sendObj);
@@ -282,7 +262,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
             catch(const std::exception& e)
             {
                 std::cerr << e.what() << '\n';
-                cout<<"id not find!"<<endl;
+                LOG_INFO("id not find! -> " + e.what());
                 sendObj->setMsgType(MSG_LOGIN_REFUSE);
                 sendObj->setMsg("Login err! id not found!\n");
                 SeqToBin::getInstance().getBuff().push(sendObj);
@@ -295,9 +275,6 @@ void handleUserLogMsg(TransObj* obj, int fd)
             sendObj->setFd(fd);
             ComManger::getInstance().addSessionTalker(sendObj->id, string(name), fd);
         }
-        cout<<"now do the send thing!"<<endl;
-        // TransObj* tansObj = new TransObj(id, MSG_LOGIN_ACCEPT, 1, fd);
-        // SeqToBin::getInstance().getBuff().push(tansObj);
         sendObj->setMsgType(MSG_LOGIN_ACCEPT);
         SeqToBin::getInstance().getBuff().push(sendObj);
         delete(msqlResSet);
@@ -308,14 +285,13 @@ void handleUserLogMsg(TransObj* obj, int fd)
 
 #ifdef CLIENT_COMPARE
 
-    cout<<" client handleUserLogMsg"<<endl;
 #endif
 }
 
 void handleUserLogRefusedMsg(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
-        cout<<"get in handleUserLogRefusedMsg err nullptr"<<endl;
+        LOG_ERR("get in handleUserLogRefusedMsg err nullptr");
         return;
     }
 
@@ -332,22 +308,17 @@ void handleUserLogRefusedMsg(TransObj* obj, int fd)
 void handleUserLogAcceptedMsg(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
-        cout<<"get in handleUserLogAcceptedMsg err nullptr"<<endl;
+        LOG_ERR("get in handleUserLogAcceptedMsg err nullptr");
         return;
     }
 
 #ifdef CLIENT_COMPARE
-    cout << hex << (void *)(obj) << endl;
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"you have login in success!\n";
-    cout<<"1"<<endl;
     Player::getInstance().setPlayerLogin(obj->getId(), obj->getName(), obj->getPasswd());
-    cout<<"2"<<endl;
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
-    cout<<"3"<<endl;
     delete(obj);
-    cout<<"4"<<endl;
 #endif
 }
 
@@ -361,14 +332,14 @@ void handleUserLogOutMsg(TransObj* obj, int fd)
 #endif
 
 #ifdef CLIENT_COMPARE
-    cout<<"client handleUserLogOutMsg"<<endl;
+
 #endif
 }
 
 void handleAskForFriendMsg(TransObj* obj, int fd) {
 
     if (obj == nullptr) {
-        cout<<"get in handleAskForFriendMsg err nullptr"<<endl;
+        LOG_ERR("get in handleAskForFriendMsg err nullptr");
         return;
     }
 
@@ -379,21 +350,20 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
         if (msqlResSet->next()) {
             obj->recverId = msqlResSet->getInt("userid");
         } else {
-            cout<<"asked friend not found!"<<endl;
+            LOG_INFO("asked friend not found!");
             obj->setMsgType(MSG_ASK_FOR_FRIEND_NOT_FOUND);
             obj->setFd(fd);
             SeqToBin::getInstance().getBuff().push(obj);
             return 0;
         }
         if (ComManger::getInstance().isTalkerOnline(obj->recverId)) {
-            cout<<"servr handleAskForFriendMsg friend online!"<<endl;
             int fd = ComManger::getInstance().getTalkerFd(obj->recverId);
             obj->fd = fd;
 
             SeqToBin::getInstance().getBuff().push(obj);
             return 1;
         }
-        cout<<"servr handleAskForFriendMsg friend offline!"<<endl;
+        LOG_INFO("servr handleAskForFriendMsg friend offline!");
         return 0;
     });
 
@@ -401,7 +371,6 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
 
 #ifdef CLIENT_COMPARE
 
-    cout<<"client handleAskForFriendMsg"<<endl;
     if (obj == nullptr) {
         return;
     }
@@ -418,7 +387,7 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
 void handleAskForFriendNotFoundMsg(TransObj* obj, int fd)
 {
     if (obj == nullptr) {
-        cout<<"get in handleAskForFriendNotFoundMsg err nullptr"<<endl;
+        LOG_ERR("get in handleAskForFriendNotFoundMsg err nullptr");
         return;
     }
 
@@ -437,7 +406,7 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
 {
 
     if (obj == nullptr) {
-        cout<<"get in handleAskForFriendAcceptMsg err nullptr"<<endl;
+        LOG_ERR("get in handleAskForFriendAcceptMsg err nullptr");
         return;
     }
 #ifdef SERVER_COMPARE
@@ -449,7 +418,7 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
             string name;
             if (ComManger::getInstance().getTalkerName(obj->id, name)) {
                 if (name.length() >= NAME_MAX_LEN) {
-                    cout<<"server handleAskForFriendAcceptMsg get name length err "<<name.length()<<endl;
+                    LOG_INFO("server handleAskForFriendAcceptMsg get name length err " + name);
                     return -1;
                 }
                 obj->setMsg(name.c_str());
@@ -457,7 +426,7 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
             SeqToBin::getInstance().getBuff().push(obj);
             return 1;
         }
-        cout<<"server handleAskForFriendAcceptMsg get recverId err "<<endl;
+        LOG_ERR(server handleAskForFriendAcceptMsg get recverId err );
         return -1;
     });
 
@@ -467,7 +436,7 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
 
     string name = obj->getName();
     if (name.length() >= NAME_MAX_LEN) {
-        cout<<"client handleAskForFriendAcceptMsg get name length err "<<name.length()<<endl;
+        LOG_ERR("client handleAskForFriendAcceptMsg get name length err " + name);
         return;
     }
     if (Player::getInstance().addFriend(move(name), obj->id)) {
@@ -476,7 +445,7 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
         SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
         SeqToBin::getInstance().putSysMsg(sysObj);
     } else {
-        cout<<"client handleAskForFriendAcceptMsg add  friend err "<<name<<endl;
+        LOG_INFO("client handleAskForFriendAcceptMsg add  friend err " + name);
     }
 #endif
 }
