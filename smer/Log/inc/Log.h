@@ -95,28 +95,28 @@ public:
     void putErrLog(string str) {
         string level = " -ERROR- : ";
         string timeStamp = Ztime::getInstance().getCurTimeWithHms();
-        string log = timeStamp + level + str + "\n";
+        string log = "[ " + timeStamp + level + "] " + str + "\n";
         putLog(log);
     }
 
     void putDebugLog(string str) {
         string level = " -DEBUG- : ";
         string timeStamp = Ztime::getInstance().getCurTimeWithHms();
-        string log = timeStamp + level + str + "\n";
+        string log = "[ " +  timeStamp + level + "] " + str + "\n";
         putLog(log);
     }
 
     void putInfoLog(string str) {
         string level = " -INFO- : ";
         string timeStamp = Ztime::getInstance().getCurTimeWithHms();
-        string log = timeStamp + level + str + "\n";
+        string log = "[ " + timeStamp + level + "] " + str + "\n";
         putLog(log);
     }
 
     void putWarningLog(string str) {
         string level = " -WARNING- : ";
         string timeStamp = Ztime::getInstance().getCurTimeWithHms();
-        string log = timeStamp + level + str + "\n";
+        string log = "[ " timeStamp + level + "] " + str + "\n";
         putLog(log);
     }
 

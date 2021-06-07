@@ -33,13 +33,11 @@ bool KGRedisClient::ExecuteCmd_spop(std::vector<std::string>& response, const ch
     va_start(args, format);
     memset(cmdBuf, 0, sizeof(cmdBuf));
     vsnprintf(cmdBuf, 100, format, args);
-    cout<<"format 1 "<<endl;
     cout<<cmdBuf<<endl;
-    cout<<endl<<"format 2 "<<endl;
     if (conType == REDIS_CON_NORMAL_TYPE) {
         redisContext *ctx = CreateContext();
         if(ctx == NULL) {
-            cout<<"CreateContext err!"<<endl;
+            LOG_INFO("CreateContext err!");
             return false;
         }
         reply = (redisReply*)redisCommand(ctx, cmdBuf);
@@ -47,19 +45,19 @@ bool KGRedisClient::ExecuteCmd_spop(std::vector<std::string>& response, const ch
     } else if (conType == REDIS_CON_CLUSTER_TYPE) {
         redisClusterContext *ctx = CreateClusterContext();
         if(ctx == NULL) {
-            cout<<"CreateContext err!"<<endl;
+            LOG_INFO("CreateContext err!");
             return false;
         }
         reply = (redisReply*)redisClusterCommand(ctx, cmdBuf);
         ReleaseClusterContext(ctx, reply != NULL);
     } else {
-        cout<<"conType err!"<<endl;
+        LOG_INFO("conType err!");
         return false;
     }
     va_end(args);
     
     if(reply == NULL) {
-        cout<<"reply == NULL"<<endl;
+        LOG_INFO("reply == NULL");
         return false;
     }
     std::shared_ptr<redisReply> autoFree(reply, freeReplyObject);
@@ -127,17 +125,13 @@ redisReply* KGRedisClient::ExecuteCmd(const char* format, ...)
  
     redisContext *ctx = CreateContext();
     if(ctx == NULL) {
-        cout<<"CreateContext err!"<<endl;
+        LOG_ERR("CreateContext err!");
         return NULL;
     }
-  //  redisReply *reply = (redisReply*)redisCommand(ctx, "spop %b", cmd, len);
- //   redisReply *reply = (redisReply*)redisCommand(ctx, "%s", cmd); 
-    cout<<"exce1"<<endl;
+
     vprintf(format, args);
     memset(cmdBuf, 0, sizeof(cmdBuf));
     vsnprintf(cmdBuf, 100, format, args);
-    cout<<"exce2"<<endl;
-    // redisReply* reply = (redisReply*)redisvCommand(ctx, format, args);
     redisReply* reply = (redisReply*)redisCommand(ctx, cmdBuf);
     va_end(args);
  
@@ -150,7 +144,6 @@ redisClusterContext* KGRedisClient::CreateClusterContext()
 {
 
     {
-//        CAutoLock autolock(m_lock);
         std::unique_lock <std::mutex> lck(_clusterMutex);
         if(!m_clusterClients.empty())
         {
@@ -178,19 +171,11 @@ redisClusterContext* KGRedisClient::CreateClusterContext()
 
     if(ctx == NULL || ctx->err != 0)
     {
-        printf("Error in cluster conn: %s\n", ctx->errstr);
+        LOG_ERR("Error in cluster conn: %s\n" + ctx->errstr);
         if(ctx != NULL) redisClusterFree(ctx);
         m_beginInvalidTime = time(NULL);
         return NULL;
     }
-
-    // redisReply *reply;
-    // std::string strReply = "AUTH ";
-    // strReply += m_password;
-    // reply = (redisReply*)redisCommand(ctx, strReply.c_str());
-    // freeReplyObject(reply);
-    // reply = NULL;
-    printf("connect OK\n");
     return ctx;
 }
 
@@ -198,7 +183,6 @@ redisClusterContext* KGRedisClient::CreateClusterContext()
 redisContext* KGRedisClient::CreateContext()
 {
     {
-//        CAutoLock autolock(m_lock);
         std::unique_lock <std::mutex> lck(_mutex);
         if(!m_clients.empty())
         {
@@ -226,7 +210,7 @@ redisContext* KGRedisClient::CreateContext()
     reply = (redisReply*)redisCommand(ctx, strReply.c_str());
     freeReplyObject(reply);
     reply = NULL;
-    printf("connect OK\n");
+    LOG_DEBUG("connect OK\n");
     return ctx;
 }
 
@@ -234,7 +218,6 @@ void KGRedisClient::ReleaseContext(redisContext *ctx, bool active)
 {
     if(ctx == NULL) return;
     if(!active) {redisFree(ctx); return;}
-//    CAutoLock autolock(m_lock);
     std::unique_lock <std::mutex> lck(_mutex);
     m_clients.push(ctx);
 }
@@ -243,7 +226,6 @@ void KGRedisClient::ReleaseClusterContext(redisClusterContext *ctx, bool active)
 {
     if(ctx == NULL) return;
     if(!active) {redisClusterFree(ctx); return;}
-//    CAutoLock autolock(m_lock);
     std::unique_lock <std::mutex> lck(_clusterMutex);
     m_clusterClients.push(ctx);
 }
@@ -314,7 +296,6 @@ bool KGRedisClient::ExecHMset(std::vector<std::string>& response, string&& hashN
         ss<<" ";
         ss<<(*it).second;
     }
-    cout<<"KGRedisClient::ExecHMset "<<ss.str().c_str()<<endl;
     return ExecuteCmd_spop(response, ss.str().c_str());
 }
 

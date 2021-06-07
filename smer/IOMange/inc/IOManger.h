@@ -1,6 +1,6 @@
 #ifndef _IOManger_H_
 #define _IOManger_H_
-
+#include "Log.h"
 #include "Singleton.h"
 #include "ConcQueue.h"
 #include "SeqAbleObj.h"
@@ -31,15 +31,13 @@ public:
     }
 
     void run() {
+        LOG_DEBUG("IOManger running");
         while (true) {
-            cout<<"wait for talk..."<<endl;
             unique_lock<mutex> lock(data_mutex);
             data_cond.wait(lock, [this] {return this->talking || !(this->outputMsg.empty());});
             if (!this->talking) {
-                cout<<"get in handleOutputMsg"<<endl;
                 handleOutputMsg();
             } else {
-                cout<<"get in handleTalk"<<endl;
                 handleTalk();
             }
             
@@ -59,18 +57,12 @@ public:
 
     void turnToTalk() {
         unique_lock<mutex> lock(data_mutex);
-        std::cout<<"now turn to talking !!"<<std::endl;
-        // TransObj* obj = new TransObj(1, MSG_TALK, 0);
-        // talkingQueue.push(obj);
         talking = true;
         data_cond.notify_one();
     }
 
     void putOutputMsg(std::shared_ptr<std::stringstream> msg) {
         unique_lock<mutex> lock(data_mutex);
-        std::cout<<"now turn to show msg !!"<<std::endl;
-        // TransObj* obj = new TransObj(1, MSG_TALK, 0);
-        // talkingQueue.push(obj);
         outputMsg.push(msg);
         data_cond.notify_one();
     }
@@ -80,7 +72,6 @@ public:
 
 private:
     IOManger() : talking(false) {
-        // load friends
     };
     bool talking;
     ConcQueue<std::shared_ptr<std::stringstream> > outputMsg;
@@ -89,13 +80,6 @@ private:
     
 friend class Singleton;
 };
-
-
-// class Communicate
-// {
-
-
-// };
 
 
 #endif // _IOManger_H_

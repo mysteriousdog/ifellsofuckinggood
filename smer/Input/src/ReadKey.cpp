@@ -48,37 +48,26 @@ CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
     struct termios stored_settings;
     tcgetattr(0,&stored_settings);
     new_settings = stored_settings;
-    // cout<<new_settings.c_lflag<<endl;
-    // cout<<(new_settings.c_cc[VTIME] == 0)<<endl;
-    // cout<<(new_settings.c_cc[VMIN] == 1)<<endl;
     new_settings.c_lflag &= (~ICANON);
 	new_settings.c_lflag &= ~ECHO;// 关闭回显
     new_settings.c_cc[VTIME] = 0;
-    // tcgetattr(0,&stored_settings);
     new_settings.c_cc[VMIN] = 1;
     tcsetattr(0,TCSANOW,&new_settings);
-    
-    // in = getchar();
     int keyboard;
     int ret,i;
-    // char c;
     fd_set readfd;
     struct timeval timeout;
     keyboard = open("/dev/tty",O_RDONLY | O_NONBLOCK);
     assert(keyboard>0);
 
-    timeout.tv_sec= 1;
-    timeout.tv_usec= 0;
+    timeout.tv_sec= 0;
+    timeout.tv_usec= 500000;
     FD_ZERO(&readfd);
     FD_SET(keyboard,&readfd);
     ret=select(keyboard+1,&readfd,NULL,NULL,&timeout);
     if(FD_ISSET(keyboard,&readfd))
     {
         i=read(keyboard,&in,1);
-        // if('\n'==c)
-        // continue;
-        // printf("hehethe input is %c\n",c);
-        // if ('q'==c)
     }
     
     tcsetattr(0,TCSANOW,&stored_settings);

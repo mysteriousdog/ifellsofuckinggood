@@ -46,7 +46,6 @@ public:
         switch (cmd->getType())
         {
         case CMD_ENTER:
-            cout<<"SysManger CMD_ENTER!!"<<endl;
             cmd->doCommand(ioManger);
             break;
         
@@ -58,7 +57,6 @@ public:
     void handleRecvMsg() {
         TransObj* rcvObj;
         if ((rcvObj = SeqToBin::getInstance().getRcvBuff().tryAndPop()) != nullptr) {
-            cout << hex << (void *)(rcvObj) << endl;
             MsgHandler::getInstance().handle(rcvObj, -1);
         }
     }

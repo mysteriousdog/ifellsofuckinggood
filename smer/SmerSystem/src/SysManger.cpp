@@ -14,9 +14,7 @@ static sysMsgHandle sysMsgHandleTable[] = {
 void SysManger::handleSysMsg() {
         SystemMsgObj* sysObj = nullptr;
         if ((sysObj = SeqToBin::getInstance().tryGetSysMsg()) != nullptr) {
-            cout<<"SysManger::handleSysMsg tryGetSysMsg"<<endl;
             for (int loop = 0; loop < (sizeof(sysMsgHandleTable) / sizeof(sysMsgHandle)); loop++) {
-                cout<<"SysManger::handleSysMsg tryGetSysMsg msgType"<<sysMsgHandleTable[loop].sysMsgType<<" "<<sysObj->msgType<<endl;
                 if (sysMsgHandleTable[loop].sysMsgType == sysObj->msgType) {
                     sysMsgHandleTable[loop].handler(sysObj);
                 }
@@ -29,7 +27,6 @@ void SysManger::handleSysMsgOfShowOutputMsg(SystemMsgObj* sysObj) {
     if (sspt == nullptr) {
         return;
     }
-    // cout<<"SysManger::handleSysMsgOfShowOutputMsg "<<sspt->str()<<endl;
     IOManger::getInstance().putOutputMsg(sspt);
     delete(sysObj);
 }
@@ -40,7 +37,6 @@ void SysManger::handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj) {
     }
     list<TransObj*> reqs;
     getAllRequests(reqs);
-    // show requests
     auto ss = make_shared<stringstream>();
     (*ss)<<"All requests list down here: \n";
     int i = 0;
@@ -61,16 +57,10 @@ void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
             continue;
         }
         (*ss)<<i++<<": "<<it->first<<". ";
-        // (*ss)<<i++;
-        // (*ss)<<": ";
-        // (*ss)<<it->first;
-        // (*ss)<<". ";
         if (i % 3 == 0) {
             (*ss)<<"\n";
         }
     }
-   
-    cout<<"SysManger::handleSysMsgOfShowFriends "<<ss->str().c_str()<<endl;
     ioManger.putOutputMsg(ss);
     delete(sysObj);
 }

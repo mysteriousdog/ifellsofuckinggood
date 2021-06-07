@@ -73,6 +73,7 @@ if(CLIENT_COMPARE)
     target_link_libraries(${APP_NAME} libboost_log-mt.dylib)
     target_link_libraries(${APP_NAME} libboost_log_setup-mt.dylib)
     target_link_libraries(${APP_NAME} libboost_thread-mt.dylib)
+    target_link_libraries(${APP_NAME} libboost_date_time-mt.dylib)
 endif()
 
 

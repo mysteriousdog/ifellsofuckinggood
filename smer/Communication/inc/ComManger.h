@@ -2,7 +2,7 @@
 #define _COM_MANGER_H_
 
 #ifdef SERVER_COMPARE
-
+#include "Log.h"
 #include "Singleton.h"
 #include <vector>
 #include <string>
@@ -32,9 +32,9 @@ public:
     bool flushAllUserHashData() {
         vector<string> response;
         if (KGRedisClient::getInstance().ExecHgetAll(response, "userHash")) {
-            cout<<"reflash redis userHash success"<<endl;
+            LOG_DEBUG("reflash redis userHash success");
         } else {
-            cout<<"reflash redis userHash err"<<endl;
+            LOG_ERR("reflash redis userHash err");
             return false;
         }
         for (int loop = 0; loop < response.size(); loop += 2) {
