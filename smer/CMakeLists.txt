@@ -71,7 +71,7 @@ set(APP_SOURCE_DIR ${PROJECT_SOURCE_DIR}/smer/)
 
 list(APPEND SMER_SRC ${SMER_HEADER})
 
-add_library(smer SHARED ${SMER_SRC})
+add_library(smer ${SMER_SRC})
 
 target_include_directories(smer
     PUBLIC ${APP_SOURCE_DIR}/Actor/inc

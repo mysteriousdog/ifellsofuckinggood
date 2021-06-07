@@ -136,7 +136,7 @@ void test_clientLog()
     MyLog::getInstance().Log("test2");
     LOG_DEBUG("test3");
     LOG_INFO("test4");
-    LOG_ERROR("test5");
+    LOG_ERR("test5");
 }
 
 
