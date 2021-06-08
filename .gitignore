@@ -8,3 +8,4 @@ appendonly.aof
 build
 bin
 *.log
+*.data

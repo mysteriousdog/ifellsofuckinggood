@@ -5,7 +5,10 @@
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
-#include <map>
+#include <boost/archive/binary_iarchive.hpp> //二进制序列化
+#include <boost/archive/binary_oarchive.hpp> //二进制序列化
+#include <boost/serialization/vector.hpp> //序列化STL容器要导入
+#include <boost/serialization/map.hpp> //序列化STL容器要导入
 using namespace std;
 
 #define PLAYER_DATA_FILE "../data/player.data"
@@ -18,13 +21,32 @@ typedef struct PlayerData {
     int id;
     string name;
     string password;
+    PlayerData(){}
+    PlayerData(int id_, string& name_, string& password_):
+    id(id_),
+    name(name_),
+    password(password_)
+    {}
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar& id;
+        ar& name;
+        ar& password;
+    }
 
 }playerData;
 
 typedef struct FriendData {
 
     int id;
+    FriendData(){};
     FriendData(int id_): id(id_){}
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar& id;
+    }
 
 }friendData;
 
@@ -93,7 +115,7 @@ public:
         }
         friends[name] = new friendData(id);
         isFriendsChanged = true;
-        return true;
+        return savePlayerData();
     }
     bool delFriend(string&& name) {
         if (friends.count(name) > 0) {
@@ -104,7 +126,7 @@ public:
             isFriendsChanged = true;
             return true;
         }
-        return false;
+        return savePlayerData();
     }
 
     void setLoginStatus(bool isLogined) {
@@ -114,6 +136,19 @@ public:
         return logined;
     }
 
+    bool savePlayerData();
+    bool loadPlayerData();
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar& data.id;
+        ar& data.name;
+        ar& data.password;
+        ar& friends;
+    }
+    
+    
 private:
     bool logined;
     Player(): isFriendsChanged(false), logined(false){};
@@ -124,7 +159,9 @@ private:
     mutex data_mutex;
     condition_variable data_cond;
 friend class Singleton;
-
+friend class boost::serialization::access;
 };
+
+
 
 #endif

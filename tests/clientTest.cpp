@@ -21,44 +21,51 @@
 #include "ThreadPool.h"
 #include "SysManger.h"
 #include "Log.h"
+#include "FileIO.h"
 #include <unistd.h>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+// 保存为XML
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+
+// 保存为纯文本
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/map.hpp>
 using namespace std;
 
 bool clientInit(size_t threadPoolSize) {
-    cout<<"init client  start"<<endl;
+    LOG_INFO("init client  start");
     MyLog::getInstance().Init(LOG_PATH);
-    cout<<"init MyLog  succ"<<endl;
+    LOG_INFO("init MyLog  succ");
+    Player::getInstance().loadPlayerData();
+    LOG_INFO("init Player  succ");
     int ret = 0;
     ThreadPool::getInstance().init(threadPoolSize);
-    cout<<"init ThreadPool  succ"<<endl;
-
+    LOG_INFO("init ThreadPool  succ");
     Client* rcvClient = new Client("121.5.41.213", 8877);
-    cout<<"create rcvClient  succ"<<endl;
+    LOG_INFO("create rcvClient  succ");
     rcvClient->init();
-    cout<<"init rcvClient  succ"<<endl;
-
-    // Client* sendClient = new Client("121.5.41.213", 8877);
-    // cout<<"create sendClient  succ"<<endl;
-    // sendClient->init();
-    // cout<<"init sendClient  succ"<<endl;
+    LOG_INFO("init rcvClient  succ");
 
     ThreadPool::getInstance().enqueue(&Client::run, rcvClient);
     ThreadPool::getInstance().enqueue(&Client::recvMsg, rcvClient);
-    cout<<"init client thread succ"<<endl;
+    LOG_INFO("init client thread succ");
     ThreadPool::getInstance().enqueue(&IOManger::run, &(IOManger::getInstance()));
-    cout<<"init IOManger thread succ"<<endl;
+    LOG_INFO("init IOManger thread succ");
     sleep(1);
-    cout<<"init client complete"<<endl;
+    LOG_INFO("init client complete");
     return ret;
 }
 
 void clientEnd() {
-    cout<<"end client  start"<<endl;
+    LOG_INFO("end client  start");
     TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
     sleep(3);
     SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
     sleep(1);
-    cout<<"end client complete"<<endl;
+    LOG_INFO("end client complete");
 }
 
 void UtilTestUnit() {
@@ -129,6 +136,20 @@ void test_clientReginAccHandle()
     SysManger::getInstance().handleRecvMsg();
 }
 
+void save(string path, map<int, PlayerData> &m) {
+    std::ofstream file(path);
+    // binary_oarchive 会以二进制形式保存，若要改为xml或text，将头文件和该类型的“binary”直接替换为xml或者text即可
+    boost::archive::binary_oarchive oa(file, boost::archive::no_header);
+    oa << m;
+}
+
+void load(string path, map<int, PlayerData> &m)
+{
+    std::ifstream file(path);
+    boost::archive::binary_iarchive ia(file, boost::archive::no_header);
+    ia >> m;
+}
+
 void test_clientLog()
 {
     MyLog::getInstance().Init(LOG_PATH);
@@ -140,13 +161,37 @@ void test_clientLog()
 }
 
 
+void test_clientFileIO()
+{
+    string name = "zlh";
+    string passwd = "123";
+    int id = 1;
+    Player::getInstance().init(name, passwd, id);
+    Player::getInstance().addFriend("lily", 2);
+    Player::getInstance().addFriend("l2ily", 3);
+    Player::getInstance().savePlayerData();
+
+    if (Player::getInstance().loadPlayerData())
+    {
+        cout<<Player::getInstance().getPlayerName()<<endl;
+        cout<<Player::getInstance().getPlayerId()<<endl;
+        auto friends = Player::getInstance().getAllFriends();
+        for (auto it = friends.begin(); it != friends.end(); it++) {
+            cout<<it->first<<" "<< it->second->id <<endl;
+        }
+    }
+}
+
 int main()
 {
-    // clientInit(4);
-    // Game& game =  Game::getInstance();
-    // game();
-    // clientEnd();
-    test_clientLog();
+    clientInit(4);
+    Game& game =  Game::getInstance();
+    game();
+    clientEnd();
+
+    // test_clientFileIO();
+
+    // test_clientLog();
 
     // test_clientReginAccHandle();
 
