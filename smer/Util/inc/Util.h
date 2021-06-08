@@ -1,6 +1,6 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
-
+#ifdef CLIENT_COMPARE
 #include <iostream>
 #include <vector>
 #include "SeqAbleObj.h"
@@ -41,3 +41,4 @@ TransObj* handleInputOfShowRequests(string&& input);
 TransObj* handleInputOfAccRequest(string&& input);
 bool splitInputStr2NameAndPwd(vector<string>& res, string&& input);
 #endif // _UTIL_H_
+#endif

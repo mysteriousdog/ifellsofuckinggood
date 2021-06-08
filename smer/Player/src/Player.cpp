@@ -1,3 +1,4 @@
+
 #include "Player.h"
 #include "SeqAbleObj.h"
 #include "Log.h"
@@ -7,7 +8,7 @@
 const int NAME_MAX_LEN = 24;
 const int PASSWORD_MAX_LEN = MAX_TRANS_MSG_LEN - NAME_MAX_LEN;
 
-
+#ifdef CLIENT_COMPARE
 bool Player::savePlayerData()
 {
     ofstream fout(PLAYER_DATA_FILE, ios::binary);   
@@ -22,7 +23,9 @@ bool Player::savePlayerData()
         return false;
     } 
 }
+#endif
 
+#ifdef CLIENT_COMPARE
 bool Player::loadPlayerData()
 {
     ifstream fin(PLAYER_DATA_FILE, ios::in|ios::binary);    
@@ -33,18 +36,7 @@ bool Player::loadPlayerData()
         fin.seekg(0);
         boost::archive::binary_iarchive ia(fin);
         ia >> (*this);
-
-        // //event对象信息填写
-        // event.eid = data["eid"];
-        // event.eventname = data["eventname"];
-        // event.starttime = data["starttime"];
-        // event.genderforevent = data["genderforevent"];
-        // event.is_canceled = data["is_canceled"];
-        // event.location = data["location"];
-        // event.statusforevent = data["statusforevent"];
-        // event.players.push_back(data["player"]);
-
-        // events.insert(pair<string, Events>(event.eid, event));      
+    
         fin.close();
         return true;
     } 
@@ -53,3 +45,4 @@ bool Player::loadPlayerData()
         return false;
     } 
 }
+#endif

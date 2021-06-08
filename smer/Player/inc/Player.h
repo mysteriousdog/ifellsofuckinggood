@@ -15,7 +15,6 @@ using namespace std;
 extern const int NAME_MAX_LEN;
 extern const int PASSWORD_MAX_LEN;
 int const MAX_FRIENDS_NUM = 3000;
-
 typedef struct PlayerData {
 
     int id;
@@ -99,7 +98,7 @@ public:
     int getTalkerId() {
         return friends[talkerName]->id;
     }
-
+#ifdef CLIENT_COMPARE
     map<string, friendData*>& getAllFriends() {
         return friends;
     } 
@@ -128,17 +127,17 @@ public:
         }
         return savePlayerData();
     }
-
+#endif
     void setLoginStatus(bool isLogined) {
         logined = isLogined;
     }
     bool isLogined() {
         return logined;
     }
-
+#ifdef CLIENT_COMPARE
     bool savePlayerData();
     bool loadPlayerData();
-
+#endif
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {

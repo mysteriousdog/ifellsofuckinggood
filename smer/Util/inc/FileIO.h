@@ -27,7 +27,7 @@ public:
         }
     }
 
-    bool writeToFile(const string& path, const string& str) {
+    void writeToFile(const string& path, const string& str) {
 
         if (path2file.count(path) > 0 && path2file[path] != nullptr) {
             auto f = path2file[path];

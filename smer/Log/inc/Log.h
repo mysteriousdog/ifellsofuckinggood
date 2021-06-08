@@ -79,7 +79,6 @@ public:
 
     void run() {
         while (true) {
-            std::cout<<"wait for log: "<<endl;
             if (logs.waitTillNotEmpty()) {
                 auto log = logs.pop();
                 auto file = LOG_PATH + Ztime::getInstance().getCurTimeWithYmd() + ".log";
@@ -89,7 +88,6 @@ public:
     }
 
     void putLog(string& str) {
-        std::cout<<"in logs: "<<str<<endl;
         logs.push(str);
     }
     void putErrLog(string str) {

@@ -1,3 +1,4 @@
+#ifdef CLIENT_COMPARE
 #include "Util.h"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -212,3 +213,4 @@ TransObj* Util::getMsgFromInput(string&& input)
 
     return nullptr;
 }
+#endif
