@@ -86,7 +86,6 @@ void handleUserSendMsg(TransObj* obj, int fd) {
     (*ss)<<obj->msg<<" \n";
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
-    delete(obj);
 
 #endif
 }
@@ -300,7 +299,6 @@ void handleUserLogRefusedMsg(TransObj* obj, int fd)
     (*ss)<<obj->msg;
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
-    delete(obj);
 
 #endif
 }
@@ -316,9 +314,9 @@ void handleUserLogAcceptedMsg(TransObj* obj, int fd)
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"you have login in success!\n";
     Player::getInstance().setPlayerLogin(obj->getId(), obj->getName(), obj->getPasswd());
+    Player::getInstance().savePlayerData();
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
-    delete(obj);
 #endif
 }
 
@@ -396,7 +394,6 @@ void handleAskForFriendNotFoundMsg(TransObj* obj, int fd)
     (*ss)<<"the friend you asked " <<obj->msg<< " do not exists!\n";
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
-    delete(obj);
     
 #endif
 }
@@ -426,7 +423,7 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
             SeqToBin::getInstance().getBuff().push(obj);
             return 1;
         }
-        LOG_ERR(server handleAskForFriendAcceptMsg get recverId err );
+        LOG_ERR("server handleAskForFriendAcceptMsg get recverId err ");
         return -1;
     });
 

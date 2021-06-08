@@ -58,6 +58,7 @@ public:
         TransObj* rcvObj;
         if ((rcvObj = SeqToBin::getInstance().getRcvBuff().tryAndPop()) != nullptr) {
             MsgHandler::getInstance().handle(rcvObj, -1);
+            delete(rcvObj);
         }
     }
 #endif
