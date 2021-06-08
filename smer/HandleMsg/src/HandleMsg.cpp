@@ -313,6 +313,7 @@ void handleUserLogAcceptedMsg(TransObj* obj, int fd)
 #ifdef CLIENT_COMPARE
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"you have login in success!\n";
+    LOG_INFO("login now " + to_string(obj->getId()) + " " + obj->getName() + " " + obj->getPasswd());
     Player::getInstance().setPlayerLogin(obj->getId(), obj->getName(), obj->getPasswd());
     Player::getInstance().savePlayerData();
     SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);

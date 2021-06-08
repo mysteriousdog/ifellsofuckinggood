@@ -29,22 +29,9 @@ bool Player::loadPlayerData()
     fin.seekg(0, ios::end);
     streampos fp = fin.tellg(); 
     if (fin.is_open()&&fp) {    
-        //然后要把文件指针放到文件头部
         fin.seekg(0);
         boost::archive::binary_iarchive ia(fin);
-        ia >> (*this);
-
-        // //event对象信息填写
-        // event.eid = data["eid"];
-        // event.eventname = data["eventname"];
-        // event.starttime = data["starttime"];
-        // event.genderforevent = data["genderforevent"];
-        // event.is_canceled = data["is_canceled"];
-        // event.location = data["location"];
-        // event.statusforevent = data["statusforevent"];
-        // event.players.push_back(data["player"]);
-
-        // events.insert(pair<string, Events>(event.eid, event));      
+        ia >> (*this); 
         fin.close();
         return true;
     } 

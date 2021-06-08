@@ -39,5 +39,6 @@ TransObj* handleInputOfChoseTalker(string&& input);
 TransObj* handleInputOfShowFriends(string&& input);
 TransObj* handleInputOfShowRequests(string&& input);
 TransObj* handleInputOfAccRequest(string&& input);
+TransObj* handleInputOfShowMySelf(string&& input);
 bool splitInputStr2NameAndPwd(vector<string>& res, string&& input);
 #endif // _UTIL_H_

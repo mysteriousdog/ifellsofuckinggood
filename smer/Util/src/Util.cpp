@@ -44,6 +44,8 @@ static CommunicationCmd communicationCmdTable[] = {
     {"acceptRequest", handleInputOfAccRequest},
     {"Acceptrequest", handleInputOfAccRequest},
     {"ACCEPTREQUEST", handleInputOfAccRequest},
+    {"Me", handleInputOfShowMySelf},
+    {"me", handleInputOfShowMySelf},
 };
 
 bool splitInputStr2NameAndPwd(vector<string>& res, string&& input) {
@@ -64,6 +66,7 @@ TransObj* handleInputOfLogin(string&& input) {
         return obj;
     }
     delete(obj);
+    LOG_ERR("handleInputOfLogin setNamePasswd err!");
     return nullptr;
 }
 
@@ -210,5 +213,20 @@ TransObj* Util::getMsgFromInput(string&& input)
         }
     }
 
+    return nullptr;
+}
+
+TransObj* handleInputOfShowMySelf(string&& input)
+{
+    int id = Player::getInstance().getPlayerId();
+    string name = Player::getInstance().getPlayerName();
+    string passwd = Player::getInstance().getPlayerPwd();
+    shared_ptr<stringstream> ss = make_shared<stringstream>();
+    (*ss)<<"Your info: "<<" \n";
+    (*ss)<<"id: "<<id<<" \n";
+    (*ss)<<"name: "<<name<<" \n";
+    (*ss)<<"passwd: "<<passwd<<" \n";
+    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    SeqToBin::getInstance().putSysMsg(sysObj);
     return nullptr;
 }
