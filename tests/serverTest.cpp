@@ -26,25 +26,25 @@ using namespace std;
 // }
 
 int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
-    cout<<"init   start"<<endl;
+    LOG_INFO("init   start");
     int ret = 0;
     if (!ComManger::getInstance().init()) {
-        cout<<"ComManger init err"<<endl;
+        LOG_ERR("ComManger init err");
         return 0;
     }
     
     ThreadPool::getInstance().init(threadPoolSize);
-    cout<<"ThreadPool init succ"<<endl;
+    LOG_INFO("ThreadPool init succ");
     MyLog& mylog = MyLog::getInstance();
     ThreadPool::getInstance().enqueue(&MyLog::run, &mylog);
-    cout<<"MyLog init succ"<<endl;
+    LOG_INFO("MyLog init succ");
     MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", mysqlPoolSize, "user");
     Client* client = new Client();
     auto res = ThreadPool::getInstance().enqueue(*client);
 
     ServerHandler serverhandler(8877);
 	IOLoop::Instance()->start();
-    cout<<"init server complete"<<endl;
+    LOG_INFO("init server complete");
     return ret;
 }
 

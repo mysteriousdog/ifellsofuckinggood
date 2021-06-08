@@ -207,7 +207,7 @@ ResultSet* MysqlPool::ExecQuery(const char* format, ...)
     }
     catch(const std::exception& e)
     {
-        LOG_INFO("MysqlPool::ExecQuery" + e.what());
+        LOG_INFO("MysqlPool::ExecQuery" + string(e.what()));
         state->close();
         delete(state);
         ReleaseConnection(conn);
@@ -244,7 +244,7 @@ bool MysqlPool::ExecInsert(const char* format, ...)
     }
     catch(const std::exception& e)
     {
-        LOG_INFO("executeUpdate"  +  e.what());
+        LOG_INFO("executeUpdate"  +  string(e.what()));
         ReleaseConnection(conn);
         return false;
     }

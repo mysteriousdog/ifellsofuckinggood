@@ -65,7 +65,7 @@ int ComManger::getTalkerFd(int id)
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
-            LOG_ERR("getTalkerFd exception " + e.what());
+            LOG_ERR("getTalkerFd exception " + string(e.what()));
             return -1;
         }
         return fd;
@@ -84,7 +84,7 @@ bool ComManger::getTalkerName(int id, string& res)
         }
         catch(const std::exception& e)
         {
-            LOG_ERR("getTalkerFd exception " + e.what());
+            LOG_ERR("getTalkerFd exception " + string(e.what()));
             return false;
         }
         return true;

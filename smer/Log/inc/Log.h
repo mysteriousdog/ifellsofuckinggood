@@ -116,7 +116,7 @@ public:
     void putWarningLog(string str) {
         string level = " -WARNING- : ";
         string timeStamp = Ztime::getInstance().getCurTimeWithHms();
-        string log = "[ " timeStamp + level + "] " + str + "\n";
+        string log = "[ " + timeStamp + level + "] " + str + "\n";
         putLog(log);
     }
 

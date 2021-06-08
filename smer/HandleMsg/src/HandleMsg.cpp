@@ -233,7 +233,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
         const char* name = obj->getName();
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password, userid from userinfo where username = \'%s\';", name);
         if (msqlResSet == nullptr) {
-            LOG_ERR("no find name -> " + name);
+            LOG_ERR("no find name -> " + string(name));
             // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
             // SeqToBin::getInstance().getBuff().push(tansObj);
             sendObj->setMsgType(MSG_LOGIN_REFUSE);
@@ -262,7 +262,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
             catch(const std::exception& e)
             {
                 std::cerr << e.what() << '\n';
-                LOG_INFO("id not find! -> " + e.what());
+                LOG_INFO("id not find! -> " + string(e.what()));
                 sendObj->setMsgType(MSG_LOGIN_REFUSE);
                 sendObj->setMsg("Login err! id not found!\n");
                 SeqToBin::getInstance().getBuff().push(sendObj);
@@ -426,7 +426,7 @@ void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
             SeqToBin::getInstance().getBuff().push(obj);
             return 1;
         }
-        LOG_ERR(server handleAskForFriendAcceptMsg get recverId err );
+        LOG_ERR("server handleAskForFriendAcceptMsg get recverId err ");
         return -1;
     });
 

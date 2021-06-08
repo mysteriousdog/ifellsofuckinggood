@@ -146,7 +146,7 @@ public:
 				
 
 				if (strcmp(buffer, "stop") == 0) {
-					LOG_INFO(epoll stop----);
+					LOG_INFO("epoll stop----");
 				}
 				MsgHandler& msgHandler =  MsgHandler::getInstance();
 				TransObj obj;

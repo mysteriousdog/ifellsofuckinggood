@@ -171,7 +171,7 @@ redisClusterContext* KGRedisClient::CreateClusterContext()
 
     if(ctx == NULL || ctx->err != 0)
     {
-        LOG_ERR("Error in cluster conn: %s\n" + ctx->errstr);
+        LOG_ERR("Error in cluster conn: %s\n" + string(ctx->errstr));
         if(ctx != NULL) redisClusterFree(ctx);
         m_beginInvalidTime = time(NULL);
         return NULL;
