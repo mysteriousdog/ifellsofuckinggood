@@ -154,7 +154,7 @@ typedef struct TransObj
         return fd;
     }
 
-    virtual ~TransObj(){std::cout<<"~TransObj() "<<std::endl;}
+    ~TransObj(){std::cout<<"~TransObj() "<<std::endl;}
 } tansObj;
 
 typedef struct SystemMsgObj

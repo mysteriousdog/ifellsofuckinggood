@@ -149,9 +149,8 @@ public:
 					LOG_INFO("epoll stop----");
 				}
 				MsgHandler& msgHandler =  MsgHandler::getInstance();
-				TransObj obj;
-				memcpy(&obj, buffer, sizeof(TransObj));
-				cout << hex << (void *)(&obj) << endl;
+				TransObj obj = new TransObj();
+				memcpy(obj, buffer, sizeof(TransObj));
 				msgHandler.handle(&obj, fd);
 			}
 		}
