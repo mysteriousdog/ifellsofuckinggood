@@ -1,3 +1,4 @@
+#ifdef CLIENT_COMPARE
 #include "Util.h"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -216,6 +217,7 @@ TransObj* Util::getMsgFromInput(string&& input)
     return nullptr;
 }
 
+
 TransObj* handleInputOfShowMySelf(string&& input)
 {
     int id = Player::getInstance().getPlayerId();
@@ -230,3 +232,6 @@ TransObj* handleInputOfShowMySelf(string&& input)
     SeqToBin::getInstance().putSysMsg(sysObj);
     return nullptr;
 }
+
+#endif
+

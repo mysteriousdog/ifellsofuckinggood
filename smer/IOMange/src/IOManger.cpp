@@ -1,3 +1,4 @@
+#ifdef CLIENT_COMPARE
 #include "IOManger.h"
 #include "Player.h"
 #include "Util.h"
@@ -42,6 +43,7 @@ void IOManger::handleOutputMsg()
     }
 }
 
+
 bool IOManger::tryLoginFirst() {
     if (!Player::getInstance().isLogined()) {
         auto ss = make_shared<stringstream>();
@@ -55,3 +57,4 @@ bool IOManger::tryLoginFirst() {
     }
     return false;
 }
+#endif

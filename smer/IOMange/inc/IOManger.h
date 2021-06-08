@@ -1,5 +1,6 @@
 #ifndef _IOManger_H_
 #define _IOManger_H_
+#ifdef CLIENT_COMPARE
 #include "Log.h"
 #include "Singleton.h"
 #include "ConcQueue.h"
@@ -47,9 +48,7 @@ public:
     void operator () () {
         run();
     }
-
     bool tryLoginFirst();
-
     bool isTalking() {
         unique_lock<mutex> lock(data_mutex);
         return talking;
@@ -83,3 +82,4 @@ friend class Singleton;
 
 
 #endif // _IOManger_H_
+#endif

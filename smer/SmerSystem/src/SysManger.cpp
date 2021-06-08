@@ -1,3 +1,4 @@
+#ifdef CLIENT_COMPARE
 #include "SysManger.h"
 #include <iostream>
 #include <functional>
@@ -7,7 +8,9 @@ using namespace std;
 
 static sysMsgHandle sysMsgHandleTable[] = {
     {SYS_OUTPUT_MSG, bind(&SysManger::handleSysMsgOfShowOutputMsg, &SysManger::getInstance(), placeholders::_1)},
+#ifdef CLIENT_COMPARE
     {SYS_SHOW_FRIENDS_MSG, bind(&SysManger::handleSysMsgOfShowFriends, &SysManger::getInstance(), placeholders::_1)},
+#endif
     {SYS_SHOW_ASK_FOR_FRIEND_REQ, bind(&SysManger::handleSysMsgOfShowAskForFriendReq, &SysManger::getInstance(), placeholders::_1)}
 };
 
@@ -47,6 +50,7 @@ void SysManger::handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj) {
     delete(sysObj);
 }
 
+#ifdef CLIENT_COMPARE
 void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
 {
     auto friends = player.getAllFriends();
@@ -64,3 +68,5 @@ void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
     ioManger.putOutputMsg(ss);
     delete(sysObj);
 }
+#endif
+#endif

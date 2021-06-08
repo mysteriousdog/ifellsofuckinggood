@@ -1,3 +1,4 @@
+
 #include "Player.h"
 #include "SeqAbleObj.h"
 #include "Log.h"
@@ -7,7 +8,7 @@
 const int NAME_MAX_LEN = 24;
 const int PASSWORD_MAX_LEN = MAX_TRANS_MSG_LEN - NAME_MAX_LEN;
 
-
+#ifdef CLIENT_COMPARE
 bool Player::savePlayerData()
 {
     ofstream fout(PLAYER_DATA_FILE, ios::binary);   
@@ -22,7 +23,9 @@ bool Player::savePlayerData()
         return false;
     } 
 }
+#endif
 
+#ifdef CLIENT_COMPARE
 bool Player::loadPlayerData()
 {
     ifstream fin(PLAYER_DATA_FILE, ios::in|ios::binary);    
@@ -31,7 +34,7 @@ bool Player::loadPlayerData()
     if (fin.is_open()&&fp) {    
         fin.seekg(0);
         boost::archive::binary_iarchive ia(fin);
-        ia >> (*this); 
+        ia >> (*this);
         fin.close();
         return true;
     } 
@@ -40,3 +43,4 @@ bool Player::loadPlayerData()
         return false;
     } 
 }
+#endif

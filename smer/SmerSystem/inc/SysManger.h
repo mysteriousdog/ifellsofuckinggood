@@ -1,6 +1,6 @@
 #ifndef _INPUT_SYS_MANGER_H_
 #define _INPUT_SYS_MANGER_H_
-
+#ifdef CLIENT_COMPARE
 #include "Singleton.h"
 #include "IOManger.h"
 #include "ReadKey.h"
@@ -64,8 +64,9 @@ public:
 #endif
 
     void handleSysMsg();
-
+#ifdef CLIENT_COMPARE
     void handleSysMsgOfShowFriends(SystemMsgObj* sysObj);
+#endif
     void handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj);
     void handleSysMsgOfShowOutputMsg(SystemMsgObj* sysObj);
 
@@ -110,4 +111,5 @@ friend class Singleton;
 
 
 
+#endif
 #endif
