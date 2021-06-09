@@ -15,7 +15,7 @@ static sysMsgHandle sysMsgHandleTable[] = {
 };
 
 void SysManger::handleSysMsg() {
-        SystemMsgObj* sysObj = nullptr;
+        shared_ptr<SystemMsgObj> sysObj = nullptr;
         if ((sysObj = SeqToBin::getInstance().tryGetSysMsg()) != nullptr) {
             for (int loop = 0; loop < (sizeof(sysMsgHandleTable) / sizeof(sysMsgHandle)); loop++) {
                 if (sysMsgHandleTable[loop].sysMsgType == sysObj->msgType) {
@@ -25,20 +25,19 @@ void SysManger::handleSysMsg() {
         }
     }
 
-void SysManger::handleSysMsgOfShowOutputMsg(SystemMsgObj* sysObj) {
+void SysManger::handleSysMsgOfShowOutputMsg(shared_ptr<SystemMsgObj> sysObj) {
     auto sspt = sysObj->getSysMsgPtr();
     if (sspt == nullptr) {
         return;
     }
     IOManger::getInstance().putOutputMsg(sspt);
-    delete(sysObj);
 }
 
-void SysManger::handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj) {
+void SysManger::handleSysMsgOfShowAskForFriendReq(shared_ptr<SystemMsgObj> sysObj) {
     if (sysObj == nullptr) {
         return;
     }
-    list<TransObj*> reqs;
+    list<shared_ptr<TransObj>> reqs;
     getAllRequests(reqs);
     auto ss = make_shared<stringstream>();
     (*ss)<<"All requests list down here: \n";
@@ -47,11 +46,10 @@ void SysManger::handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj) {
         (*ss)<<i<<": "<<(*it)->msg<<" \n";
     }
     IOManger::getInstance().putOutputMsg(ss);
-    delete(sysObj);
 }
 
 #ifdef CLIENT_COMPARE
-void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
+void SysManger::handleSysMsgOfShowFriends(shared_ptr<SystemMsgObj> sysObj)
 {
     auto friends = player.getAllFriends();
     auto ss = make_shared<stringstream>();
@@ -66,7 +64,6 @@ void SysManger::handleSysMsgOfShowFriends(SystemMsgObj* sysObj)
         }
     }
     ioManger.putOutputMsg(ss);
-    delete(sysObj);
 }
 #endif
 #endif

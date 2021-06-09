@@ -123,7 +123,7 @@ shared_ptr<TransObj> handleInputOfShowFriends(string&& input) {
     if (IOManger::getInstance().tryLoginFirst()) {
         return nullptr;
     }
-    SystemMsgObj* sysObj = new SystemMsgObj(SYS_SHOW_FRIENDS_MSG);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_SHOW_FRIENDS_MSG);
     SeqToBin::getInstance().putSysMsg(sysObj);
     // show 所有的friends
     return nullptr;
@@ -139,7 +139,7 @@ shared_ptr<TransObj> handleInputOfShowRequests(string&& input)
     // show 所有的friends
     // list<RequestObj*> allReqs;
     // SysManger::getInstance().getAllRequests(allReqs);
-    SystemMsgObj* sysObj = new SystemMsgObj(SYS_SHOW_ASK_FOR_FRIEND_REQ);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_SHOW_ASK_FOR_FRIEND_REQ);
     SeqToBin::getInstance().putSysMsg(sysObj);
     
     return nullptr;
@@ -156,7 +156,7 @@ shared_ptr<TransObj> handleInputOfAccRequest(string&& input)
         if (!SysManger::getInstance().getOneRequest(index, reqObj)) {
             shared_ptr<stringstream> ss = make_shared<stringstream>();
             (*ss)<<"Your command of accept the request send err"<<" \n";
-            SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+            auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
             SeqToBin::getInstance().putSysMsg(sysObj);
             return nullptr;
         }
@@ -165,14 +165,14 @@ shared_ptr<TransObj> handleInputOfAccRequest(string&& input)
         auto obj = make_shared<TransObj>(Player::getInstance().getPlayerId(), recvId, MSG_ASK_FOR_FRIEND_ACCEPT, MAX_TRANS_MSG_LEN, -1);
         shared_ptr<stringstream> ss = make_shared<stringstream>();
         (*ss)<<"Your command of accept the request have been send"<<" \n";
-        SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
         SeqToBin::getInstance().putSysMsg(sysObj);
         Player::getInstance().addFriend(move(name), recvId);
         return obj;
     }
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"Your input number of accepted request id not exists ==> "<<input<<" \n";
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
     return nullptr;
 }
@@ -226,7 +226,7 @@ shared_ptr<TransObj> handleInputOfShowMySelf(string&& input)
     (*ss)<<"id: "<<id<<" \n";
     (*ss)<<"name: "<<name<<" \n";
     (*ss)<<"passwd: "<<passwd<<" \n";
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
     return nullptr;
 }

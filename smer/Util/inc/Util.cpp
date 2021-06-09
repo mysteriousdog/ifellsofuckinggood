@@ -124,7 +124,7 @@ shared_ptr<TransObj> handleInputOfShowFriends(string&& input) {
     if (IOManger::getInstance().tryLoginFirst()) {
         return nullptr;
     }
-    SystemMsgObj* sysObj = new SystemMsgObj(SYS_SHOW_FRIENDS_MSG);
+    auto sysObj = new SystemMsgObj(SYS_SHOW_FRIENDS_MSG);
     SeqToBin::getInstance().putSysMsg(sysObj);
     // show 所有的friends
     return nullptr;

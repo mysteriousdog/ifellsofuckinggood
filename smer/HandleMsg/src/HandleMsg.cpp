@@ -84,7 +84,7 @@ void handleUserSendMsg(shared_ptr<TransObj>obj, int fd) {
     (*ss)<<"You just got message from ";
     (*ss)<<obj->id<<" :\n";
     (*ss)<<obj->msg<<" \n";
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
 
 #endif
@@ -184,7 +184,7 @@ void handleUserRegRefusedMsg(shared_ptr<TransObj>obj, int fd)
 
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<obj->getMsg();
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
 
 #endif
@@ -203,7 +203,7 @@ void handleUserRegAcceptedMsg(shared_ptr<TransObj>obj, int fd)
     int id = obj->getId();
     Player::getInstance().setPlayerId(id);
     (*ss)<<"Regin success!\n";
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
 
 #endif
@@ -295,7 +295,7 @@ void handleUserLogRefusedMsg(shared_ptr<TransObj>obj, int fd)
 #ifdef CLIENT_COMPARE
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<obj->msg;
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
 
 #endif
@@ -314,7 +314,7 @@ void handleUserLogAcceptedMsg(shared_ptr<TransObj>obj, int fd)
     LOG_INFO("login now " + to_string(obj->getId()) + " " + obj->getName() + " " + obj->getPasswd());
     Player::getInstance().setPlayerLogin(obj->getId(), obj->getName(), obj->getPasswd());
     Player::getInstance().savePlayerData();
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
 #endif
 }
@@ -375,7 +375,7 @@ void handleAskForFriendMsg(shared_ptr<TransObj>obj, int fd) {
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"You have a request from ";
     (*ss)<<name;
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
     SysManger::getInstance().pushBackReq(obj);
 #endif
@@ -391,7 +391,7 @@ void handleAskForFriendNotFoundMsg(shared_ptr<TransObj>obj, int fd)
 #ifdef CLIENT_COMPARE
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"the friend you asked " <<obj->msg<< " do not exists!\n";
-    SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+    auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
     
 #endif
@@ -438,7 +438,7 @@ void handleAskForFriendAcceptMsg(shared_ptr<TransObj>obj, int fd)
     if (Player::getInstance().addFriend(move(name), obj->id)) {
         shared_ptr<stringstream> ss = make_shared<stringstream>();
         (*ss)<<"Your ask friend request had been accepted from "<<name<<"\n";
-        SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
         SeqToBin::getInstance().putSysMsg(sysObj);
     } else {
         LOG_INFO("client handleAskForFriendAcceptMsg add  friend err " + name);

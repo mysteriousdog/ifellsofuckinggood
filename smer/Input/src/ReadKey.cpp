@@ -77,7 +77,7 @@ CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
     }
     Command* comd = new Command(cmd[in]);
     SeqToBin& sb = SeqToBin::getInstance();
-    tansObj* obj = new tansObj(MSG_CMD, sizeof(Command));
+    auto obj = make_shared<tansObj>(MSG_CMD, sizeof(Command));
     memcpy(obj->msg, (void*)comd, obj->len);
     if (isActorCmd(cmd[in])) {
         sb.getBuff().push(obj);
@@ -86,7 +86,7 @@ CMD_TYPE_UINT32_ENUM ReadKey::scanKeyBoard()
         std::cout<<"get system"<<cmd[in]<<std::endl;
         sysCmdQue.push(comd);
     } else {
-        delete(obj);
+        // delete(obj);
     }
     return cmd[in];
 }

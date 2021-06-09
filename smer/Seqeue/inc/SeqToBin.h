@@ -31,16 +31,16 @@ public:
     ConcQueue<shared_ptr<TransObj>>& getRcvBuff() {
         return rcvBuff;
     }
-    SystemMsgObj* tryGetSysMsg() {
+    shared_ptr<SystemMsgObj> tryGetSysMsg() {
         return sysBuff.tryAndPop();
     }
-    void putSysMsg(SystemMsgObj* sysObj) {
+    void putSysMsg(shared_ptr<SystemMsgObj> sysObj) {
         sysBuff.push(sysObj);
     }
 private:
     ConcQueue<shared_ptr<TransObj>> buff;
     ConcQueue<shared_ptr<TransObj>> rcvBuff;
-    ConcQueue<SystemMsgObj*> sysBuff;
+    ConcQueue<shared_ptr<SystemMsgObj>> sysBuff;
 friend class Singleton;
 friend class client;
 };

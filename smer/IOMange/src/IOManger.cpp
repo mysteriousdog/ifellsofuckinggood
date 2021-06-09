@@ -26,7 +26,7 @@ void IOManger::handleTalk()
         return;
     }
 
-    TransObj* talkObj = Util::getInstance().getMsgFromInput(move(str));
+    shared_ptr<TransObj> talkObj = Util::getInstance().getMsgFromInput(move(str));
     if (talkObj != nullptr) {
         SeqToBin::getInstance().getBuff().push(talkObj);
     }
@@ -51,7 +51,7 @@ bool IOManger::tryLoginFirst() {
         (*ss)<<"Try Regin ==> Regin@yourname|yourpassword\n";
         (*ss)<<"Try Login ==> Login@yourname|yourpassword\n";
         (*ss)<<"(-_-)\n";
-        SystemMsgObj* sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
+        auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
         SeqToBin::getInstance().putSysMsg(sysObj);
         return true;
     }

@@ -16,7 +16,7 @@ using namespace std;
 
 
 // typedef void (*SYS_MSG_HANDLE_FUNC_PTR)(SystemMsgObj* sysObj);
-typedef function<void(SystemMsgObj*)> SYS_MSG_HANDLE_FUNC;
+typedef function<void(shared_ptr<SystemMsgObj>)> SYS_MSG_HANDLE_FUNC;
 typedef struct SysMsgHandle {
 
     SYS_MSG_TYPE_UINT32_ENUM sysMsgType;
@@ -64,28 +64,28 @@ public:
 
     void handleSysMsg();
 #ifdef CLIENT_COMPARE
-    void handleSysMsgOfShowFriends(SystemMsgObj* sysObj);
+    void handleSysMsgOfShowFriends(shared_ptr<SystemMsgObj> sysObj);
 #endif
-    void handleSysMsgOfShowAskForFriendReq(SystemMsgObj* sysObj);
-    void handleSysMsgOfShowOutputMsg(SystemMsgObj* sysObj);
+    void handleSysMsgOfShowAskForFriendReq(shared_ptr<SystemMsgObj> sysObj);
+    void handleSysMsgOfShowOutputMsg(shared_ptr<SystemMsgObj> sysObj);
 
-    void pushBackReq(TransObj* req) {
+    void pushBackReq(shared_ptr<TransObj> req) {
         reqBuff.push_back(req);
     }
-    void pushFrontReq(TransObj* req) {
+    void pushFrontReq(shared_ptr<TransObj> req) {
         reqBuff.push_front(req);
     }
 
-    TransObj* popBackReq() {
+    shared_ptr<TransObj> popBackReq() {
         return reqBuff.pop_back();
     }
-    TransObj* popFrontReq() {
+    shared_ptr<TransObj> popFrontReq() {
         return reqBuff.pop_front();
     }
     bool eraseOneReq(int index) {
        return reqBuff.erase(index);
     }
-    void getAllRequests(list<TransObj*> reqs) {
+    void getAllRequests(list<shared_ptr<TransObj>> reqs) {
         reqBuff.getAllData(reqs);
     }
     bool containsReqIdx(int index) {
@@ -94,7 +94,7 @@ public:
         }
         return false;
     }
-    bool getOneRequest(int index, TransObj* req) {
+    bool getOneRequest(int index, shared_ptr<TransObj>& req) {
         return reqBuff.getOneRequest(index, req);
     }
 
@@ -102,7 +102,7 @@ private:
     SysManger() : ioManger(IOManger::getInstance()), player(Player::getInstance()){};
     IOManger& ioManger;
     Player& player;
-    ConcList<TransObj*> reqBuff;
+    ConcList<shared_ptr<TransObj>> reqBuff;
     
 friend class Singleton;
 };

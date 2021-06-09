@@ -61,7 +61,7 @@ bool clientInit(size_t threadPoolSize) {
 
 void clientEnd() {
     LOG_INFO("end client  start");
-    TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
+    auto obj = make_shared<TransObj>(1,MSG_BUTTON,3, -1);
     sleep(3);
     SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
     sleep(1);
@@ -81,10 +81,8 @@ void UtilTestUnit() {
     assert(res[0] == "zhulihua");
     assert(res[1] == "123456");
 
-    TransObj* obj;
-
     // MSG_REG的测试
-    obj = util.getMsgFromInput("regin@zhulihua|123456");
+    auto obj = util.getMsgFromInput("regin@zhulihua|123456");
     assert(obj != nullptr);
     assert(obj->msgType == MSG_REG);
     assert(strncmp(obj->msg, "zhulihua", NAME_MAX_LEN) == 0);
@@ -121,7 +119,7 @@ void UtilTestUnit() {
 
 void test_clientReginAccHandle()
 {
-    TransObj* obj = new TransObj();
+    auto obj = make_shared<TransObj>();
     obj->setName("zlh");
     obj->setPasswd("123");
     obj->setId(48);
