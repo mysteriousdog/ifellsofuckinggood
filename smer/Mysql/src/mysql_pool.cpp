@@ -5,17 +5,17 @@
 #include <stdio.h>  
 #include <stdarg.h>
 #include "mysql_pool.h"
- 
+#include "Log.h"
+
 using namespace std;
 using namespace sql;
  
 pthread_mutex_t MysqlPool::lock = PTHREAD_MUTEX_INITIALIZER;
  
-//Singleton: get the single object
 MysqlPool& MysqlPool::GetInstance()
 {  
     static MysqlPool instance_;
-    cout<<"GetInstance"<<endl; 
+    LOG_DEBUG("GetInstance"); 
     return instance_;  
 }
  
@@ -33,15 +33,12 @@ void MysqlPool::initPool(std::string url_, std::string user_, std::string passwo
     }  
     catch(sql::SQLException& e)  
     {  
-        perror("Get sql driver failed");
-        cout<<"Get sql driver failed"<<endl;  
+        LOG_ERR("Get sql driver failed"); 
     }  
     catch(std::runtime_error& e)  
     {  
-        perror("Run error"); 
-        cout<<"Run error"<<endl; 
+        LOG_ERR("Run error");
     }  
-    cout<<"initPool"<<endl; 
     this->InitConnection(maxSize/2);
 } 
  
@@ -60,9 +57,8 @@ void MysqlPool::InitConnection(int initSize)
             ++(this->curSize);  
         }  
         else  
-        {  
-            perror("create conn error");
-            cout<<"create conn error"<<endl;   
+        {   
+            LOG_ERR("create conn error"); 
         }  
     }  
     pthread_mutex_unlock(&lock);  
@@ -73,23 +69,27 @@ Connection* MysqlPool::CreateConnection()
 {
     Connection* conn;  
     try{  
-        cout<<"CreateConnection start"<<endl;
+        LOG_INFO("CreateConnection start");
         conn = driver->connect(this->url,this->user,this->password);  //create a conn 
-        cout<<"CreateConnection end"<<endl;
+        LOG_INFO("CreateConnection end");
         return conn;  
     }  
     catch(sql::SQLException& e)  
     {  
-        perror("link error"); 
-        cout<<"link error in MysqlPool::CreateConnection"<<endl;   
+        LOG_ERR("Link error in MysqlPool::CreateConnection");  
         return nullptr;  
     }  
     catch(std::runtime_error& e)  
-    {  
-        perror("run error");
-        cout<<"run error in MysqlPool::CreateConnection"<<endl;   
+    {    
+        LOG_ERR("un error in MysqlPool::CreateConnection");   
         return nullptr;  
-    }  
+    } catch(const std::exception& e)
+    {
+        LOG_ERR("std::exception error in MysqlPool::CreateConnection");  
+        return nullptr;  
+    }
+    LOG_ERR("unknow error in MysqlPool::CreateConnection"); 
+    return nullptr; 
 }
  
 Connection* MysqlPool::GetConnection()
@@ -100,20 +100,17 @@ Connection* MysqlPool::GetConnection()
  
     if(connList.size() > 0)//the pool have a conn 
     {  
-        cout<<"mysql conn poll have conn "<<connList.size()<<endl;
         conn = connList.front(); 
         connList.pop_front();//move the first conn 
         if(conn->isClosed())//if the conn is closed, delete it and recreate it
         {  
             delete conn;  
-            cout<<"mysql conn poll the conn is closed "<<endl;
             conn = this->CreateConnection();  
         }  
  
         if(conn == nullptr)  
         {  
             --curSize; 
-            cout<<"mysql conn poll the conn is nullptr "<<endl;
         }
  
         pthread_mutex_unlock(&lock);
@@ -124,25 +121,21 @@ Connection* MysqlPool::GetConnection()
     {  
         if(curSize < maxSize)//the pool no conn
         {
-            cout<<"mysql conn poll empty "<<endl;
             conn = this->CreateConnection();  
             if(conn)
             {  
-                cout<<"mysql conn poll empty create new con success!"<<endl;
                 ++curSize;  
                 pthread_mutex_unlock(&lock);  
                 return conn;  
             }  
             else
             {  
-                cout<<"mysql conn poll empty create new con error!"<<endl;
                 pthread_mutex_unlock(&lock);  
                 return nullptr;  
             }  
         }  
         else //the conn count > maxSize
         { 
-            cout<<"mysql conn poll size over maxSize!"<<endl;
             pthread_mutex_unlock(&lock);  
             return nullptr;  
         }  
@@ -176,6 +169,7 @@ void MysqlPool::DestoryConnPool()
  
 void MysqlPool::DestoryConnection(Connection* conn)  
 {  
+    LOG_INFO("MysqlPool::DestoryConnection");
     if(conn)  
     {  
         try{  
@@ -183,11 +177,11 @@ void MysqlPool::DestoryConnection(Connection* conn)
         }  
         catch(sql::SQLException&e)  
         {  
-            perror(e.what());  
+            LOG_ERR(e.what()); 
         }  
         catch(std::exception& e)  
         {  
-            perror(e.what());  
+            LOG_ERR(e.what());  
         } 
         delete conn;  
     }  
@@ -203,7 +197,7 @@ ResultSet* MysqlPool::ExecQuery(const char* format, ...)
     ResultSet* reply = nullptr;
     Connection *conn = GetConnection();
     if (conn == nullptr) {
-        cout<<"MysqlPool::ExecQuery err in get con "<<endl;
+        LOG_INFO("MysqlPool::ExecQuery err in get con ");
         return reply;
     }
     conn->setSchema(databaseName);
@@ -213,21 +207,18 @@ ResultSet* MysqlPool::ExecQuery(const char* format, ...)
     va_start(args, format);
     vsnprintf(cmdBuf, 100, format, args);
     va_end(args);
-    cout<<"in fun MysqlPool::ExecQuery "<<cmdBuf<<endl;
     try
     {
         reply = state->executeQuery(cmdBuf);
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        LOG_INFO("MysqlPool::ExecQuery" + string(e.what()));
         state->close();
         delete(state);
         ReleaseConnection(conn);
         return nullptr;
     }
-
-    cout<<"in fun MysqlPool::ExecQuery reply is end"<<endl;
     state->close();
     delete(state);
     ReleaseConnection(conn);
@@ -239,7 +230,7 @@ bool MysqlPool::ExecInsert(const char* format, ...)
     ResultSet* reply = nullptr;
     Connection *conn = GetConnection();
     if (conn == nullptr) {
-        cout<<"MysqlPool::ExecInsert err in get con "<<endl;
+        LOG_INFO("MysqlPool::ExecInsert err in get con ");
         return reply;
     }
     conn->setSchema(databaseName);
@@ -248,7 +239,7 @@ bool MysqlPool::ExecInsert(const char* format, ...)
     va_start(args, format);
     vsnprintf(cmdBuf, 100, format, args);
     va_end(args);
-    cout<<"in fun MysqlPool::ExecInsert "<<cmdBuf<<endl;
+
     bool res = false;;
     try
     {
@@ -259,7 +250,7 @@ bool MysqlPool::ExecInsert(const char* format, ...)
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        LOG_INFO("executeUpdate"  +  string(e.what()));
         ReleaseConnection(conn);
         return false;
     }

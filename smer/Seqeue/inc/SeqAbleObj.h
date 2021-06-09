@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string.h>
 #include <memory>
+#include <string.h>
 #include "Player.h"
 
 const int MAX_TRANS_MSG_LEN = 64;
@@ -72,7 +73,8 @@ typedef struct TransObj
             return false;
         }
         clearName();
-        strncpy(msg, name_.c_str(), NAME_MAX_LEN);
+        // strncpy(msg, name_.c_str(), NAME_MAX_LEN);
+        snprintf(msg, NAME_MAX_LEN, name_.c_str());
         return true;
     }
 
@@ -81,7 +83,8 @@ typedef struct TransObj
             return false;
         }
         clearName();
-        strncpy(msg, name_, NAME_MAX_LEN);
+        // strncpy(msg, name_, NAME_MAX_LEN);
+        snprintf(msg, NAME_MAX_LEN, name_);
         return true;
     }
 
@@ -90,7 +93,8 @@ typedef struct TransObj
             return false;
         }
         clearPasswd();
-        strncpy(msg + NAME_MAX_LEN, passwd_.c_str(), PASSWORD_MAX_LEN);
+        // strncpy(msg + NAME_MAX_LEN, passwd_.c_str(), PASSWORD_MAX_LEN);
+        snprintf(msg + NAME_MAX_LEN, PASSWORD_MAX_LEN, passwd_.c_str());
         return true;
     }
 
@@ -99,7 +103,8 @@ typedef struct TransObj
             return false;
         }
         clearPasswd();
-        strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
+        // strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
+        snprintf(msg + NAME_MAX_LEN, PASSWORD_MAX_LEN, passwd_);
         return true;
     }
 
@@ -108,8 +113,10 @@ typedef struct TransObj
             return false;
         }
         clearMsg();
-        strncpy(msg, name_, NAME_MAX_LEN);
-        strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
+        setName(name_);
+        setPasswd(passwd_);
+        // strncpy(msg, name_, NAME_MAX_LEN);
+        // strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
         return true;
     }
 
@@ -122,6 +129,7 @@ typedef struct TransObj
         this->setId(((TransObj*)buff)->getId());
         this->setMsgType(((TransObj*)buff)->getMsgType());
         this->setMsg(((TransObj*)buff)->getMsg());
+        memcpy(msg, (const char*)(((TransObj*)buff)->getMsg()), MAX_TRANS_MSG_LEN);
         return true;
     }
 
@@ -152,7 +160,7 @@ typedef struct TransObj
         return fd;
     }
 
-    virtual ~TransObj(){std::cout<<"~TransObj() "<<std::endl;}
+    ~TransObj(){}
 } tansObj;
 
 typedef struct SystemMsgObj

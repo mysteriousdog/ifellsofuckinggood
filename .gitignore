@@ -7,3 +7,5 @@ appendonly.aof
 *.rdb
 build
 bin
+*.log
+*.data

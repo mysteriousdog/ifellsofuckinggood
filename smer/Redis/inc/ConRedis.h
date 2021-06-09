@@ -4,6 +4,7 @@
 #ifdef SERVER_COMPARE
 
 #include <hiredis/hiredis.h>
+#include "Log.h"
 #include <iostream>
 
 using namespace std;
@@ -18,10 +19,9 @@ public:
         c = redisConnect(ip,port);
         if (c->err) {
             redisFree(c);
-            cout<<"connect failed !"<<endl;
+            LOG_ERR("connect failed");
             return false;
         }
-        cout<<" hello linux, connect succes!"<<endl;
         return true;
     }
 

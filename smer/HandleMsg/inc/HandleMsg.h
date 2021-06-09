@@ -10,7 +10,7 @@
 using namespace std;
 
 // typedef void (*MSG_HANDLE_FUNC_PTR)(TransObj*, int);
-typedef std::function<void(TransObj*, int)> MSG_HANDLE_FUNC_PTR;
+typedef std::function<void(shared_ptr<TransObj>, int)> MSG_HANDLE_FUNC_PTR;
 
 typedef struct MsgHandle{
 
@@ -19,25 +19,25 @@ typedef struct MsgHandle{
 
 } msgHandle;
 
-void handleMsgCmd(TransObj* obj, int fd);
-void handleUserConnectMsg(TransObj* obj, int fd);
-void handleUserSendMsg(TransObj* obj, int fd);
-void handleUserRegMsg(TransObj* obj, int fd);
-void handleUserLogMsg(TransObj* obj, int fd);
-void handleUserLogRefusedMsg(TransObj* obj, int fd);
-void handleUserLogAcceptedMsg(TransObj* obj, int fd);
-void handleUserLogOutMsg(TransObj* obj, int fd);
-void handleAskForFriendMsg(TransObj* obj, int fd);
-void handleAskForFriendNotFoundMsg(TransObj* obj, int fd);
-void handleAskForFriendAcceptMsg(TransObj* obj, int fd);
-void handleUserRegRefusedMsg(TransObj* obj, int fd);
-void handleUserRegAcceptedMsg(TransObj* obj, int fd);
+void handleMsgCmd(shared_ptr<TransObj> obj, int fd);
+void handleUserConnectMsg(shared_ptr<TransObj> obj, int fd);
+void handleUserSendMsg(shared_ptr<TransObj>obj, int fd);
+void handleUserRegMsg(shared_ptr<TransObj>obj, int fd);
+void handleUserLogMsg(shared_ptr<TransObj>obj, int fd);
+void handleUserLogRefusedMsg(shared_ptr<TransObj>obj, int fd);
+void handleUserLogAcceptedMsg(shared_ptr<TransObj>obj, int fd);
+void handleUserLogOutMsg(shared_ptr<TransObj>obj, int fd);
+void handleAskForFriendMsg(shared_ptr<TransObj>obj, int fd);
+void handleAskForFriendNotFoundMsg(shared_ptr<TransObj>obj, int fd);
+void handleAskForFriendAcceptMsg(shared_ptr<TransObj>obj, int fd);
+void handleUserRegRefusedMsg(shared_ptr<TransObj>obj, int fd);
+void handleUserRegAcceptedMsg(shared_ptr<TransObj>obj, int fd);
 
 class MsgHandler : public Singleton<MsgHandler>
 {
 public:
 
-    void handle(TransObj* obj, int fd);
+    void handle(shared_ptr<TransObj>obj, int fd);
 
 private:
     MsgHandler(){};

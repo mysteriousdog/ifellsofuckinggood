@@ -1,6 +1,6 @@
 #ifndef _THREAD_POOL_H
 #define _THREAD_POOL_H
-
+#include "Log.h"
 #include <vector>
 #include <queue>
 #include <memory>
@@ -81,7 +81,7 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
         // don't allow enqueueing after stopping the pool
         if(stop)
         {
-            std::cout<<"enqueue stop!!!!!!!"<<std::endl;
+            LOG_INFO("enqueue stop!!!!!!!");
             throw std::runtime_error("enqueue on stopped ThreadPool");
         }
         tasks.emplace([task](){ (*task)(); });

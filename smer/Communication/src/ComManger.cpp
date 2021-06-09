@@ -10,20 +10,17 @@ bool ComManger::addSessionTalker(int id, string&& name, int fd)
     string idStr = to_string(id);
     string fdStr = to_string(fd);
     if (KGRedisClient::getInstance().ExecSadd(response, "userSession", move(idStr))) {
-        cout<<"ComManger::addSessionTalker succ1: "<<endl;
-        // for (auto it = response.begin(); it != response.end(); it++) {
-        //     cout<<*it<<endl;
-        // }
+        LOG_DEBUG("ComManger::addSessionTalker succ1: " + name);
         vector<pair<string, string> > keyVals {{"name", name}, {"fd", fdStr}};
 
         if (!KGRedisClient::getInstance().ExecHMset(response, move(idStr),  keyVals)) {
-            cout<<"ComManger::addSessionTalker error2: "<<endl;
+            LOG_ERR("ComManger::addSessionTalker error2: ");
             return false;
         }
-        cout<<"ComManger::addSessionTalker succ2: "<<endl;
+        LOG_DEBUG("ComManger::addSessionTalker succ2: ");
         return true;
     }
-    cout<<"ComManger::addSessionTalker error1: "<<endl;
+    LOG_ERR("ComManger::addSessionTalker error1: ");
     return false;
 }
 
@@ -31,7 +28,7 @@ bool ComManger::isTalkerOnline(int id)
 {
     vector<string> response;
     if (KGRedisClient::getInstance().ExecScontain(response, "userSession", to_string(id))) {
-        cout<<"ComManger::isTalkerOnline: "<<endl;
+        LOG_DEBUG("ComManger::isTalkerOnline: ");
         for (auto it = response.begin(); it != response.end(); it++) {
             cout<<*it<<endl;
         }
@@ -44,15 +41,15 @@ bool ComManger::removeSessionTalker(int id)
 {
     vector<string> response;
     if (KGRedisClient::getInstance().ExecSremove(response, "userSession", to_string(id))) {
-        cout<<"ComManger::removeSessionTalker1: "<<endl;
+        LOG_DEBUG("CComManger::removeSessionTalker1: ");
         if (KGRedisClient::getInstance().ExecDel(response, to_string(id))) {
-            cout<<"ComManger::removeSessionTalker2: "<<endl;
+            LOG_DEBUG("ComManger::removeSessionTalker2: ");
             return true;
         }
-        cout<<"ComManger::removeSessionTalker2 err: "<<endl;
+        LOG_ERR("ComManger::removeSessionTalker2 err: ");
         return false;
     }
-    cout<<"ComManger::removeSessionTalker1 err: "<<endl;
+    LOG_ERR("ComManger::removeSessionTalker1 err: ");
     return false;
 }
 
@@ -68,12 +65,12 @@ int ComManger::getTalkerFd(int id)
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
-            cout<<"getTalkerFd exception"<<endl;
+            LOG_ERR("getTalkerFd exception " + string(e.what()));
             return -1;
         }
         return fd;
     }
-    cout<<"getTalkerFd ExecHget"<<endl;
+    LOG_DEBUG("getTalkerFd ExecHget");
     return -1;
 }
 
@@ -87,13 +84,12 @@ bool ComManger::getTalkerName(int id, string& res)
         }
         catch(const std::exception& e)
         {
-            std::cerr << e.what() << '\n';
-            cout<<"getTalkerName exception"<<endl;
+            LOG_ERR("getTalkerFd exception " + string(e.what()));
             return false;
         }
         return true;
     }
-    cout<<"getTalkerName ExecHget"<<endl;
+    LOG_DEBUG("getTalkerName ExecHget");
     return false;
 }
 

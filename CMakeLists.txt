@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required (VERSION 3.0.2)
 
 option(TESTING "enable test compilation" OFF)
 option(SERVER_COMPARE "enable server compilation" OFF)
@@ -20,6 +20,7 @@ add_compile_options(-std=c++11 -g)
 
 if(CLIENT_COMPARE)
     add_compile_options(-D CLIENT_COMPARE)
+    add_definitions(-D BOOST_LOG_DYN_LINK)
 else()
     add_compile_options(-D SERVER_COMPARE)
     add_definitions(-D _GLIBCXX_USE_CXX11_ABI=0)
@@ -49,13 +50,31 @@ set(all_code_files
     ${ALL_RUN_HEADER}
 )
 
+LINK_DIRECTORIES(/usr/local/lib)
+
+
+
 add_executable(${APP_NAME} ${all_code_files})
 target_link_libraries(${APP_NAME} smer)
+
 if(SERVER_COMPARE)
-    target_link_libraries(${APP_NAME} libmysqlcppconn.so)
+    target_link_libraries(${APP_NAME} libmysqlcppconn.so.7.1.1.8)
     target_link_libraries(${APP_NAME} librediscluster.so)
+    target_link_libraries(${APP_NAME} libboost_filesystem.so)
+    target_link_libraries(${APP_NAME} libboost_system.so)
+    target_link_libraries(${APP_NAME} libboost_date_time.so)
     find_package(Threads)
     target_link_libraries(${APP_NAME} ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+if(CLIENT_COMPARE)
+    target_link_libraries(${APP_NAME} libboost_filesystem-mt.dylib)
+    target_link_libraries(${APP_NAME} libboost_system-mt.dylib)
+    target_link_libraries(${APP_NAME} libboost_log-mt.dylib)
+    target_link_libraries(${APP_NAME} libboost_log_setup-mt.dylib)
+    target_link_libraries(${APP_NAME} libboost_thread-mt.dylib)
+    target_link_libraries(${APP_NAME} libboost_date_time-mt.dylib)
+    target_link_libraries(${APP_NAME} libboost_serialization-mt.dylib)
 endif()
 
 

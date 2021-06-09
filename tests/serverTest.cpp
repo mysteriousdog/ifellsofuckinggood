@@ -1,5 +1,5 @@
 #ifdef SERVER_COMPARE
-
+#include "Log.h"
 #include "Zepoll.h"
 #include "redis_pool.h"
 #include <vector>
@@ -11,6 +11,10 @@
 #include "SeqToBin.h"
 #include "Player.h"
 #include <stdio.h>
+#include "ZTime.h"
+#include "FileIO.h"
+#include "Log.h"
+#include <map>
 using namespace std;
 
 
@@ -22,26 +26,27 @@ using namespace std;
 // }
 
 int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
-    cout<<"init   start"<<endl;
+    LOG_INFO("init   start");
     int ret = 0;
     if (!ComManger::getInstance().init()) {
-        cout<<"ComManger init err"<<endl;
+        LOG_ERR("ComManger init err");
         return 0;
     }
     ThreadPool::getInstance().init(threadPoolSize);
+    LOG_INFO("ThreadPool init succ");
+    MyLog& mylog = MyLog::getInstance();
+    ThreadPool::getInstance().enqueue(&MyLog::run, &mylog);
+    LOG_INFO("MyLog init succ");
     MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", mysqlPoolSize, "user");
     Client* client = new Client();
     auto res = ThreadPool::getInstance().enqueue(*client);
-
-    ServerHandler serverhandler(8877);
-	IOLoop::Instance()->start();
-    cout<<"init server complete"<<endl;
+    LOG_INFO("init server complete");
     return ret;
 }
 
 void serverEnd() {
     cout<<"end server  start"<<endl;
-    TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
+    auto obj = make_shared<TransObj>(1,MSG_BUTTON,3, -1);
     sleep(3);
     SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
     cout<<"end server complete"<<endl;
@@ -62,7 +67,7 @@ void testServerInit(size_t threadPoolSize, size_t mysqlPoolSize) {
 
 void testServerEnd() {
     cout<<"end server  start"<<endl;
-    TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
+    auto obj = make_shared<TransObj>(1,MSG_BUTTON,3, -1);
     sleep(3);
     SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
     cout<<"end server complete"<<endl;
@@ -71,12 +76,11 @@ void testServerEnd() {
 bool serverRegTest() {
     char name[] = "zlh";
     char passwd[] = "8219497Pwd!";
-    TransObj* obj = new TransObj(1,MSG_REG, sizeof(passwd) + sizeof(name));
+    auto obj = make_shared<TransObj>(1,MSG_REG, sizeof(passwd) + sizeof(name));
     sprintf((obj->msg), name);
     sprintf((obj->msg) + NAME_MAX_LEN, passwd);
     try
     {
-        cout << hex << (void *)obj << endl;
         handleUserRegMsg(obj, -1);
     }
     catch(const std::exception& e)
@@ -91,12 +95,11 @@ bool serverRegTest() {
 
 bool serverLoginTest() {
     char passwd[] = "8219497Pwd!";
-    TransObj* obj = new TransObj(2,MSG_LOGIN, sizeof(passwd));
+    auto obj = make_shared<TransObj>(2,MSG_LOGIN, sizeof(passwd));
     sprintf((obj->msg) + NAME_MAX_LEN, passwd);
     cout<<"now the input password is "<<obj->msg<<endl;
     try
     {
-        cout << hex << (void *)obj << endl;
         handleUserLogMsg(obj, -1);
     }
     catch(const std::exception& e)
@@ -110,10 +113,9 @@ bool serverLoginTest() {
 }
 
 bool serverLogoutTest() {
-    TransObj* obj = new TransObj(1,MSG_LOGOUT, 1);
+    auto obj = make_shared<TransObj>(1,MSG_LOGOUT, 1);
     try
     {
-        cout << hex << (void *)obj << endl;
         handleUserLogOutMsg(obj, -1);
     }
     catch(const std::exception& e)
@@ -127,13 +129,12 @@ bool serverLogoutTest() {
 }
 
 bool serverAskForFriendTest() {
-    TransObj* obj = new TransObj(1,MSG_ASK_FOR_FRIEND, 1);
+    auto obj = make_shared<TransObj>(1,MSG_ASK_FOR_FRIEND, 1);
     obj->setrecverId(2);
     obj->clearMsg();
     obj->setMsg("lily");
     try
     {
-        cout << hex << (void *)obj << endl;
         handleAskForFriendMsg(obj, -1);
     }
     catch(const std::exception& e)
@@ -147,7 +148,7 @@ bool serverAskForFriendTest() {
 }
 
 bool serverAskForFriendNotFoundTest() {
-    TransObj* obj = new TransObj(1,MSG_ASK_FOR_FRIEND, 1);
+    auto obj = make_shared<TransObj>(1,MSG_ASK_FOR_FRIEND, 1);
     snprintf(obj->msg, NAME_MAX_LEN, "xxx");
     try
     {
@@ -191,13 +192,30 @@ void mysqlTest() {
     assert(passwd == "123");
 }
 
+
+void test_namepasswd()
+{
+    const char* name = "123";
+    const char* passwd = "321";
+    auto obj = make_shared<TransObj>();
+    obj->setName(name);
+    obj->setPasswd(passwd);
+    cout<<obj->getName()<<endl;
+    cout<<obj->getPasswd()<<endl;
+}
+
+
 int main(int argc, char** argv) {
     // testServerInit(4, 4);
     // mysqlTest();
     // testServerEnd();
 
-    serverInit(4, 4);
+    serverInit(6, 4);
+    ServerHandler serverhandler(8877);
+	IOLoop::Instance()->start();
     serverEnd();
+    // test_namepasswd();
+
 	return 0;
 }
 #endif

@@ -1,7 +1,7 @@
 #ifndef __ZEPOLLER_H__
 #define __ZEPOLLER_H__
 #ifdef SERVER_COMPARE
-
+#include "Log.h"
 #include <string>
 #include <netdb.h>
 #include <sys/socket.h>
@@ -57,8 +57,6 @@ public:
 			int nfds = epoll_wait(epfd_, events, MAX_EVENTS, -1/*Timeout*/);
 			for (int i = 0; i < nfds; ++i) {
 				int fd = events[i].data.fd;
-                std::cout << "find fd" << fd << std::endl;
-                std::cout << "find event" << events[i].events << std::endl;
 				Handler* handler = handlers_[fd];
 				handler->handle(events[i]);
 			}
@@ -73,7 +71,7 @@ public:
 		e.events = events;
 
 		if (epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &e) < 0) {
-			std::cout << "Failed to insert handler to epoll" << std::endl;
+			LOG_ERR("Failed to insert handler to epoll" );
 		}
 	}
 
@@ -89,7 +87,6 @@ public:
 		Handler* handler = handlers_[fd];
 		handlers_.erase(fd);
 		delete handler;
-		//将fd从epoll堆删除
 		epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, NULL);
 	}
 
@@ -98,7 +95,7 @@ private:
 	{
 		epfd_ = epoll_create1(0);  //flag=0 等价于epll_craete
 		if (epfd_ < 0) {
-			std::cout << "Failed to create epoll" << std::endl;
+			LOG_ERR("Failed to create epoll");
 			exit(1);
 		}
 	}
@@ -127,10 +124,9 @@ public:
 		{
 			if (received > 0)
 			{
-				std::cout << "Writing: " << buffer << std::endl;
 				if (send(fd, buffer, received, 0) != received)
 				{
-					std::cout << "Error writing to socket" << std::endl;
+					LOG_ERR("Error writing to socket");
 				}
 			}
 
@@ -139,57 +135,24 @@ public:
 
 		if (e.events & EPOLLIN)
 		{
-			std::cout << "read" << std::endl;
 			received = recv(fd, buffer, BUFFER_SIZE, 0);
 			if (received <= 0) {
                 IOLoop::Instance()->removeHandler(fd);
-				std::cout << "Error reading from socket" << std::endl;
+				LOG_ERR("Error reading from socket");
 			}
 			else if (received > 0) {
 				// buffer[received] = 0;
 
 				
 
-				std::cout << "Reading: " <<std::endl;
 				if (strcmp(buffer, "stop") == 0) {
-					std::cout << "stop----" << std::endl;
+					LOG_INFO("epoll stop----");
 				}
-                std::cout << "Writing: " << std::endl;
 				MsgHandler& msgHandler =  MsgHandler::getInstance();
-				TransObj obj;
-				memcpy(&obj, buffer, sizeof(TransObj));
-				cout << hex << (void *)(&obj) << endl;
-				msgHandler.handle(&obj, fd);
-
-				
-
-				// TransObj* obj = new TransObj();
-				// cout<<"obj->msgType "<<obj->msgType<<endl;
-				// cout<<"obj->id "<<obj->id<<endl;
-				// cout<<"obj->len "<<obj->len<<endl;
-				// cout<<"obj->fd "<<obj->fd<<endl;
-				// cout<<"fd "<<fd<<endl;
-				// cout<<"obj->msg "<<obj->getMsg()<<endl;
-				// obj->setFd(fd);
-				// obj->setMsg("hdjsjdhsjdhjs");
-				// SeqToBin::getInstance().getBuff().push(obj);
-				// Command* cmd = (Command*)obj->msg;
-				// Command cmd(0);
-				// memcpy((void*)&cmd, (void*)obj->msg, obj->len);
-				// // CMD_TYPE_UINT32_ENUM a = cmd->getType();
-				// cout<<"cmd->type "<<cmd.getType()<<endl;
-                // if (send(fd, buffer, received, 0) != received)
-				// {
-				// 	std::cout << "Error writing to socket" << std::endl;
-				// }
+				auto obj = make_shared<TransObj>();
+				obj->transBuff2Obj(buffer);
+				msgHandler.handle(obj, fd);
 			}
-
-			// if (received > 0) {
-			// 	IOLoop::Instance()->modifyHandler(fd, EPOLLOUT);
-			// } else {
-			// 	std::cout << "disconnect fd=" << fd << std::endl;
-			// 	IOLoop::Instance()->removeHandler(fd);
-			// }
 		}
 
 		return 0;
@@ -210,7 +173,7 @@ public:
 
 		if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		{
-			std::cout << "Failed to create server socket" << std::endl;
+			LOG_ERR("Failed to create server socket" );
 			exit(1);
 		}
 
@@ -220,17 +183,17 @@ public:
 
 		if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0)
 		{
-			std::cout << "Failed to bind server socket" << std::endl;
+			LOG_ERR("Failed to bind server socket" );
 			exit(1);
 		}
 
 		if (listen(fd, MAX_PENDING) < 0)
 		{
-			std::cout << "Failed to listen on server socket" << std::endl;
+			LOG_ERR("Failed to listen on server socket" );
 			exit(1);
 		}
 		setnonblocking(fd);
-        std::cout << "server !!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		LOG_INFO("server start !!!!!!!!!!!!!!!!!!!!!!!!!");
 		IOLoop::Instance()->addHandler(fd, this, EPOLLIN);
 	}
 
@@ -244,13 +207,11 @@ public:
 
 		if (client < 0)
 		{
-			std::cout << "Error accepting connection" << std::endl;
+			LOG_ERR("Error accepting connection");
 			return -1;
 		}
-
-		std::cout << "accept connected: " << inet_ntoa(client_addr.sin_addr) << std::endl;
+		LOG_INFO("accept connected: "  + string(inet_ntoa(client_addr.sin_addr)));
 		Handler* clientHandler = new EchoHandler();
-		// IOLoop::Instance()->addHandler(client, clientHandler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR);
         IOLoop::Instance()->addHandler(client, clientHandler, EPOLLIN);
 		return 0;
 	}
