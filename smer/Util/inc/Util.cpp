@@ -88,6 +88,7 @@ shared_ptr<TransObj> handleInputOfRegin(string&& input) {
     if(obj->setNamePasswd(res[0].c_str(), res[1].c_str())) {
         return obj;
     }
+    (obj);
     return nullptr;
 }
 
