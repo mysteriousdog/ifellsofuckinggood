@@ -32,6 +32,7 @@ public:
         if (path2file.count(path) > 0 && path2file[path] != nullptr) {
             auto f = path2file[path];
             (*f) << str;
+            (*f).flush();
         } else {
             boost::filesystem::path fpath(path);
             boost::filesystem::fstream* f = new boost::filesystem::fstream(fpath, std::ios_base::app);

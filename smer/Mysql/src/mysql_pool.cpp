@@ -83,7 +83,13 @@ Connection* MysqlPool::CreateConnection()
     {    
         LOG_ERR("un error in MysqlPool::CreateConnection");   
         return nullptr;  
-    }  
+    } catch(const std::exception& e)
+    {
+        LOG_ERR("std::exception error in MysqlPool::CreateConnection");  
+        return nullptr;  
+    }
+    LOG_ERR("unknow error in MysqlPool::CreateConnection"); 
+    return nullptr; 
 }
  
 Connection* MysqlPool::GetConnection()

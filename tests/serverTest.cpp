@@ -32,7 +32,6 @@ int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
         LOG_ERR("ComManger init err");
         return 0;
     }
-    
     ThreadPool::getInstance().init(threadPoolSize);
     LOG_INFO("ThreadPool init succ");
     MyLog& mylog = MyLog::getInstance();
@@ -41,9 +40,6 @@ int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
     MysqlPool::GetInstance().initPool("tcp://127.0.0.1:3306", "root", "353656535132Zlh!", mysqlPoolSize, "user");
     Client* client = new Client();
     auto res = ThreadPool::getInstance().enqueue(*client);
-
-    ServerHandler serverhandler(8877);
-	IOLoop::Instance()->start();
     LOG_INFO("init server complete");
     return ret;
 }
@@ -197,60 +193,29 @@ void mysqlTest() {
 }
 
 
+void test_namepasswd()
+{
+    const char* name = "123";
+    const char* passwd = "321";
+    auto obj = make_shared<TransObj>();
+    obj->setName(name);
+    obj->setPasswd(passwd);
+    cout<<obj->getName()<<endl;
+    cout<<obj->getPasswd()<<endl;
+}
+
+
 int main(int argc, char** argv) {
     // testServerInit(4, 4);
     // mysqlTest();
     // testServerEnd();
 
-    serverInit(4, 4);
-    LOG_ERR("fuck");
-    LOG_DEBUG("fuck2");
-    LOG_INFO("fuck3");
-    LOG_WARNING("fuck4");
+    serverInit(6, 4);
+    ServerHandler serverhandler(8877);
+	IOLoop::Instance()->start();
     serverEnd();
+    // test_namepasswd();
 
-
-    // std::string path = "wwww1.txt";
- 
-    // history history1;
-    // history1.m_id = 20;
-    // history1.m_kk = 20;
-    // history1.m_sec = 20;
-    // history1.name = "abacdefasdfasdfwerwer";
- 
-    // //file path
-    // boost::filesystem::path fpath(path);
-    // boost::filesystem::fstream fstream(fpath, std::ios_base::out);
- 
-    // //write data to file
-    // fstream << history1;
-    // fstream.close();
- 
- 
-    // boost::filesystem::fstream fstream1(fpath, std::ios_base::in);
-    // history history2;
-    // //read data from file
-    // fstream1 >> history2;
- 
-    // std::cout << history2.m_id << std::endl;
-    // std::cout << history2.name << std::endl;
- 
- 
-    // fstream1.close();
-
-
-    // string strPosixTime = Ztime::getInstance().getCurTimeWithYmdhms();
-    // cout<<strPosixTime<<endl;
-    
-    // strPosixTime = Ztime::getInstance().getCurTimeWithYmd();
-    // cout<<strPosixTime<<endl;
-
-    // strPosixTime = Ztime::getInstance().getCurTimeWithHms();
-    // cout<<strPosixTime<<endl;
-
-    // FileIo::getInstance().writeToFile("1.txt", "sghsdghsgd");
-    // LOG_ERR("fuck");
-    // MyLog::getInstance().run();
 	return 0;
 }
 #endif

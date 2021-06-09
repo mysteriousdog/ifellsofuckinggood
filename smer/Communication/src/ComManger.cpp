@@ -10,7 +10,7 @@ bool ComManger::addSessionTalker(int id, string&& name, int fd)
     string idStr = to_string(id);
     string fdStr = to_string(fd);
     if (KGRedisClient::getInstance().ExecSadd(response, "userSession", move(idStr))) {
-        LOG_DEBUG("ComManger::addSessionTalker succ1: ");
+        LOG_DEBUG("ComManger::addSessionTalker succ1: " + name);
         vector<pair<string, string> > keyVals {{"name", name}, {"fd", fdStr}};
 
         if (!KGRedisClient::getInstance().ExecHMset(response, move(idStr),  keyVals)) {

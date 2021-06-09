@@ -267,8 +267,6 @@ void handleUserLogMsg(shared_ptr<TransObj>obj, int fd)
                 return 0;
             }
             obj->setId(id);
-            obj->setName(name);
-            obj->setPasswd(tansPasswd);
             obj->setFd(fd);
             ComManger::getInstance().addSessionTalker(obj->id, string(name), fd);
         }

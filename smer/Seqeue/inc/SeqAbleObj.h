@@ -73,7 +73,8 @@ typedef struct TransObj
             return false;
         }
         clearName();
-        strncpy(msg, name_.c_str(), NAME_MAX_LEN);
+        // strncpy(msg, name_.c_str(), NAME_MAX_LEN);
+        snprintf(msg, NAME_MAX_LEN, name_.c_str());
         return true;
     }
 
@@ -82,7 +83,8 @@ typedef struct TransObj
             return false;
         }
         clearName();
-        strncpy(msg, name_, NAME_MAX_LEN);
+        // strncpy(msg, name_, NAME_MAX_LEN);
+        snprintf(msg, NAME_MAX_LEN, name_);
         return true;
     }
 
@@ -91,7 +93,8 @@ typedef struct TransObj
             return false;
         }
         clearPasswd();
-        strncpy(msg + NAME_MAX_LEN, passwd_.c_str(), PASSWORD_MAX_LEN);
+        // strncpy(msg + NAME_MAX_LEN, passwd_.c_str(), PASSWORD_MAX_LEN);
+        snprintf(msg + NAME_MAX_LEN, PASSWORD_MAX_LEN, passwd_.c_str());
         return true;
     }
 
@@ -100,7 +103,8 @@ typedef struct TransObj
             return false;
         }
         clearPasswd();
-        strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
+        // strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
+        snprintf(msg + NAME_MAX_LEN, PASSWORD_MAX_LEN, passwd_);
         return true;
     }
 
@@ -109,8 +113,10 @@ typedef struct TransObj
             return false;
         }
         clearMsg();
-        strncpy(msg, name_, NAME_MAX_LEN);
-        strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
+        setName(name_);
+        setPasswd(passwd_);
+        // strncpy(msg, name_, NAME_MAX_LEN);
+        // strncpy(msg + NAME_MAX_LEN, passwd_, PASSWORD_MAX_LEN);
         return true;
     }
 
@@ -154,7 +160,7 @@ typedef struct TransObj
         return fd;
     }
 
-    ~TransObj(){std::cout<<"~TransObj() "<<std::endl;}
+    ~TransObj(){}
 } tansObj;
 
 typedef struct SystemMsgObj
