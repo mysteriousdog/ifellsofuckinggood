@@ -53,7 +53,7 @@ bool Client::run()
     int objSize = sizeof(TransObj);
     LOG_INFO("client thread begin !! ");
     while (true) {
-        TransObj* tansObj = seq.getBuff().pop();
+        shared_ptr<TransObj> tansObj = seq.getBuff().pop();
         if (tansObj == nullptr) {
             continue;
         }
@@ -62,7 +62,7 @@ bool Client::run()
             break;
         }
         memset(buf, 0, MAX_LEN_OF_SEND_BUFF);
-        memcpy((void*)buf, (void*)tansObj, objSize);
+        memcpy((void*)buf, (void*)(tansObj.get()), objSize);
         // memcpy((void*)((TransObj*)buf)->msg, tansObj->msg, tansObj->len);
         sendLen = objSize;
 #ifdef SERVER_COMPARE
@@ -77,7 +77,6 @@ bool Client::run()
             LOG_ERR("send from client err ...");
         }
 #endif
-        delete(tansObj);
     }
 
     close(client);
@@ -89,10 +88,9 @@ bool Client::recvMsg()
     LOG_INFO("rcv msg!!! ");
     char rcvBuf[512] = {0};
     while (recv(client, rcvBuf, sizeof(rcvBuf), 0) > 0) {
-        TransObj* recvTansObj = new TransObj();
+        auto recvTansObj = make_shared<TransObj>();
         if (!recvTansObj->transBuff2Obj(rcvBuf)) {
             LOG_ERR("recvTansObj->transBuff2Obj err ...");
-            delete(recvTansObj);
             continue;
         }
         SeqToBin::getInstance().getRcvBuff().push(recvTansObj);

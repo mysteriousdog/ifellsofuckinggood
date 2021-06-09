@@ -20,15 +20,15 @@ class Client;
 class SeqToBin : public Singleton<SeqToBin>
 {
 public:
-    void save2Bin(SeqAbleObj& obj)
-    {
-        tansObj* tansObj = obj.getSeqData();
-        buff.push(tansObj);
-    }
-    ConcQueue<tansObj*>& getBuff() {
+    // void save2Bin(SeqAbleObj& obj)
+    // {
+    //     tansObj* tansObj = obj.getSeqData();
+    //     buff.push(tansObj);
+    // }
+    ConcQueue<shared_ptr<TransObj>>& getBuff() {
         return buff;
     }
-    ConcQueue<tansObj*>& getRcvBuff() {
+    ConcQueue<shared_ptr<TransObj>>& getRcvBuff() {
         return rcvBuff;
     }
     SystemMsgObj* tryGetSysMsg() {
@@ -38,8 +38,8 @@ public:
         sysBuff.push(sysObj);
     }
 private:
-    ConcQueue<tansObj*> buff;
-    ConcQueue<tansObj*> rcvBuff;
+    ConcQueue<shared_ptr<TransObj>> buff;
+    ConcQueue<shared_ptr<TransObj>> rcvBuff;
     ConcQueue<SystemMsgObj*> sysBuff;
 friend class Singleton;
 friend class client;

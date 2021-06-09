@@ -38,7 +38,7 @@ msgHandle g_msgHandle[] = {
     {MSG_ASK_FOR_FRIEND_ACCEPT, handleAskForFriendAcceptMsg}
 };
 
-void MsgHandler::handle(TransObj* obj, int fd)
+void MsgHandler::handle(shared_ptr<TransObj>obj, int fd)
 {
     if (obj == nullptr) {
         return;
@@ -52,7 +52,7 @@ void MsgHandler::handle(TransObj* obj, int fd)
     }
 }
 
-void handleUserConnectMsg(TransObj* obj, int fd) {
+void handleUserConnectMsg(shared_ptr<TransObj>obj, int fd) {
     if (obj == nullptr) {
         return;
     }
@@ -64,7 +64,7 @@ void handleUserConnectMsg(TransObj* obj, int fd) {
 
 }
 
-void handleUserSendMsg(TransObj* obj, int fd) {
+void handleUserSendMsg(shared_ptr<TransObj>obj, int fd) {
 
     if (obj == nullptr) {
         LOG_ERR("get in handleUserSendMsg err nullptr ");
@@ -90,7 +90,7 @@ void handleUserSendMsg(TransObj* obj, int fd) {
 #endif
 }
 
-void handleMsgCmd(TransObj* obj, int fd) {
+void handleMsgCmd(shared_ptr<TransObj>obj, int fd) {
     Command *cmd = (Command*)obj->msg;
 #ifdef CLIENT_COMPARE
     if (fd == -1) {
@@ -100,18 +100,18 @@ void handleMsgCmd(TransObj* obj, int fd) {
     }
 #endif
 #ifdef SERVER_COMPARE
-    auto userMap = ComManger::getInstance().getAllUserMap();
-    // SeqToBin& seq = SeqToBin::getInstance();
-    for (auto iter = userMap.begin(); iter != userMap.end(); iter++) {
-        if (send(iter->second, (void*)obj, obj->len, 0) != obj->len)
-        {
-            LOG_ERR("Error writing to socket" );
-        }
-    }
+    // auto userMap = ComManger::getInstance().getAllUserMap();
+    // // SeqToBin& seq = SeqToBin::getInstance();
+    // for (auto iter = userMap.begin(); iter != userMap.end(); iter++) {
+    //     if (send(iter->second, (void*)obj, obj->len, 0) != obj->len)
+    //     {
+    //         LOG_ERR("Error writing to socket" );
+    //     }
+    // }
 #endif
 }
 
-void handleUserRegMsg(TransObj* obj, int fd)
+void handleUserRegMsg(shared_ptr<TransObj>obj, int fd)
 {
     if (obj == nullptr) {
         LOG_ERR("client handleUserRegMsg err nullptr!");
@@ -124,17 +124,17 @@ void handleUserRegMsg(TransObj* obj, int fd)
 
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
         LOG_INFO("do reg!  fd-> " + to_string(fd));
-        TransObj* sendObj = new TransObj();
-        sendObj->setFd(fd);
+        auto sendObj = make_shared<TransObj>();
+        obj->setFd(fd);
         const char* name = obj->getName();
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password from userinfo where username = \'%s\';", name);
         if (msqlResSet->next()) {
             delete(msqlResSet);
             LOG_ERR("name reg exists already " + string(name));
-            // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
-            sendObj->setMsgType(MSG_REG_REFUSE);
-            sendObj->setMsg("regin err! name reg exists already!");
-            SeqToBin::getInstance().getBuff().push(sendObj);
+            // shared_ptr<TransObj>tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
+            obj->setMsgType(MSG_REG_REFUSE);
+            obj->setMsg("regin err! name reg exists already!");
+            SeqToBin::getInstance().getBuff().push(obj);
             return 0;
         }
         const char* passwd = obj->getPasswd();
@@ -142,27 +142,27 @@ void handleUserRegMsg(TransObj* obj, int fd)
         bool res = MysqlPool::GetInstance().ExecInsert("insert into userinfo (username, fd, password) values(\'%s\', %d, \'%s\');", name, int(fd), passwd);
         if (res) {
             auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select max(userid) as id from userinfo;");
-            // TransObj* tansObj = new TransObj(-1, MSG_REG_ACCEPT, 1, fd);
-            sendObj->setMsgType(MSG_REG_ACCEPT);
+            // shared_ptr<TransObj>tansObj = new TransObj(-1, MSG_REG_ACCEPT, 1, fd);
+            obj->setMsgType(MSG_REG_ACCEPT);
             if (!msqlResSet->next()) {
                 // tansObj->setMsgType(MSG_REG_REFUSE);
-                sendObj->setMsgType(MSG_REG_REFUSE);
-                sendObj->setMsg("regin err no found current id! \n");
+                obj->setMsgType(MSG_REG_REFUSE);
+                obj->setMsg("regin err no found current id! \n");
             } else {
                 int id  = msqlResSet->getInt("id");
                 // tansObj->setId(id);
-                sendObj->setId(id);
-                sendObj->setMsg("regin accepted! \n");
+                obj->setId(id);
+                obj->setMsg("regin accepted! \n");
             }
-            SeqToBin::getInstance().getBuff().push(sendObj);
+            SeqToBin::getInstance().getBuff().push(obj);
             
             return 1;
         }
         LOG_ERR("handleUserRegMsg insert failed ");
-        // TransObj* tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
-        sendObj->setMsgType(MSG_REG_REFUSE);
-        sendObj->setMsg("regin err! insert error!\n");
-        SeqToBin::getInstance().getBuff().push(sendObj);
+        // shared_ptr<TransObj>tansObj = new TransObj(-1, MSG_REG_REFUSE, 1, fd);
+        obj->setMsgType(MSG_REG_REFUSE);
+        obj->setMsg("regin err! insert error!\n");
+        SeqToBin::getInstance().getBuff().push(obj);
         return res ? 1: 0;
     });
 #endif
@@ -174,7 +174,7 @@ void handleUserRegMsg(TransObj* obj, int fd)
 
 }
 
-void handleUserRegRefusedMsg(TransObj* obj, int fd)
+void handleUserRegRefusedMsg(shared_ptr<TransObj>obj, int fd)
 {
     if (obj == nullptr) {
         LOG_ERR("client handleUserRegRefusedMsg err nullptr!");
@@ -190,7 +190,7 @@ void handleUserRegRefusedMsg(TransObj* obj, int fd)
 #endif
 }
 
-void handleUserRegAcceptedMsg(TransObj* obj, int fd)
+void handleUserRegAcceptedMsg(shared_ptr<TransObj>obj, int fd)
 {
     if (obj == nullptr) {
         LOG_ERR("client handleUserRegAcceptedMsg err nullptr!");
@@ -211,7 +211,7 @@ void handleUserRegAcceptedMsg(TransObj* obj, int fd)
 }
 
 
-void handleUserLogMsg(TransObj* obj, int fd)
+void handleUserLogMsg(shared_ptr<TransObj>obj, int fd)
 {
     if (obj == nullptr) {
         LOG_ERR("get in handleUserLogMsg err nullptr");
@@ -220,24 +220,22 @@ void handleUserLogMsg(TransObj* obj, int fd)
 #ifdef SERVER_COMPARE
     ThreadPool::getInstance().enqueue([obj, fd] () mutable {
 
-        TransObj* sendObj = new TransObj();
-
         if (obj->len > MAX_TRANS_MSG_LEN) {
             LOG_ERR("msg len too long! -> " + to_string(obj->len));
-            sendObj->setMsgType(MSG_LOGIN_REFUSE);
-            sendObj->setMsg("Login err! msg len too long! \n");
-            SeqToBin::getInstance().getBuff().push(sendObj);
+            obj->setMsgType(MSG_LOGIN_REFUSE);
+            obj->setMsg("Login err! msg len too long! \n");
+            SeqToBin::getInstance().getBuff().push(obj);
             return 0;
         }
         const char* name = obj->getName();
         auto msqlResSet = MysqlPool::GetInstance().ExecQuery("select password, userid from userinfo where username = \'%s\';", name);
         if (msqlResSet == nullptr) {
             LOG_ERR("no find name -> " + string(name));
-            // TransObj* tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
+            // shared_ptr<TransObj>tansObj = new TransObj(id, MSG_LOGIN_REFUSE, 1, fd);
             // SeqToBin::getInstance().getBuff().push(tansObj);
-            sendObj->setMsgType(MSG_LOGIN_REFUSE);
-            sendObj->setMsg("Login err! not found name\n");
-            SeqToBin::getInstance().getBuff().push(sendObj);
+            obj->setMsgType(MSG_LOGIN_REFUSE);
+            obj->setMsg("Login err! not found name\n");
+            SeqToBin::getInstance().getBuff().push(obj);
             delete(msqlResSet);
             return 0;
         }
@@ -247,9 +245,9 @@ void handleUserLogMsg(TransObj* obj, int fd)
 
             if (strcmp(tansPasswd, relPasswd.c_str()) != 0) {
                 LOG_INFO("password not equal! -> " + string(tansPasswd));
-                sendObj->setMsgType(MSG_LOGIN_REFUSE);
-                sendObj->setMsg("Login err! password not equal!\n");
-                SeqToBin::getInstance().getBuff().push(sendObj);
+                obj->setMsgType(MSG_LOGIN_REFUSE);
+                obj->setMsg("Login err! password not equal!\n");
+                SeqToBin::getInstance().getBuff().push(obj);
                 delete(msqlResSet);
                 return 0;
             }
@@ -262,20 +260,20 @@ void handleUserLogMsg(TransObj* obj, int fd)
             {
                 std::cerr << e.what() << '\n';
                 LOG_INFO("id not find! -> " + string(e.what()));
-                sendObj->setMsgType(MSG_LOGIN_REFUSE);
-                sendObj->setMsg("Login err! id not found!\n");
-                SeqToBin::getInstance().getBuff().push(sendObj);
+                obj->setMsgType(MSG_LOGIN_REFUSE);
+                obj->setMsg("Login err! id not found!\n");
+                SeqToBin::getInstance().getBuff().push(obj);
                 delete(msqlResSet);
                 return 0;
             }
-            sendObj->setId(id);
-            sendObj->setName(name);
-            sendObj->setPasswd(tansPasswd);
-            sendObj->setFd(fd);
-            ComManger::getInstance().addSessionTalker(sendObj->id, string(name), fd);
+            obj->setId(id);
+            obj->setName(name);
+            obj->setPasswd(tansPasswd);
+            obj->setFd(fd);
+            ComManger::getInstance().addSessionTalker(obj->id, string(name), fd);
         }
-        sendObj->setMsgType(MSG_LOGIN_ACCEPT);
-        SeqToBin::getInstance().getBuff().push(sendObj);
+        obj->setMsgType(MSG_LOGIN_ACCEPT);
+        SeqToBin::getInstance().getBuff().push(obj);
         delete(msqlResSet);
         
         return 1;
@@ -287,7 +285,7 @@ void handleUserLogMsg(TransObj* obj, int fd)
 #endif
 }
 
-void handleUserLogRefusedMsg(TransObj* obj, int fd)
+void handleUserLogRefusedMsg(shared_ptr<TransObj>obj, int fd)
 {
     if (obj == nullptr) {
         LOG_ERR("get in handleUserLogRefusedMsg err nullptr");
@@ -303,7 +301,7 @@ void handleUserLogRefusedMsg(TransObj* obj, int fd)
 #endif
 }
 
-void handleUserLogAcceptedMsg(TransObj* obj, int fd)
+void handleUserLogAcceptedMsg(shared_ptr<TransObj>obj, int fd)
 {
     if (obj == nullptr) {
         LOG_ERR("get in handleUserLogAcceptedMsg err nullptr");
@@ -322,7 +320,7 @@ void handleUserLogAcceptedMsg(TransObj* obj, int fd)
 }
 
 
-void handleUserLogOutMsg(TransObj* obj, int fd)
+void handleUserLogOutMsg(shared_ptr<TransObj>obj, int fd)
 {
 #ifdef SERVER_COMPARE
     ThreadPool::getInstance().enqueue([obj] {
@@ -335,7 +333,7 @@ void handleUserLogOutMsg(TransObj* obj, int fd)
 #endif
 }
 
-void handleAskForFriendMsg(TransObj* obj, int fd) {
+void handleAskForFriendMsg(shared_ptr<TransObj>obj, int fd) {
 
     if (obj == nullptr) {
         LOG_ERR("get in handleAskForFriendMsg err nullptr");
@@ -383,7 +381,7 @@ void handleAskForFriendMsg(TransObj* obj, int fd) {
 #endif
 }
 
-void handleAskForFriendNotFoundMsg(TransObj* obj, int fd)
+void handleAskForFriendNotFoundMsg(shared_ptr<TransObj>obj, int fd)
 {
     if (obj == nullptr) {
         LOG_ERR("get in handleAskForFriendNotFoundMsg err nullptr");
@@ -400,7 +398,7 @@ void handleAskForFriendNotFoundMsg(TransObj* obj, int fd)
 }
 
 
-void handleAskForFriendAcceptMsg(TransObj* obj, int fd)
+void handleAskForFriendAcceptMsg(shared_ptr<TransObj>obj, int fd)
 {
 
     if (obj == nullptr) {

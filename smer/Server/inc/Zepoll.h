@@ -149,9 +149,9 @@ public:
 					LOG_INFO("epoll stop----");
 				}
 				MsgHandler& msgHandler =  MsgHandler::getInstance();
-				TransObj obj = new TransObj();
-				memcpy(obj, buffer, sizeof(TransObj));
-				msgHandler.handle(&obj, fd);
+				auto obj = make_shared<TransObj>();
+				obj->transBuff2Obj(buffer);
+				msgHandler.handle(obj, fd);
 			}
 		}
 

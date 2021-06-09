@@ -50,7 +50,7 @@ int serverInit(size_t threadPoolSize, size_t mysqlPoolSize) {
 
 void serverEnd() {
     cout<<"end server  start"<<endl;
-    TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
+    auto obj = make_shared<TransObj>(1,MSG_BUTTON,3, -1);
     sleep(3);
     SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
     cout<<"end server complete"<<endl;
@@ -71,7 +71,7 @@ void testServerInit(size_t threadPoolSize, size_t mysqlPoolSize) {
 
 void testServerEnd() {
     cout<<"end server  start"<<endl;
-    TransObj* obj = new TransObj(1,MSG_BUTTON,3, -1);
+    auto obj = make_shared<TransObj>(1,MSG_BUTTON,3, -1);
     sleep(3);
     SeqToBin::getInstance().getBuff().waitPushTillEmpty(obj);
     cout<<"end server complete"<<endl;
@@ -80,12 +80,11 @@ void testServerEnd() {
 bool serverRegTest() {
     char name[] = "zlh";
     char passwd[] = "8219497Pwd!";
-    TransObj* obj = new TransObj(1,MSG_REG, sizeof(passwd) + sizeof(name));
+    auto obj = make_shared<TransObj>(1,MSG_REG, sizeof(passwd) + sizeof(name));
     sprintf((obj->msg), name);
     sprintf((obj->msg) + NAME_MAX_LEN, passwd);
     try
     {
-        cout << hex << (void *)obj << endl;
         handleUserRegMsg(obj, -1);
     }
     catch(const std::exception& e)
@@ -100,12 +99,11 @@ bool serverRegTest() {
 
 bool serverLoginTest() {
     char passwd[] = "8219497Pwd!";
-    TransObj* obj = new TransObj(2,MSG_LOGIN, sizeof(passwd));
+    auto obj = make_shared<TransObj>(2,MSG_LOGIN, sizeof(passwd));
     sprintf((obj->msg) + NAME_MAX_LEN, passwd);
     cout<<"now the input password is "<<obj->msg<<endl;
     try
     {
-        cout << hex << (void *)obj << endl;
         handleUserLogMsg(obj, -1);
     }
     catch(const std::exception& e)
@@ -119,10 +117,9 @@ bool serverLoginTest() {
 }
 
 bool serverLogoutTest() {
-    TransObj* obj = new TransObj(1,MSG_LOGOUT, 1);
+    auto obj = make_shared<TransObj>(1,MSG_LOGOUT, 1);
     try
     {
-        cout << hex << (void *)obj << endl;
         handleUserLogOutMsg(obj, -1);
     }
     catch(const std::exception& e)
@@ -136,13 +133,12 @@ bool serverLogoutTest() {
 }
 
 bool serverAskForFriendTest() {
-    TransObj* obj = new TransObj(1,MSG_ASK_FOR_FRIEND, 1);
+    auto obj = make_shared<TransObj>(1,MSG_ASK_FOR_FRIEND, 1);
     obj->setrecverId(2);
     obj->clearMsg();
     obj->setMsg("lily");
     try
     {
-        cout << hex << (void *)obj << endl;
         handleAskForFriendMsg(obj, -1);
     }
     catch(const std::exception& e)
@@ -156,7 +152,7 @@ bool serverAskForFriendTest() {
 }
 
 bool serverAskForFriendNotFoundTest() {
-    TransObj* obj = new TransObj(1,MSG_ASK_FOR_FRIEND, 1);
+    auto obj = make_shared<TransObj>(1,MSG_ASK_FOR_FRIEND, 1);
     snprintf(obj->msg, NAME_MAX_LEN, "xxx");
     try
     {

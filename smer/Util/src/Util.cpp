@@ -57,12 +57,12 @@ bool splitInputStr2NameAndPwd(vector<string>& res, string&& input) {
     return true;
 }
 
-TransObj* handleInputOfLogin(string&& input) {
+shared_ptr<TransObj> handleInputOfLogin(string&& input) {
     vector<string> res;
     if (!splitInputStr2NameAndPwd(res, move(input))) {
         return nullptr;
     }
-    TransObj* obj = new TransObj(-1, -1, MSG_LOGIN, MAX_TRANS_MSG_LEN, -1);
+    auto obj = make_shared<TransObj>(-1, -1, MSG_LOGIN, MAX_TRANS_MSG_LEN, -1);
     if(obj->setNamePasswd(res[0].c_str(), res[1].c_str())) {
         return obj;
     }
@@ -71,21 +71,21 @@ TransObj* handleInputOfLogin(string&& input) {
     return nullptr;
 }
 
-TransObj* handleInputOfLogout(string&& input) {
+shared_ptr<TransObj> handleInputOfLogout(string&& input) {
     if (IOManger::getInstance().tryLoginFirst()) {
         return nullptr;
     }
-    TransObj* obj = new TransObj(-1, -1, MSG_LOGOUT, -1, -1);
+    auto obj = make_shared<TransObj>(-1, -1, MSG_LOGOUT, -1, -1);
     obj->setMsgType(MSG_LOGOUT);
     return obj;
 }
 
-TransObj* handleInputOfRegin(string&& input) {
+shared_ptr<TransObj> handleInputOfRegin(string&& input) {
     vector<string> res;
     if (!splitInputStr2NameAndPwd(res, move(input))) {
         return nullptr;
     }
-    TransObj* obj = new TransObj(-1, -1, MSG_REG, MAX_TRANS_MSG_LEN, -1);
+    auto obj = make_shared<TransObj>(-1, -1, MSG_REG, MAX_TRANS_MSG_LEN, -1);
     if(obj->setNamePasswd(res[0].c_str(), res[1].c_str())) {
         return obj;
     }
@@ -93,7 +93,7 @@ TransObj* handleInputOfRegin(string&& input) {
     return nullptr;
 }
 
-TransObj* handleInputOfAskForFriend(string&& input) {
+shared_ptr<TransObj> handleInputOfAskForFriend(string&& input) {
     if (IOManger::getInstance().tryLoginFirst()) {
         return nullptr;
     }
@@ -101,12 +101,12 @@ TransObj* handleInputOfAskForFriend(string&& input) {
         LOG_INFO("name length should be in " + to_string(NAME_MAX_LEN - 1));
         return nullptr;
     }
-    TransObj* obj = new TransObj(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
+    auto obj = make_shared<TransObj>(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
     obj->setMsg(input.c_str());
     return obj;
 }
 
-TransObj* handleInputOfChoseTalker(string&& input) {
+shared_ptr<TransObj> handleInputOfChoseTalker(string&& input) {
     if (IOManger::getInstance().tryLoginFirst()) {
         return nullptr;
     }
@@ -116,12 +116,12 @@ TransObj* handleInputOfChoseTalker(string&& input) {
     }
     // 首先要判断这个人存不存在 然后判断是不是好友 最后判断是不是在线
     Player::getInstance().setTalkerName(move(input));
-    TransObj* obj = new TransObj(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
+    auto obj = make_shared<TransObj>(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
     obj->setMsg(input.c_str());
     return obj;
 }
 
-TransObj* handleInputOfShowFriends(string&& input) {
+shared_ptr<TransObj> handleInputOfShowFriends(string&& input) {
     if (IOManger::getInstance().tryLoginFirst()) {
         return nullptr;
     }
@@ -131,7 +131,7 @@ TransObj* handleInputOfShowFriends(string&& input) {
     return nullptr;
 }
 
-TransObj* handleInputOfShowRequests(string&& input)
+shared_ptr<TransObj> handleInputOfShowRequests(string&& input)
 {
     if (IOManger::getInstance().tryLoginFirst()) {
         return nullptr;
@@ -147,14 +147,14 @@ TransObj* handleInputOfShowRequests(string&& input)
     return nullptr;
 }
 
-TransObj* handleInputOfAccRequest(string&& input)
+shared_ptr<TransObj> handleInputOfAccRequest(string&& input)
 {
     if (IOManger::getInstance().tryLoginFirst()) {
         return nullptr;
     }
     int index = atoi(input.c_str());
     if (SysManger::getInstance().containsReqIdx(index)) {
-        TransObj* reqObj = nullptr;
+        shared_ptr<TransObj> reqObj = nullptr;
         if (!SysManger::getInstance().getOneRequest(index, reqObj)) {
             shared_ptr<stringstream> ss = make_shared<stringstream>();
             (*ss)<<"Your command of accept the request send err"<<" \n";
@@ -164,7 +164,7 @@ TransObj* handleInputOfAccRequest(string&& input)
         }
         int recvId = reqObj->id;
         string name = reqObj->msg;
-        TransObj* obj = new TransObj(Player::getInstance().getPlayerId(), recvId, MSG_ASK_FOR_FRIEND_ACCEPT, MAX_TRANS_MSG_LEN, -1);
+        auto obj = make_shared<TransObj>(Player::getInstance().getPlayerId(), recvId, MSG_ASK_FOR_FRIEND_ACCEPT, MAX_TRANS_MSG_LEN, -1);
         shared_ptr<stringstream> ss = make_shared<stringstream>();
         (*ss)<<"Your command of accept the request have been send"<<" \n";
         SystemMsgObj *sysObj = new SystemMsgObj(SYS_OUTPUT_MSG, ss);
@@ -184,7 +184,7 @@ void Util::splitStr(vector<string>& res, string&& source, string&& fg)
     boost::split(res, source, boost::is_any_of(fg));
 }
 
-TransObj* Util::getMsgFromInput(string&& input)
+shared_ptr<TransObj> Util::getMsgFromInput(string&& input)
 {
     vector<string> res;
     splitStr(res, move(input), INPUTSTR_SPLIT_FLAG);
@@ -200,7 +200,7 @@ TransObj* Util::getMsgFromInput(string&& input)
         if (input.length() >= MAX_TRANS_MSG_LEN || input.length() <= 0) {
             LOG_INFO("name length should be in 1 ~ " + to_string(MAX_TRANS_MSG_LEN));
         }
-        TransObj* obj = new TransObj(1, 1, MSG_TALK, 1, 1);
+        auto obj = make_shared<TransObj>(1, 1, MSG_TALK, 1, 1);
         obj->setMsg(input.c_str());
         // 设置talk对象 recverId_
         return obj;
@@ -218,7 +218,7 @@ TransObj* Util::getMsgFromInput(string&& input)
 }
 
 
-TransObj* handleInputOfShowMySelf(string&& input)
+shared_ptr<TransObj> handleInputOfShowMySelf(string&& input)
 {
     int id = Player::getInstance().getPlayerId();
     string name = Player::getInstance().getPlayerName();
