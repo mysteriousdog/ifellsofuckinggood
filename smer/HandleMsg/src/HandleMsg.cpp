@@ -369,10 +369,9 @@ void handleAskForFriendMsg(shared_ptr<TransObj>obj, int fd) {
     if (obj == nullptr) {
         return;
     }
-    char* name = obj->msg;
     shared_ptr<stringstream> ss = make_shared<stringstream>();
     (*ss)<<"You have a request from ";
-    (*ss)<<name;
+    (*ss)<<obj->getName();
     auto sysObj = make_shared<SystemMsgObj>(SYS_OUTPUT_MSG, ss);
     SeqToBin::getInstance().putSysMsg(sysObj);
     SysManger::getInstance().pushBackReq(obj);

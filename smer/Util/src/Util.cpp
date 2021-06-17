@@ -99,7 +99,8 @@ shared_ptr<TransObj> handleInputOfAskForFriend(string&& input) {
         LOG_INFO("name length should be in " + to_string(NAME_MAX_LEN - 1));
         return nullptr;
     }
-    auto obj = make_shared<TransObj>(-1, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
+    int id = Player::getInstance().getPlayerId();
+    auto obj = make_shared<TransObj>(id, -1, MSG_ASK_FOR_FRIEND, MAX_TRANS_MSG_LEN, -1);
     obj->setMsg(input.c_str());
     return obj;
 }
