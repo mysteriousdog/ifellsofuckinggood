@@ -85,7 +85,7 @@ public:
     bool eraseOneReq(int index) {
        return reqBuff.erase(index);
     }
-    void getAllRequests(list<shared_ptr<TransObj>> reqs) {
+    void getAllRequests(list<shared_ptr<TransObj>>& reqs) {
         reqBuff.getAllData(reqs);
     }
     bool containsReqIdx(int index) {

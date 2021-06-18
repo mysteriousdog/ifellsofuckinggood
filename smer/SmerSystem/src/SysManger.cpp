@@ -43,7 +43,7 @@ void SysManger::handleSysMsgOfShowAskForFriendReq(shared_ptr<SystemMsgObj> sysOb
     (*ss)<<"All requests list down here: \n";
     int i = 0;
     for (auto it = reqs.begin(); it != reqs.end(); it++) {
-        (*ss)<<i<<": "<<(*it)->msg<<" \n";
+        (*ss)<<i++<<": "<<(*it)->msg<<" \n";
     }
     IOManger::getInstance().putOutputMsg(ss);
 }
